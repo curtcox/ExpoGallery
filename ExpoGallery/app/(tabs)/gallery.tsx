@@ -14,6 +14,7 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
+      {exampleRow('deviceid',       'Device ID',      'pricetag',               'deviceid-example')}
       {exampleRow('chat',           'Chat',           'chatbubble-outline',     'chat-example')}
       {exampleRow('icons',          'Icons',          'images-sharp',           'guides/icons/')}
       {exampleRow('map',            'Map',            'map-outline',            'versions/latest/sdk/map-view/')}
