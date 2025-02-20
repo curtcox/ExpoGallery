@@ -14,13 +14,15 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      {exampleRow('deviceid',       'Device ID',      'pricetag',               'deviceid-example')}
+      {exampleRow('device-id',      'Device ID',      'pricetag',               'versions/latest/sdk/device/')}
+      {exampleRow('device-info',    'Device Info',    'information',            'https://stackoverflow.com/questions/46863644/expo-get-unique-device-id-without-ejecting')}
       {exampleRow('chat',           'Chat',           'chatbubble-outline',     'chat-example')}
       {exampleRow('icons',          'Icons',          'images-sharp',           'guides/icons/')}
       {exampleRow('map',            'Map',            'map-outline',            'versions/latest/sdk/map-view/')}
       {exampleRow('map-pins',       'Map Pins',       'pin-outline',            'map-pins-example')}
       {exampleRow('fetch',          'Fetch',          'cloud-download-outline', 'versions/latest/sdk/expo/#api')}
       {exampleRow('local-storage',  'Local Storage',  'folder-outline',         'versions/latest/sdk/filesystem/')}
+      {exampleRow('secure-storage', 'Secure Storage', 'lock-closed',            'versions/latest/sdk/securestore/')}
       {exampleRow('json',           'JSON',           'code-outline',           'json-example')}
       {exampleRow('external-app',   'External App',   'open-outline',           'linking/into-other-apps/')}
       {exampleRow('text-to-speech', 'Text to Speech', 'volume-high-outline',    'versions/latest/sdk/speech/')}
