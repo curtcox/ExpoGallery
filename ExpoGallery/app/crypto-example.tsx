@@ -4,6 +4,7 @@ import * as Crypto from 'expo-crypto';
 
 export default function HomeScreen() {
   const [digest, setDigest] = useState<string>('');
+  const [uuid, setUuid] = useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -12,13 +13,18 @@ export default function HomeScreen() {
         'GitHub stars are neat 🌟'
       );
       setDigest(digest);
+
+      const newUuid = Crypto.randomUUID();
+      setUuid(newUuid);
     })();
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Crypto Module Example</Text>
+      <Text>Crypto SHA256 Example</Text>
       <Text style={styles.digestText}>{digest}</Text>
+      <Text style={styles.titleText}>Random UUID Example</Text>
+      <Text style={styles.digestText}>{uuid}</Text>
     </View>
   );
 }
@@ -34,5 +40,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 12,
     fontFamily: 'monospace',
+  },
+  titleText: {
+    marginTop: 20,
   },
 });
