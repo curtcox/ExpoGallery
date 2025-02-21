@@ -14,9 +14,10 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      {exampleRow('device-id',      'Device ID',      'pricetag',               'versions/latest/sdk/device/')}
-      {exampleRow('device-info',    'Device Info',    'information',            'https://stackoverflow.com/questions/46863644/expo-get-unique-device-id-without-ejecting')}
+      {exampleRow('device-id',      'Device ID',      'pricetag',               'https://stackoverflow.com/questions/46863644/expo-get-unique-device-id-without-ejecting')}
+      {exampleRow('device-info',    'Device Info',    'information',            'versions/latest/sdk/device/')}
       {exampleRow('chat',           'Chat',           'chatbubble-outline',     'chat-example')}
+      {exampleRow('crypto',         'Crypto',         'key',                    'latest/sdk/crypto/')}
       {exampleRow('icons',          'Icons',          'images-sharp',           'guides/icons/')}
       {exampleRow('map',            'Map',            'map-outline',            'versions/latest/sdk/map-view/')}
       {exampleRow('map-pins',       'Map Pins',       'pin-outline',            'map-pins-example')}
