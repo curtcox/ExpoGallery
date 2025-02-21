@@ -2,7 +2,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useColorScheme, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const DATA = Array(10000)
+const DATA = Array(1000)
   .fill(0)
   .map((_, v) => ({ index: v }));
 

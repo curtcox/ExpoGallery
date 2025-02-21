@@ -1,21 +1,31 @@
 import React from 'react';
 import {StyleSheet, Button, Alert, Platform} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
+import { info } from './log-example';
+import { useEffect } from 'react';
+
+const handlePress = (buttonType: string) => {
+  const message = `${buttonType} Pressed`;
+  info(message);
+  console.log(message);
+};
+
+export const oneButtonAlert = (message: string) => {
+  if (Platform.OS === 'web') {
+    window.alert(message);
+    handlePress('OK');
+  } else {
+    Alert.alert('Alert Title', message, [
+      {text: 'OK', onPress: () => handlePress('OK')},
+    ]);
+  }
+};
 
 export default function HomeScreen() {
-  const handlePress = (buttonType: string) => {
-    console.log(`${buttonType} Pressed`);
-  };
 
-  const createOneButtonAlert = () => {
-    if (Platform.OS === 'web') {
-      window.alert('My Alert Msg');
-    } else {
-      Alert.alert('Alert Title', 'My Alert Msg', [
-        {text: 'OK', onPress: () => handlePress('OK')},
-      ]);
-    }
-  };
+  useEffect(() => {
+    info('Viewing Alert Example');
+  }, []);
 
   const createTwoButtonAlert = () => {
     if (Platform.OS === 'web') {
@@ -66,7 +76,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <Button title={'1-Button Alert'} onPress={createOneButtonAlert} />
+        <Button title={'1-Button Alert'} onPress={() => oneButtonAlert('My Alert Msg')} />
         <Button title={'2-Button Alert'} onPress={createTwoButtonAlert} />
         <Button title={'3-Button Alert'} onPress={createThreeButtonAlert} />
       </SafeAreaView>
