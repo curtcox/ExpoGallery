@@ -14,6 +14,9 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
+      {exampleRow('alert',          'Alert',          'folder-outline',         'https://reactnative.dev/docs/alert')}
+      {exampleRow('notifications',  'Notifications',  'folder-outline',         'versions/latest/sdk/notifications/')}
+      {exampleRow('storage',        'Storage',        'folder-outline',         'versions/latest/sdk/async-storage/')}
       {exampleRow('device-id',      'Device ID',      'pricetag',               'https://stackoverflow.com/questions/46863644/expo-get-unique-device-id-without-ejecting')}
       {exampleRow('device-info',    'Device Info',    'information',            'versions/latest/sdk/device/')}
       {exampleRow('chat',           'Chat',           'chatbubble-outline',     'chat-example')}
