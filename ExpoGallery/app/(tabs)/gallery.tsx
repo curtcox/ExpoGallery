@@ -37,6 +37,7 @@ export default function HomeScreen() {
       {exampleRow('secure-storage', 'Secure Storage', 'lock-closed',            'versions/latest/sdk/securestore/')}
       {exampleRow('json',           'JSON',           'code-outline',           'json-example')}
       {exampleRow('external-app',   'External App',   'open-outline',           'linking/into-other-apps/')}
+      {exampleRow('query-param',    'Query Param',    'open-outline',           'router/reference/url-parameters/')}
       {exampleRow('text-to-speech', 'Text to Speech', 'volume-high-outline',    'versions/latest/sdk/speech/')}
       {exampleRow('speech-to-text', 'Speech to Text', 'mic-outline',            'https://github.com/trestrantham/react-native-speech-recognition')}
     </ParallaxScrollView>
