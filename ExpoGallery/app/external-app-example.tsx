@@ -1,7 +1,7 @@
-import { ThemedText } from '@/components/ThemedText';
+import { Link } from 'expo-router';
 
 export default function HomeScreen() {
   return (
-      <ThemedText type="title">External App Example</ThemedText>
+    <Link href="https://expo.dev">Go to Expo</Link>
   );
 }
