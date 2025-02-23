@@ -1,12 +1,13 @@
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
-
+import { Link } from 'expo-router';
 
 export default function HomeScreen() {
   return (
       <View>
         <ThemedText type="title">Icons Example</ThemedText>
+        <Link href='https://ionic.io/ionicons'>Iconicons</Link>
         {icon('images-sharp')}
         {icon('map-outline')}
         {icon('pin-outline')}
