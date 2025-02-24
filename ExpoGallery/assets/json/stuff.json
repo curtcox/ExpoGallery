@@ -1,0 +1,33 @@
+{
+    "foo": "bar",
+    "baz": {
+        "qux": "quux"
+    },
+    "nested": {
+        "array": [
+            {
+                "key": "value"
+            },
+            {
+                "key": "another value"
+            }
+        ]
+    },
+    "empty": {},
+    "array": [
+        1,
+        2,
+        3
+    ],
+    "boolean": true,
+    "nullValue": null,
+    "number": 42,
+    "string": "Hello, world!",
+    "object": {
+        "key1": "value1",
+        "key2": "value2"
+    },
+    "date": "2023-10-01T12:00:00Z",
+    "time": "12:00:00",
+    "datetime": "2023-10-01T12:00:00Z"
+}

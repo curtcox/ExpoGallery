@@ -1,6 +1,6 @@
 import { useLocalSearchParams, router } from 'expo-router';
 import { useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { TextInput } from 'react-native';
 
 export default function Page() {
   const params = useLocalSearchParams<{ query?: string }>();

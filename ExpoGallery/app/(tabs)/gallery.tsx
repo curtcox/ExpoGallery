@@ -19,6 +19,7 @@ export default function HomeScreen() {
         />
       }>
       {exampleRow('alert',          'Alert',          'alert-outline',          'https://reactnative.dev/docs/alert')}
+      {exampleRow('asset',          'Asset',          'alert-outline',          'versions/latest/sdk/asset/')}
       {exampleRow('notifications',  'Notifications',  'notifications-outline',  'versions/latest/sdk/notifications/')}
       {exampleRow('list',           'List',           'list-outline',           'versions/latest/sdk/flash-list/')}
       {exampleRow('log',            'Log',            'warning-outline',        'versions/latest/sdk/flash-list/')}
