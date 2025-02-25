@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Button, Alert, Image } from 'react-native';
+import { StyleSheet, View, Button, Image } from 'react-native';
 import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
+import { info } from './log-example';
+import { oneButtonAlert } from './alert-example';
 
 // Embedded JSON data with resource markers
 const resourcesData = {
@@ -47,26 +49,36 @@ const resourcesData = {
 };
 
 // Map of resource categories to specific pin images
-const categoryImages = {
+const categoryImages: { [key: string]: any } = {
   shelter: require('../assets/images/react-logo.png'),
-  food:    require('../assets/images/react-logo.png'),
-  other:   require('../assets/images/react-logo.png'),
+  food: require('../assets/images/react-logo.png'),
+  other: require('../assets/images/react-logo.png'),
+};
+
+type Region = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
 };
 
 export default function App() {
-  const [region, setRegion] = useState(null);
-  const mapRef = useRef(null);
+  const [region, setRegion] = useState<Region | null>(null);
+  const mapRef = useRef<MapView | null>(null);
 
   // Request permission and fetch the device's current location
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Permission to access location was denied');
+        const message = 'Permission to access location was denied';
+        info(message);
+        oneButtonAlert(message);
         return;
       }
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
+      // const latitude = 38.6636; const longitude = -90.32779; // <--- To force a specific location
       setRegion({
         latitude,
         longitude,
@@ -81,6 +93,16 @@ export default function App() {
     if (region && mapRef.current) {
       mapRef.current.animateToRegion(region, 1000);
     }
+  };
+
+  const handleMarkerPress = (resource: any) => {
+      console.log({resource});
+      const details = resource? `
+      Name: ${resource.name}
+      Category: ${resource.category}
+      Details: ${resource.details}
+    ` : 'No resource selected';
+    oneButtonAlert(details);
   };
 
   return (
@@ -99,14 +121,12 @@ export default function App() {
                 latitude: resource.location.latitude,
                 longitude: resource.location.longitude,
               }}
-              title={resource.name}
-              description={resource.details}
+              onPress={() => handleMarkerPress(resource)}
             >
-            <Image
-              // Use a specific image for the resource category if available; otherwise, use a default pin image
-              source={categoryImages[resource.category] || categoryImages['other']}
-              style={{ width: 30, height: 30 }}
-            />
+              <Image
+                source={categoryImages[resource.category] || categoryImages['other']}
+                style={{ width: 30, height: 30 }}
+              />
             </Marker>
           ))}
         </MapView>
