@@ -63,6 +63,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     left: 20,
-    // Optional: add styling to your button container as needed
   },
 });
