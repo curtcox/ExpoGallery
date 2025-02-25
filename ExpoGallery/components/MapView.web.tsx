@@ -1,4 +1,4 @@
-import MapView, { Marker } from "@teovilla/react-native-web-maps";
+import MapView, { Marker, Callout } from "@teovilla/react-native-web-maps";
 
-export { Marker };
+export { Marker, Callout };
 export default MapView;
