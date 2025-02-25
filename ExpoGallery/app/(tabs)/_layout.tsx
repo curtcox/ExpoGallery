@@ -27,6 +27,7 @@ export default function TabLayout() {
       }}>
         {tabScreen('index',   'Home',    'home')}
         {tabScreen('explore', 'Explore', 'airplane')}
+        {tabScreen('focus',   'Focus',   'search')}
         {tabScreen('gallery', 'Gallery', 'albums')}
         {tabScreen('map',     'Map',     'map-outline')}
         {tabScreen('chat',    'Chat',    'chatbubble-outline')}
