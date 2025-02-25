@@ -23,7 +23,8 @@ export default function HomeScreen() {
       {exampleRow('notifications',  'Notifications',  'notifications-outline',  'versions/latest/sdk/notifications/')}
       {exampleRow('list',           'List',           'list-outline',           'versions/latest/sdk/flash-list/')}
       {exampleRow('log',            'Log',            'warning-outline',        'versions/latest/sdk/flash-list/')}
-      {exampleRow('location',       'Location',       'locate-outline',        '/versions/latest/sdk/location/')}
+      {exampleRow('location',       'Location',       'locate-outline',         'versions/latest/sdk/location/')}
+      {exampleRow('status-bar',     'Status Bar',     'locate-outline',         'versions/latest/sdk/status-bar/')}
       {exampleRow('image',          'Image',          'image-outline',          'versions/latest/sdk/flash-list/')}
       {exampleRow('storage',        'Storage',        'folder-outline',         'versions/latest/sdk/async-storage/')}
       {exampleRow('device-id',      'Device ID',      'pricetag',               'https://stackoverflow.com/questions/46863644/expo-get-unique-device-id-without-ejecting')}
