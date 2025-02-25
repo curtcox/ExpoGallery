@@ -46,13 +46,12 @@ const resourcesData = {
   ]
 };
 
-const asset = (path: string) => `../assets/images/${path}.png`;
-
 // Map of resource categories to specific pin images
-// const categoryImages = {
-//   shelter: require(asset('icon')),
-//   food:    require(asset('icon')),
-// };
+const categoryImages = {
+  shelter: require('../assets/images/react-logo.png'),
+  food:    require('../assets/images/react-logo.png'),
+  other:   require('../assets/images/react-logo.png'),
+};
 
 export default function App() {
   const [region, setRegion] = useState(null);
@@ -103,11 +102,11 @@ export default function App() {
               title={resource.name}
               description={resource.details}
             >
-              {/* <Image
-                // Use a specific image for the resource category if available; otherwise, use a default pin image
-                source={categoryImages[resource.category] || require(asset('icon'))}
-                style={{ width: 30, height: 30 }}
-              /> */}
+            <Image
+              // Use a specific image for the resource category if available; otherwise, use a default pin image
+              source={categoryImages[resource.category] || categoryImages['other']}
+              style={{ width: 30, height: 30 }}
+            />
             </Marker>
           ))}
         </MapView>
