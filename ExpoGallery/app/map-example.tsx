@@ -75,6 +75,7 @@ export default function HomeScreen() {
           ref={mapRef}
           style={styles.map}
           region={region}
+          followsUserLocation={true}
           showsUserLocation={true}
           onMapReady={() => setMapLoaded(true)}
         />
