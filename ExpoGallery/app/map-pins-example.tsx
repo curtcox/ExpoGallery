@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Button, Image } from 'react-native';
 import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
-import { info } from './log-example';
+import { info, error } from './log-example';
 import { oneButtonAlert } from './alert-example';
 
 // Embedded JSON data with resource markers
@@ -62,9 +62,14 @@ type Region = {
   longitudeDelta: number;
 };
 
-export default function App() {
-  const [region, setRegion] = useState<Region | null>(null);
-  const mapRef = useRef<MapView | null>(null);
+export default function HomeScreen() {
+  const [region, setRegion] = useState<{
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  } | null>(null);
+  const mapRef = useRef<any>(null);
 
   // Request permission and fetch the device's current location
   useEffect(() => {
@@ -78,7 +83,6 @@ export default function App() {
       }
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-      // const latitude = 38.6636; const longitude = -90.32779; // <--- To force a specific location
       setRegion({
         latitude,
         longitude,
@@ -88,10 +92,26 @@ export default function App() {
     })();
   }, []);
 
-  // Function to recenter the map on the device's current location
-  const centerMap = () => {
-    if (region && mapRef.current) {
-      mapRef.current.animateToRegion(region, 1000);
+  // Function to recenter the map on the device's location
+  const centerMap = async () => {
+    try {
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      const newRegion = {
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+      setRegion(newRegion);
+      if (mapRef.current) {
+        mapRef.current.animateToRegion(newRegion, 1000);
+      } else {
+        info("Map reference is not available");
+      }
+    } catch (e) {
+      error("Error centering map:", e);
+      oneButtonAlert('Failed to center map');
     }
   };
 
