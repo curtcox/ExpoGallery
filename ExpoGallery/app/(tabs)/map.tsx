@@ -4,6 +4,7 @@ import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
 import { info, error } from '../log-example';
 import { oneButtonAlert } from '../alert-example';
+import { router } from 'expo-router';
 // Import resources data from JSON file
 import resourcesData from '../../assets/json/resources.json';
 
@@ -76,13 +77,11 @@ export default function HomeScreen() {
   };
 
   const handleMarkerPress = (resource: any) => {
-      console.log({resource});
-      const details = resource? `
-      Name: ${resource.name}
-      Category: ${resource.category}
-      Details: ${resource.details}
-    ` : 'No resource selected';
-    oneButtonAlert(details);
+    console.log({resource});
+    router.push({
+      pathname: '/resource',
+      params: { id: resource.id },
+    });
   };
 
   return (

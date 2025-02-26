@@ -1,0 +1,41 @@
+{
+  "resources": [
+    {
+      "id": "res-1001",
+      "name": "Downtown Shelter",
+      "category": "shelter",
+      "location": {
+        "latitude": 38.6636,
+        "longitude": -90.32779,
+        "address": "123 Main St, New York, NY"
+      },
+      "details": "Provides emergency shelter, meals, and hygiene facilities.",
+      "contact": {
+        "phone": "555-1234",
+        "website": "http://downtownshelter.org"
+      },
+      "hours": "24/7",
+      "capacity": 50,
+      "languagesSupported": ["en", "es"],
+      "averageRating": 4.2
+    },
+    {
+      "id": "res-1002",
+      "name": "City Food Bank",
+      "category": "food",
+      "location": {
+        "latitude": 38.66,
+        "longitude": -90.326,
+        "address": "456 Elm St, New York, NY"
+      },
+      "details": "Offers food packages and meal services.",
+      "contact": {
+        "phone": "555-5678",
+        "website": "http://cityfoodbank.org"
+      },
+      "hours": "Mon-Fri 9am-5pm",
+      "languagesSupported": ["en"],
+      "averageRating": 4.0
+    }
+  ]
+}
