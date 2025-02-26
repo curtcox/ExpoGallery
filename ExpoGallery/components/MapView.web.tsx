@@ -1,26 +1,16 @@
 import React, { forwardRef } from 'react';
+
+// Add type declarations for the missing exports
+declare module "@teovilla/react-native-web-maps" {
+  const MapView: React.ComponentType<any>;
+  export const Marker: React.ComponentType<any>;
+  export const Callout: React.ComponentType<any>;
+  export default MapView; // The warning on export default seems to work anyway
+}
+
+// Import after declaring the module
 import MapView from "@teovilla/react-native-web-maps";
-
-// Create custom Marker and Callout components for web
-// since they're not exported by the web maps package
-const Marker = ({ coordinate, title, description, children }: any) => (
-  <div
-    style={{
-      position: 'absolute',
-      transform: 'translate(-50%, -100%)',
-      left: coordinate?.latitude,
-      top: coordinate?.longitude,
-    }}
-  >
-    {children}
-  </div>
-);
-
-const Callout = ({ children }: any) => (
-  <div style={{ padding: 10, backgroundColor: 'white', borderRadius: 5 }}>
-    {children}
-  </div>
-);
+import { Marker, Callout } from "@teovilla/react-native-web-maps";
 
 // Export the components and enhanced MapView
 export { Marker, Callout };
