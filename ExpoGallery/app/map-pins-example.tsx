@@ -55,13 +55,6 @@ const categoryImages: { [key: string]: any } = {
   other: require('../assets/images/react-logo.png'),
 };
 
-type Region = {
-  latitude: number;
-  longitude: number;
-  latitudeDelta: number;
-  longitudeDelta: number;
-};
-
 export default function HomeScreen() {
   const [region, setRegion] = useState<{
     latitude: number;
@@ -70,6 +63,7 @@ export default function HomeScreen() {
     longitudeDelta: number;
   } | null>(null);
   const mapRef = useRef<any>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   // Request permission and fetch the device's current location
   useEffect(() => {
@@ -91,6 +85,13 @@ export default function HomeScreen() {
       });
     })();
   }, []);
+
+  // Effect to center map once both the map is loaded and region is set
+  useEffect(() => {
+    if (mapLoaded && region && mapRef.current) {
+      mapRef.current.animateToRegion(region, 1000);
+    }
+  }, [mapLoaded, region]);
 
   // Function to recenter the map on the device's location
   const centerMap = async () => {
@@ -133,6 +134,7 @@ export default function HomeScreen() {
           style={styles.map}
           region={region}
           showsUserLocation={true}
+          onMapReady={() => setMapLoaded(true)}
         >
           {resourcesData.resources.map(resource => (
             <Marker

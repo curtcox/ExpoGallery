@@ -13,6 +13,7 @@ export default function HomeScreen() {
     longitudeDelta: number;
   } | null>(null);
   const mapRef = useRef<any>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -36,6 +37,13 @@ export default function HomeScreen() {
       });
     })();
   }, []);
+
+  // Effect to center map once both the map is loaded and region is set
+  useEffect(() => {
+    if (mapLoaded && region && mapRef.current) {
+      mapRef.current.animateToRegion(region, 1000);
+    }
+  }, [mapLoaded, region]);
 
   // Function to recenter the map on the device's location
   const centerMap = async () => {
@@ -68,6 +76,7 @@ export default function HomeScreen() {
           style={styles.map}
           region={region}
           showsUserLocation={true}
+          onMapReady={() => setMapLoaded(true)}
         />
       )}
       <View style={styles.buttonContainer}>
