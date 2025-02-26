@@ -1,5 +1,5 @@
+import React, { forwardRef } from 'react';
 import MapView from "@teovilla/react-native-web-maps";
-import Constants from 'expo-constants';
 
 // Create custom Marker and Callout components for web
 // since they're not exported by the web maps package
@@ -24,10 +24,16 @@ const Callout = ({ children }: any) => (
 
 // Export the components and enhanced MapView
 export { Marker, Callout };
-export default (props: any) => (
-  <MapView
-    {...props}
-    provider="google"
-    googleMapsApiKey='your key here'
-  />
-);
+
+const MapViewComponent = forwardRef((props: any, ref) => {
+  return (
+    <MapView
+      {...props}
+      ref={ref}
+      provider="google"
+      googleMapsApiKey='your-api-key-here'
+    />
+  );
+});
+
+export default MapViewComponent;
