@@ -12,7 +12,7 @@
       "details": "Provides emergency shelter, meals, and hygiene facilities.",
       "contact": {
         "phone": "555-1234",
-        "website": "http://downtownshelter.org"
+        "website": "https://www.stlouis-mo.gov/homeless-services/index.cfm"
       },
       "hours": "24/7",
       "capacity": 50,
@@ -31,7 +31,7 @@
       "details": "Offers food packages and meal services.",
       "contact": {
         "phone": "555-5678",
-        "website": "http://cityfoodbank.org"
+        "website": "https://stlfoodbank.org/"
       },
       "hours": "Mon-Fri 9am-5pm",
       "languagesSupported": ["en"],
