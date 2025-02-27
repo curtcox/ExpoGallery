@@ -56,6 +56,18 @@ export default function Route() {
     }
   };
 
+  const callPhone = () => {
+    info('Calling phone number');
+    const phoneNumber = resource.contact.phone;
+    if (phoneNumber) {
+      const phoneUrl = `tel:${phoneNumber.replace(/\D/g, '')}`;
+      Linking.openURL(phoneUrl).catch(err => {
+        error('An error occurred while trying to call:', err);
+        oneButtonAlert('Could not open phone dialer');
+      });
+    }
+  };
+
   return (
     <ParallaxScrollView
     headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -82,6 +94,10 @@ export default function Route() {
         <Text style={styles.buttonText}>Visit Website</Text>
       </TouchableOpacity>
     )}
+
+    <TouchableOpacity onPress={callPhone} style={styles.button}>
+      <Text style={styles.buttonText}>Call Phone</Text>
+    </TouchableOpacity>
   </ParallaxScrollView>)
   ;
 }
