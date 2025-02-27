@@ -18,8 +18,9 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      {exampleRow('log',            'Log',            'warning-outline',        'versions/latest/sdk/flash-list/')}
-      {exampleRow('map-pins',       'Map Pins',       'pin-outline',            'map-pins-example')}
+      {exampleRow('log',         'Log',         'warning-outline',        'versions/latest/sdk/flash-list/')}
+      {exampleRow('map-pins',    'Map Pins',    'pin-outline',            'map-pins-example')}
+      {exampleRow('gifted-chat', 'Gifted Chat', 'chatbubble-outline',     'https://github.com/FaridSafi/react-native-gifted-chat')}
     </ParallaxScrollView>
   );
 }
