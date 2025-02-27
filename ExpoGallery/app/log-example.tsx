@@ -67,6 +67,7 @@ export default function HomeScreen() {
 }
 
 export function info(message: string) {
+  console.log(message);
   LOG.push({
     index: LOG.length,
     timestamp: Date.now(),
@@ -75,6 +76,7 @@ export function info(message: string) {
 }
 
 export function error(message: string, error: any) {
+  console.error(message, error);
   LOG.push({
     index: LOG.length,
     timestamp: Date.now(),
