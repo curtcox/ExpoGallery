@@ -47,6 +47,15 @@ export default function Route() {
     }
   };
 
+  // If no resource is found, display a message
+  if (!resource) {
+    return (
+      <View style={styles.noResourceContainer}>
+        <Text style={styles.noResourceText}>No matching resource found</Text>
+      </View>
+    );
+  }
+
   return (
     <ParallaxScrollView
     headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -95,5 +104,16 @@ const styles = StyleSheet.create({
     buttonText: {
       color: 'white',
       fontWeight: 'bold',
+    },
+    // Add new styles for the "no resource" message
+    noResourceContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    noResourceText: {
+      fontSize: 18,
+      textAlign: 'center',
     },
   });
