@@ -61,7 +61,8 @@
     "react-native-paper": "4.9.2",
     "react-native-chatty": "~0.2.7",
     "react-native-context-menu-view": "*",
-    "react-native-parsed-text": "*"
+    "react-native-parsed-text": "*",
+    "moment": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
