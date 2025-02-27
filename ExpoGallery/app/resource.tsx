@@ -7,11 +7,20 @@ import { info, error } from './log-example';
 import { oneButtonAlert } from './alert-example';
 
 export default function Route() {
-      const { id } = useLocalSearchParams<{
+  const { id } = useLocalSearchParams<{
     id: string;
   }>();
 
   const resource = resourcesData.resources.find(r => r.id === id);
+
+  // If no resource is found, display a message
+  if (!resource) {
+    return (
+      <View style={styles.noResourceContainer}>
+        <Text style={styles.noResourceText}>No matching resource found</Text>
+      </View>
+    );
+  }
 
   const openDirections = () => {
     info('Getting directions');
@@ -20,8 +29,8 @@ export default function Route() {
       android: 'geo:0,0?q=',
       web: 'https://maps.google.com/?q='
     });
-    const latLng = `${resource?.location.latitude},${resource?.location.longitude}`;
-    const label = resource?.name;
+    const latLng = `${resource.location.latitude},${resource.location.longitude}`;
+    const label = resource.name;
     const url = Platform.select({
       ios: `${scheme}${label}@${latLng}`,
       android: `${scheme}${latLng}(${label})`,
@@ -38,7 +47,7 @@ export default function Route() {
 
   const openWebsite = () => {
     info('Opening Website');
-    const url = resource?.contact.website;
+    const url = resource.contact.website;
     if (url) {
       Linking.openURL(url).catch(err => {
         error('An error occurred while opening website:', err);
@@ -46,15 +55,6 @@ export default function Route() {
       });
     }
   };
-
-  // If no resource is found, display a message
-  if (!resource) {
-    return (
-      <View style={styles.noResourceContainer}>
-        <Text style={styles.noResourceText}>No matching resource found</Text>
-      </View>
-    );
-  }
 
   return (
     <ParallaxScrollView
@@ -65,19 +65,19 @@ export default function Route() {
         style={styles.reactLogo}
       />
     }>
-    <Text>Resource: {resource?.name}</Text>
-    <Text>Category: {resource?.category}</Text>
-    <Text>Location: {resource?.location.address}</Text>
+    <Text>Resource: {resource.name}</Text>
+    <Text>Category: {resource.category}</Text>
+    <Text>Location: {resource.location.address}</Text>
     <TouchableOpacity onPress={openDirections} style={styles.button}>
       <Text style={styles.buttonText}>Get Directions</Text>
     </TouchableOpacity>
-    <Text>Details: {resource?.details}</Text>
-    <Text>Contact: {resource?.contact.phone}</Text>
-    <Text>Hours: {resource?.hours}</Text>
-    <Text>Languages Supported: {resource?.languagesSupported.join(', ')}</Text>
-    <Text>Average Rating: {resource?.averageRating}</Text>
+    <Text>Details: {resource.details}</Text>
+    <Text>Contact: {resource.contact.phone}</Text>
+    <Text>Hours: {resource.hours}</Text>
+    <Text>Languages Supported: {resource.languagesSupported.join(', ')}</Text>
+    <Text>Average Rating: {resource.averageRating}</Text>
 
-    {resource?.contact.website && (
+    {resource.contact.website && (
       <TouchableOpacity onPress={openWebsite} style={styles.button}>
         <Text style={styles.buttonText}>Visit Website</Text>
       </TouchableOpacity>
