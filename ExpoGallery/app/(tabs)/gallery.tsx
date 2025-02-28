@@ -1,14 +1,54 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Link } from 'expo-router';
 import { info } from '../../utils/logger';
+import { Checkbox } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ALL_EXAMPLES, FOCUSED_EXAMPLES_KEY, ExampleItem } from '@/utils/examples';
 
 export default function GalleryScreen() {
+  const [examples, setExamples] = useState<ExampleItem[]>(
+    ALL_EXAMPLES.map(example => ({ ...example, selected: false }))
+  );
+
   useEffect(() => {
     info('Viewing Gallery');
+
+    // Load saved focused examples
+    const loadFocusedExamples = async () => {
+      try {
+        const savedExamples = await AsyncStorage.getItem(FOCUSED_EXAMPLES_KEY);
+        if (savedExamples) {
+          const selectedNames = JSON.parse(savedExamples) as string[];
+          setExamples(prev => prev.map(example => ({
+            ...example,
+            selected: selectedNames.includes(example.name)
+          })));
+        }
+      } catch (error) {
+        console.error('Failed to load focused examples:', error);
+      }
+    };
+
+    loadFocusedExamples();
   }, []);
+
+  const toggleExample = (index: number) => {
+    const updatedExamples = [...examples];
+    updatedExamples[index].selected = !updatedExamples[index].selected;
+    setExamples(updatedExamples);
+
+    // Save to AsyncStorage
+    const selectedNames = updatedExamples
+      .filter(example => example.selected)
+      .map(example => example.name);
+
+    AsyncStorage.setItem(FOCUSED_EXAMPLES_KEY, JSON.stringify(selectedNames))
+      .catch(error => console.error('Failed to save focused examples:', error));
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -18,41 +58,39 @@ export default function GalleryScreen() {
           style={styles.reactLogo}
         />
       }>
-      {exampleRow('alert',          'Alert',          'alert-outline',          'https://reactnative.dev/docs/alert')}
-      {exampleRow('asset',          'Asset',          'alert-outline',          'versions/latest/sdk/asset/')}
-      {exampleRow('notifications',  'Notifications',  'notifications-outline',  'versions/latest/sdk/notifications/')}
-      {exampleRow('list',           'List',           'list-outline',           'versions/latest/sdk/flash-list/')}
-      {exampleRow('log',            'Log',            'warning-outline',        'versions/latest/sdk/flash-list/')}
-      {exampleRow('location',       'Location',       'locate-outline',         'versions/latest/sdk/location/')}
-      {exampleRow('status-bar',     'Status Bar',     'locate-outline',         'versions/latest/sdk/status-bar/')}
-      {exampleRow('image',          'Image',          'image-outline',          'versions/latest/sdk/flash-list/')}
-      {exampleRow('storage',        'Storage',        'folder-outline',         'versions/latest/sdk/async-storage/')}
-      {exampleRow('device-id',      'Device ID',      'pricetag',               'https://stackoverflow.com/questions/46863644/expo-get-unique-device-id-without-ejecting')}
-      {exampleRow('device-info',    'Device Info',    'information',            'versions/latest/sdk/device/')}
-      {exampleRow('chatty',         'Chatty',         'chatbubble-outline',     'https://github.com/MuhammedKpln/react-native-chatty')}
-      {exampleRow('gifted-chat',    'Gifted Chat',    'chatbubble-outline',     'https://github.com/FaridSafi/react-native-gifted-chat')}
-      {exampleRow('chat-links',     'Chat with links','chatbubble-outline',     'https://github.com/FaridSafi/react-native-gifted-chat')}
-      {exampleRow('crypto',         'Crypto',         'key',                    'latest/sdk/crypto/')}
-      {exampleRow('icons',          'Icons',          'images-sharp',           'guides/icons/')}
-      {exampleRow('map',            'Map',            'map-outline',            'versions/latest/sdk/map-view/')}
-      {exampleRow('map-pins',       'Map Pins',       'pin-outline',            'map-pins-example')}
-      {exampleRow('fetch',          'Fetch',          'cloud-download-outline', 'versions/latest/sdk/expo/#api')}
-      {exampleRow('local-storage',  'Local Storage',  'folder-outline',         'versions/latest/sdk/filesystem/')}
-      {exampleRow('secure-storage', 'Secure Storage', 'lock-closed',            'versions/latest/sdk/securestore/')}
-      {exampleRow('json',           'JSON',           'code-outline',           'json-example')}
-      {exampleRow('external-app',   'External App',   'open-outline',           'linking/into-other-apps/')}
-      {exampleRow('query-param',    'Query Param',    'open-outline',           'router/reference/url-parameters/')}
-      {exampleRow('text-to-speech', 'Text to Speech', 'volume-high-outline',    'versions/latest/sdk/speech/')}
-      {exampleRow('speech-to-text', 'Speech to Text', 'mic-outline',            'https://github.com/trestrantham/react-native-speech-recognition')}
+      {examples.map((example, index) => (
+        exampleRow(
+          example.name,
+          example.text,
+          example.icon as any, // Type assertion to fix TypeScript error
+          example.url,
+          example.selected,
+          () => toggleExample(index),
+          index
+        )
+      ))}
     </ParallaxScrollView>
   );
 }
 
-function exampleRow(name: string, text: string, icon: string, url: string) {
-  const examplePage = `/${name}-example`;
-  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}`;
+function exampleRow(
+  name: string,
+  text: string,
+  icon: any, // Changed type to any to fix TypeScript error
+  url: string,
+  selected: boolean,
+  onToggle: () => void,
+  key: number
+) {
+  const examplePage = `/${name}-example` as const; // Type assertion to fix TypeScript error
+  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}` as const; // Type assertion to fix TypeScript error
+
   return (
-    <View style={styles.linkRow}>
+    <View style={styles.linkRow} key={key}>
+      <Checkbox
+        status={selected ? 'checked' : 'unchecked'}
+        onPress={onToggle}
+      />
       <Ionicons name={icon} size={24} color="black" />
       <View style={styles.docsLinkContainer}>
         <Link href={docUrl}>Docs</Link>
@@ -81,7 +119,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   docsLinkContainer: {
-    marginLeft: 50, // adjust this value to ensure the docs links are aligned
+    marginLeft: 20, // Adjusted to make room for checkbox
   },
   spacer: {
     flex: 1,
