@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TextInput, Button, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { info, error } from './log-example';
-import { useEffect } from 'react';
 
 const save = async (key: string, value: string, setLastOperation: Function) => {
   try {
@@ -27,7 +26,6 @@ const getValueFor = async (key: string, setLastOperation: Function, onChangeKey:
   }
 };
 
-// New function to get all keys from AsyncStorage
 const getAllKeys = async (setStorageKeys: Function) => {
   try {
     const keys = await AsyncStorage.getAllKeys();
@@ -38,109 +36,175 @@ const getAllKeys = async (setStorageKeys: Function) => {
   }
 };
 
+interface SaveFormProps {
+  keyName: string;
+  onChangeKey: (text: string) => void;
+  value: string;
+  onChangeValue: (text: string) => void;
+  handleSave: () => void;
+}
+
+interface LoadFormProps {
+  loadKey: string;
+  setLoadKey: (text: string) => void;
+  handleLoad: () => void;
+}
+
+interface LastOperationDisplayProps {
+  lastOperation: {
+    key: string;
+    value: string;
+    type: string;
+  };
+}
+
+interface KeysDisplayProps {
+  storageKeys: string[];
+  refreshKeys: () => void;
+  handleKeyPress: (key: string) => void;
+}
+
+const SaveForm = ({ keyName, onChangeKey, value, onChangeValue, handleSave }: SaveFormProps) => (
+  <>
+    <Text style={styles.paragraph}>Save an item, and grab it later!</Text>
+    <TextInput
+      style={styles.textInput}
+      clearTextOnFocus
+      onChangeText={text => onChangeKey(text)}
+      value={keyName}
+    />
+    <TextInput
+      style={styles.textInput}
+      clearTextOnFocus
+      onChangeText={text => onChangeValue(text)}
+      value={value}
+    />
+    <Button
+      title="Save this key/value pair"
+      onPress={handleSave}
+    />
+  </>
+);
+
+const LoadForm = ({ loadKey, setLoadKey, handleLoad }: LoadFormProps) => (
+  <>
+    <Text style={styles.paragraph}>Enter your key</Text>
+    <View style={styles.loadContainer}>
+      <TextInput
+        style={[styles.textInput, styles.loadInput]}
+        onChangeText={setLoadKey}
+        value={loadKey}
+        placeholder="Enter the key for the value you want to get"
+      />
+      <Button
+        title="Load"
+        onPress={handleLoad}
+      />
+    </View>
+  </>
+);
+
+const LastOperationDisplay = ({ lastOperation }: LastOperationDisplayProps) => {
+  if (!lastOperation.key) return null;
+
+  return (
+    <View style={styles.lastOperation}>
+      <Text style={styles.lastOperationTitle}>
+        Last {lastOperation.type} operation:
+      </Text>
+      <Text>Key: {lastOperation.key}</Text>
+      <Text>Value: {JSON.stringify(lastOperation.value)}</Text>
+    </View>
+  );
+};
+
+const KeysDisplay = ({ storageKeys, refreshKeys, handleKeyPress }: KeysDisplayProps) => (
+  <View style={styles.keysContainer}>
+    <View style={styles.keysHeader}>
+      <Text style={styles.keysTitle}>All Storage Keys:</Text>
+      <Button
+        title="Refresh"
+        onPress={refreshKeys}
+      />
+    </View>
+
+    {storageKeys.length > 0 ? (
+      <FlatList
+        data={storageKeys}
+        renderItem={({ item }) => (
+          <Text
+            style={styles.keyItem}
+            onPress={() => handleKeyPress(item)}
+          >
+            {item}
+          </Text>
+        )}
+        keyExtractor={(item) => item}
+        style={styles.keysList}
+      />
+    ) : (
+      <Text style={styles.noKeys}>No keys in storage</Text>
+    )}
+  </View>
+);
+
 export default function HomeScreen() {
   const [key, onChangeKey] = useState('Your key here');
   const [value, onChangeValue] = useState('Your value here');
-  const [loadKey, setLoadKey] = useState(''); // New state for the load key input
+  const [loadKey, setLoadKey] = useState('');
   const [lastOperation, setLastOperation] = useState({ key: '', value: '', type: '' });
   const [storageKeys, setStorageKeys] = useState<string[]>([]);
 
   useEffect(() => {
     info('Viewing Storage Example');
-    // Load all keys when component mounts
     getAllKeys(setStorageKeys);
   }, []);
 
-  // Refresh keys after operations
   useEffect(() => {
     if (lastOperation.type) {
       getAllKeys(setStorageKeys);
     }
   }, [lastOperation]);
 
+  const handleSave = () => {
+    save(key, value, setLastOperation);
+    onChangeKey('Your key here');
+    onChangeValue('Your value here');
+  };
+
+  const handleLoad = () => {
+    getValueFor(loadKey, setLastOperation, onChangeKey, onChangeValue);
+    setLoadKey('');
+  };
+
+  const handleKeyPress = (selectedKey: string) => {
+    setLoadKey(selectedKey);
+    getValueFor(selectedKey, setLastOperation, onChangeKey, onChangeValue);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>Save an item, and grab it later!</Text>
-
-      <TextInput
-        style={styles.textInput}
-        clearTextOnFocus
-        onChangeText={text => onChangeKey(text)}
-        value={key}
-      />
-      <TextInput
-        style={styles.textInput}
-        clearTextOnFocus
-        onChangeText={text => onChangeValue(text)}
+      <SaveForm
+        keyName={key}
+        onChangeKey={onChangeKey}
         value={value}
+        onChangeValue={onChangeValue}
+        handleSave={handleSave}
       />
 
-      <Button
-        title="Save this key/value pair"
-        onPress={() => {
-          save(key, value, setLastOperation);
-          onChangeKey('Your key here');
-          onChangeValue('Your value here');
-        }}
+      <LoadForm
+        loadKey={loadKey}
+        setLoadKey={setLoadKey}
+        handleLoad={handleLoad}
       />
 
-      <Text style={styles.paragraph}>Enter your key</Text>
-      <View style={styles.loadContainer}>
-        <TextInput
-          style={[styles.textInput, styles.loadInput]}
-          onChangeText={setLoadKey}
-          value={loadKey}
-          placeholder="Enter the key for the value you want to get"
-        />
-        <Button
-          title="Load"
-          onPress={() => {
-            getValueFor(loadKey, setLastOperation, onChangeKey, onChangeValue);
-            setLoadKey('');
-          }}
-        />
-      </View>
+      <LastOperationDisplay lastOperation={lastOperation} />
 
-      {lastOperation.key && (
-        <View style={styles.lastOperation}>
-          <Text style={styles.lastOperationTitle}>
-            Last {lastOperation.type} operation:
-          </Text>
-          <Text>Key: {lastOperation.key}</Text>
-          <Text>Value: {JSON.stringify(lastOperation.value)}</Text>
-        </View>
-      )}
-
-      <View style={styles.keysContainer}>
-        <View style={styles.keysHeader}>
-          <Text style={styles.keysTitle}>All Storage Keys:</Text>
-          <Button
-            title="Refresh"
-            onPress={() => getAllKeys(setStorageKeys)}
-          />
-        </View>
-
-        {storageKeys.length > 0 ? (
-          <FlatList
-            data={storageKeys}
-            renderItem={({ item }) => (
-              <Text
-                style={styles.keyItem}
-                onPress={() => {
-                  setLoadKey(item);
-                  getValueFor(item, setLastOperation, onChangeKey, onChangeValue);
-                }}
-              >
-                {item}
-              </Text>
-            )}
-            keyExtractor={(item) => item}
-            style={styles.keysList}
-          />
-        ) : (
-          <Text style={styles.noKeys}>No keys in storage</Text>
-        )}
-      </View>
+      <KeysDisplay
+        storageKeys={storageKeys}
+        refreshKeys={() => getAllKeys(setStorageKeys)}
+        handleKeyPress={handleKeyPress}
+      />
     </View>
   );
 }
