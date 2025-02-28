@@ -5,7 +5,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Link } from 'expo-router';
 import { info } from '../../utils/logger';
 
-export default function HomeScreen() {
+export default function GalleryScreen() {
   useEffect(() => {
     info('Viewing Gallery');
   }, []);

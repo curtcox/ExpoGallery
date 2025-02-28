@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Button, Image } from 'react-native';
 import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
-import { info, error } from '../log-example';
-import { oneButtonAlert } from '../alert-example';
+import { info, error, oneButtonAlert } from '@/utils/index';
 import { router } from 'expo-router';
 // Import resources data from JSON file
 import resourcesData from '../../assets/json/resources.json';
