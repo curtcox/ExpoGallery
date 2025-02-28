@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Switch, ScrollView } from 'react-native';
+import { View, StyleSheet, Switch, ScrollView, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { updateSettings, subscribeToSettingsChanges, settings } from '@/storage/settings';
+import { Ionicons } from '@expo/vector-icons';
+
+// Tab configuration for UI level settings
+const tabsToCustomize = [
+  { name: 'explore', title: 'Explore', icon: 'airplane', defaultLevel: 3 },
+  { name: 'focus', title: 'Focus', icon: 'search-outline', defaultLevel: 2 },
+  { name: 'gallery', title: 'Gallery', icon: 'albums', defaultLevel: 3 },
+  { name: 'map', title: 'Map', icon: 'map-outline', defaultLevel: 1 },
+  { name: 'chat', title: 'Chat', icon: 'chatbubble-outline', defaultLevel: 1 },
+  { name: 'profile', title: 'Profile', icon: 'person-outline', defaultLevel: 1 },
+];
 
 // Update the updateSettings function to persist changes
 export default function SettingsScreen() {
   const [uiLevel, setUiLevel] = useState(settings.UI_Level);
   const [debug, setDebug] = useState(settings.debug);
+  const [tabLevels, setTabLevels] = useState<Record<string, number>>({});
 
   const handleUILevelChange = (level: number) => {
     setUiLevel(level);
@@ -19,14 +31,35 @@ export default function SettingsScreen() {
     updateSettings({ debug: newDebug });
   };
 
+  const handleTabLevelChange = (tabName: string, level: number) => {
+    const newTabLevels = { ...tabLevels, [tabName]: level };
+    setTabLevels(newTabLevels);
+    updateSettings({ tabLevels: newTabLevels });
+  };
+
   // Load settings when component mounts
   useEffect(() => {
     const unsubscribe = subscribeToSettingsChanges((newSettings) => {
       setUiLevel(newSettings.UI_Level);
       setDebug(newSettings.debug);
+      setTabLevels(newSettings.tabLevels || {});
     });
 
     return unsubscribe;
+  }, []);
+
+  // Initialize tab levels from settings or defaults
+  useEffect(() => {
+    const initialTabLevels: Record<string, number> = {};
+    tabsToCustomize.forEach(tab => {
+      initialTabLevels[tab.name] = settings.tabLevels?.[tab.name] || tab.defaultLevel;
+    });
+
+    if (!settings.tabLevels) {
+      updateSettings({ tabLevels: initialTabLevels });
+    }
+
+    setTabLevels(settings.tabLevels || initialTabLevels);
   }, []);
 
   return (
@@ -59,6 +92,44 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
+        <ThemedText type="subtitle">Tab Visibility Settings</ThemedText>
+        <ThemedText type="default">Set the minimum UI level required to see each tab</ThemedText>
+
+        {tabsToCustomize.map(tab => (
+          <View key={tab.name} style={styles.tabLevelOption}>
+            <View style={styles.tabInfo}>
+              <Ionicons name={tab.icon as any} size={20} style={styles.tabIcon} />
+              <ThemedText type="default">{tab.title}</ThemedText>
+            </View>
+
+            <View style={styles.tabLevelButtons}>
+              {[1, 2, 3].map(level => (
+                <TouchableOpacity
+                  key={level}
+                  style={[
+                    styles.levelButton,
+                    tabLevels[tab.name] === level && styles.selectedLevelButton
+                  ]}
+                  onPress={() => handleTabLevelChange(tab.name, level)}
+                >
+                  <ThemedText
+                    type="default"
+                    style={tabLevels[tab.name] === level ? styles.selectedLevelText : {}}
+                  >
+                    {level}
+                  </ThemedText>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ))}
+
+        <ThemedText type="default" style={styles.note}>
+          Note: Home and Settings tabs are always visible
+        </ThemedText>
+      </View>
+
+      <View style={styles.section}>
         <ThemedText type="subtitle">Developer Options</ThemedText>
         <View style={styles.option}>
           <ThemedText type="default">Debug Mode</ThemedText>
@@ -71,17 +142,24 @@ export default function SettingsScreen() {
           Current UI Level: {uiLevel} {debug ? '(Debug Mode On)' : ''}
         </ThemedText>
         <ThemedText type="default">
-          Visible tabs: {getVisibleTabsDescription(uiLevel)}
+          Visible tabs: {getVisibleTabsDescription(uiLevel, tabLevels)}
         </ThemedText>
       </View>
     </ScrollView>
   );
 }
 
-function getVisibleTabsDescription(level: number): string {
-  if (level === 1) return "Home, Focus, Gallery, Settings";
-  if (level === 2) return "Home, Explore, Focus, Gallery, Map, Settings, Profile";
-  return "All tabs";
+function getVisibleTabsDescription(level: number, tabLevels: Record<string, number>): string {
+  const alwaysVisibleTabs = ["Home", "Settings"];
+
+  // Get tabs visible at current UI level
+  const visibleCustomTabs = tabsToCustomize
+    .filter(tab => tabLevels[tab.name] <= level)
+    .map(tab => tab.title);
+
+  const allVisibleTabs = [...alwaysVisibleTabs, ...visibleCustomTabs];
+
+  return allVisibleTabs.join(", ");
 }
 
 const styles = StyleSheet.create({
@@ -118,5 +196,46 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
+  },
+  tabLevelOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(200, 200, 200, 0.2)',
+  },
+  tabInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  tabIcon: {
+    marginRight: 8,
+  },
+  tabLevelButtons: {
+    flexDirection: 'row',
+  },
+  levelButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(200, 200, 200, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  selectedLevelButton: {
+    backgroundColor: 'rgba(100, 100, 255, 0.2)',
+    borderColor: 'rgba(100, 100, 255, 0.5)',
+  },
+  selectedLevelText: {
+    fontWeight: 'bold',
+  },
+  note: {
+    marginTop: 16,
+    fontStyle: 'italic',
+    opacity: 0.7,
   },
 });

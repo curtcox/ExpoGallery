@@ -51,8 +51,17 @@ export default function TabLayout() {
     return () => unsubscribe();
   }, []);
 
-  // Filter tabs based on UI level
-  const visibleTabs = tabConfigurations.filter(tab => tab.uiLevel <= settings.UI_Level);
+  // Filter tabs based on UI level and custom tab levels
+  const visibleTabs = tabConfigurations.filter(tab => {
+    // Index and settings are always visible
+    if (tab.name === 'index' || tab.name === 'settings') {
+      return true;
+    }
+
+    // For other tabs, check custom tab level settings
+    const tabLevel = settings.tabLevels?.[tab.name] ?? tab.uiLevel;
+    return tabLevel <= settings.UI_Level;
+  });
 
   // Check if current tab is accessible at current UI level
   useEffect(() => {
@@ -103,6 +112,14 @@ export default function TabLayout() {
       }}>
         {tabConfigurations.map(tab => {
           const { title, icon } = getTabProperties(tab);
+
+          // Determine if tab should be visible based on custom settings
+          let isVisible = true;
+          if (tab.name !== 'index' && tab.name !== 'settings') {
+            const tabLevel = settings.tabLevels?.[tab.name] ?? tab.uiLevel;
+            isVisible = tabLevel <= settings.UI_Level;
+          }
+
           return (
             <Tabs.Screen
               key={tab.name}
@@ -110,7 +127,7 @@ export default function TabLayout() {
               options={{
                 title,
                 tabBarIcon: ({ color }) => <Ionicons name={icon as any} size={24} color={color} />,
-                href: tab.uiLevel <= settings.UI_Level ? undefined : null,
+                href: isVisible ? undefined : null,
               }}
             />
           );
