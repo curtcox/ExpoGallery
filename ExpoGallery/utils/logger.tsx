@@ -1,3 +1,6 @@
+import { oneButtonAlert } from './alerts';
+import { settings } from '@/storage/settings';
+
 export interface LogEntry {
   index: number;
   timestamp: number;
@@ -31,4 +34,7 @@ export function info(message: string) {
       message,
       error
     });
+    if (settings.debug) {
+      oneButtonAlert(message);
+    }
   }
