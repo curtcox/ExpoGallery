@@ -6,7 +6,7 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
-import { currentSettings, subscribeToSettingsChanges } from './settings';
+import { subscribeToSettingsChanges, currentSettings } from '@/storage/settings';
 
 // Define tab configurations with UI levels and variants
 const tabConfigurations = [

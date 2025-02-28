@@ -5,7 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import HomeScreen_1 from '../index_1';
 import HomeScreen_2 from '../index_2';
 import HomeScreen_3 from '../index_3';
-import { currentSettings, subscribeToSettingsChanges } from './settings';
+import { currentSettings, subscribeToSettingsChanges } from '@/storage/settings';
 
 export default function HomeScreen() {
   const [settings, setSettings] = useState(currentSettings());

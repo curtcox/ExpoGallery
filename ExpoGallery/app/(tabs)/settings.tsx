@@ -1,70 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Switch, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { error, storage } from '@/utils/index';
-
-// Define settings type to fix circular reference
-type Settings = {
-  debug: boolean;
-  UI_Level: number;
-};
-
-// Initialize settings with default values
-let settings: Settings = {
-  debug: true,
-  UI_Level: 1,
-};
-
-// Update subscribers type
-const subscribers = new Set<(settings: Settings) => void>();
-
-// Load settings from storage on startup
-async function loadSettings() {
-  try {
-    const storedSettings = await storage.getItem('settings');
-    if (storedSettings) {
-      settings = { ...settings, ...JSON.parse(storedSettings) };
-      // Notify subscribers of loaded settings
-      subscribers.forEach(callback => callback(settings));
-    }
-  } catch (e) {
-    error('Failed to load settings:', e);
-  }
-}
-
-// Call loadSettings when the module is loaded
-loadSettings();
-
-export function currentSettings() {
-  return settings;
-}
+import { updateSettings, subscribeToSettingsChanges, settings } from '@/storage/settings';
 
 // Update the updateSettings function to persist changes
-export async function updateSettings(newSettings: Partial<Settings>) {
-  settings = { ...settings, ...newSettings };
-
-  // Persist to storage
-  try {
-    await storage.setItem('settings', JSON.stringify(settings));
-  } catch (e) {
-    error('Failed to save settings:', e);
-  }
-
-  // Notify all subscribers
-  subscribers.forEach(callback => callback(settings));
-
-  return settings;
-}
-
-export function subscribeToSettingsChanges(callback: (settings: Settings) => void) {
-  subscribers.add(callback);
-
-  // Return unsubscribe function
-  return () => {
-    subscribers.delete(callback);
-  };
-}
-
 export default function SettingsScreen() {
   const [uiLevel, setUiLevel] = useState(settings.UI_Level);
   const [debug, setDebug] = useState(settings.debug);

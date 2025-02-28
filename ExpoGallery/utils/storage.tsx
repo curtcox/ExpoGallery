@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { info, error } from '../utils/logger';
+import { info, error } from './logger';
 import { Platform } from 'react-native';
 
 export const save = async (
