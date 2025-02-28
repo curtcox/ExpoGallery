@@ -1,22 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Switch, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
+import { error, storage } from '@/utils/index';
 
-// Settings singleton
-let settings = {
+// Define settings type to fix circular reference
+type Settings = {
+  debug: boolean;
+  UI_Level: number;
+};
+
+// Initialize settings with default values
+let settings: Settings = {
   debug: true,
   UI_Level: 1,
 };
 
-// Subscribers to settings changes
-const subscribers = new Set<(settings: typeof settings) => void>();
+// Update subscribers type
+const subscribers = new Set<(settings: Settings) => void>();
+
+// Load settings from storage on startup
+async function loadSettings() {
+  try {
+    const storedSettings = await storage.getItem('settings');
+    if (storedSettings) {
+      settings = { ...settings, ...JSON.parse(storedSettings) };
+      // Notify subscribers of loaded settings
+      subscribers.forEach(callback => callback(settings));
+    }
+  } catch (e) {
+    error('Failed to load settings:', e);
+  }
+}
+
+// Call loadSettings when the module is loaded
+loadSettings();
 
 export function currentSettings() {
   return settings;
 }
 
-export function updateSettings(newSettings: Partial<typeof settings>) {
+// Update the updateSettings function to persist changes
+export async function updateSettings(newSettings: Partial<Settings>) {
   settings = { ...settings, ...newSettings };
+
+  // Persist to storage
+  try {
+    await storage.setItem('settings', JSON.stringify(settings));
+  } catch (e) {
+    error('Failed to save settings:', e);
+  }
 
   // Notify all subscribers
   subscribers.forEach(callback => callback(settings));
@@ -24,7 +56,7 @@ export function updateSettings(newSettings: Partial<typeof settings>) {
   return settings;
 }
 
-export function subscribeToSettingsChanges(callback: (settings: typeof settings) => void) {
+export function subscribeToSettingsChanges(callback: (settings: Settings) => void) {
   subscribers.add(callback);
 
   // Return unsubscribe function
@@ -48,19 +80,29 @@ export default function SettingsScreen() {
     updateSettings({ debug: newDebug });
   };
 
+  // Load settings when component mounts
+  useEffect(() => {
+    const unsubscribe = subscribeToSettingsChanges((newSettings) => {
+      setUiLevel(newSettings.UI_Level);
+      setDebug(newSettings.debug);
+    });
+
+    return unsubscribe;
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <ThemedText type="title" style={styles.header}>Settings</ThemedText>
 
       <View style={styles.section}>
         <ThemedText type="subtitle">UI Complexity Level</ThemedText>
-        <ThemedText type="body">Controls which features are visible in the app</ThemedText>
+        <ThemedText type="default">Controls which features are visible in the app</ThemedText>
 
         <View style={styles.levelContainer}>
           {[1, 2, 3].map(level => (
             <View key={level} style={styles.levelOption}>
               <ThemedText
-                type="body"
+                type="default"
                 style={uiLevel === level ? styles.selectedLevel : {}}
               >
                 Level {level}
@@ -69,7 +111,7 @@ export default function SettingsScreen() {
                 value={uiLevel === level}
                 onValueChange={() => handleUILevelChange(level)}
               />
-              <ThemedText type="caption">
+              <ThemedText type="default">
                 {level === 1 ? 'Basic' : level === 2 ? 'Intermediate' : 'Advanced'}
               </ThemedText>
             </View>
@@ -80,16 +122,16 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <ThemedText type="subtitle">Developer Options</ThemedText>
         <View style={styles.option}>
-          <ThemedText type="body">Debug Mode</ThemedText>
+          <ThemedText type="default">Debug Mode</ThemedText>
           <Switch value={debug} onValueChange={toggleDebug} />
         </View>
       </View>
 
       <View style={styles.section}>
-        <ThemedText type="caption">
+        <ThemedText type="default">
           Current UI Level: {uiLevel} {debug ? '(Debug Mode On)' : ''}
         </ThemedText>
-        <ThemedText type="caption">
+        <ThemedText type="default">
           Visible tabs: {getVisibleTabsDescription(uiLevel)}
         </ThemedText>
       </View>

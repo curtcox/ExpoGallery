@@ -122,14 +122,26 @@ export default function Example() {
   const [storageKeys, setStorageKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    info('Viewing Storage Example');
-    getAllKeys(setStorageKeys);
+    const initializeStorage = async () => {
+      try {
+        info('Viewing Storage Example');
+        await getAllKeys(setStorageKeys);
+      } catch (e) {
+        error('Error initializing storage:', e);
+      }
+    };
+
+    initializeStorage();
   }, []);
 
   useEffect(() => {
-    if (lastOperation.type) {
-      getAllKeys(setStorageKeys);
-    }
+    const refreshKeys = async () => {
+      if (lastOperation.type) {
+        await getAllKeys(setStorageKeys);
+      }
+    };
+
+    refreshKeys();
   }, [lastOperation]);
 
   const handleSave = () => {
