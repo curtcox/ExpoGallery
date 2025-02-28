@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Button, Image } from 'react-native';
 import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
-import { info, error } from './log-example';
+import { info, error } from '../utils/logger';
 import { oneButtonAlert } from './alert-example';
 
 // Embedded JSON data with resource markers

@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, Button, Alert, Platform} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-import { info } from './log-example';
+import { info } from '../utils/logger';
 import { useEffect } from 'react';
 
 const handlePress = (buttonType: string) => {

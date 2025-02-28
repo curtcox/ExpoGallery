@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TextInput, Button, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { info, error } from './log-example';
+import { info, error } from '../utils/logger';
 
 const save = async (key: string, value: string, setLastOperation: Function) => {
   try {

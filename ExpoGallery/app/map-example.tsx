@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Button, Alert } from 'react-native';
 import MapView from '@/components/MapView';
 import * as Location from 'expo-location';
-import { info, error } from './log-example';
+import { info, error } from '../utils/logger';
 import { oneButtonAlert } from './alert-example';
 
 export default function Example() {

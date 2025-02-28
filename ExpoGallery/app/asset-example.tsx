@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ThemedText } from '@/components/ThemedText';
-import { info, error } from './log-example';
+import { info, error } from '../utils/logger';
 
 export default function Example() {
   const [contents, setContents] = useState('');
