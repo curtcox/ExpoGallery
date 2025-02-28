@@ -3,24 +3,7 @@ import {StyleSheet, Button, Alert, Platform} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import { info } from '../utils/logger';
 import { useEffect } from 'react';
-
-const handlePress = (buttonType: string) => {
-  const message = `${buttonType} Pressed`;
-  info(message);
-  console.log(message);
-};
-
-export const oneButtonAlert = (message: string) => {
-  if (Platform.OS === 'web') {
-    window.alert(message);
-    handlePress('OK');
-  } else {
-    Alert.alert('Alert Title', message, [
-      {text: 'OK', onPress: () => handlePress('OK')},
-    ]);
-  }
-};
-
+import { handlePress, oneButtonAlert } from '../utils/alerts';
 export default function Example() {
 
   useEffect(() => {

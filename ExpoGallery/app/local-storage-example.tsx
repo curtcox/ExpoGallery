@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TextInput, Button } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { info, error } from '../utils/logger';
-import { oneButtonAlert } from './alert-example';
+import { info, error, oneButtonAlert } from '../utils/index';
 
 // Helper function to generate a file path from the key
 const getFilePath = (key: string) => FileSystem.documentDirectory + key;

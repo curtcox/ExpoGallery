@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Link } from 'expo-router';
-import { info } from '../log-example';
+import { info } from '../../utils/logger';
 
 export default function HomeScreen() {
   useEffect(() => {

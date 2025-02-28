@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GiftedChat, IMessage, MessageTextProps } from 'react-native-gifted-chat';
 import { MessageText } from 'react-native-gifted-chat';
-import { oneButtonAlert } from './alert-example';
+import { oneButtonAlert } from '../utils/alerts';
 
 export default function Example() {
   const [messages, setMessages] = useState<IMessage[]>([]);

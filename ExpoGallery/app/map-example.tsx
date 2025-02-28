@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Button, Alert } from 'react-native';
 import MapView from '@/components/MapView';
 import * as Location from 'expo-location';
-import { info, error } from '../utils/logger';
-import { oneButtonAlert } from './alert-example';
+import { info, error, oneButtonAlert } from '../utils/index';
 
 export default function Example() {
   const [region, setRegion] = useState<{

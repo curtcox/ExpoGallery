@@ -3,8 +3,7 @@ import { useLocalSearchParams } from 'expo-router';
 import resourcesData from '../assets/json/resources.json';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Linking, Platform } from 'react-native';
-import { info, error } from '../utils/logger';
-import { oneButtonAlert } from './alert-example';
+import { info, error, oneButtonAlert } from '../utils/index';
 
 export default function Route() {
   const { id } = useLocalSearchParams<{
