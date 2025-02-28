@@ -13,9 +13,9 @@ const tabConfigurations = [
   {
     name: 'index',
     variants: [
-      { uiLevel: 1, title: 'Basic',    icon: 'home-outline' },
-      { uiLevel: 2, title: 'Advanced', icon: 'rocket-outline' },
-      { uiLevel: 3, title: 'Expert',   icon: 'diamond-outline' }
+      { uiLevel: 1, title: 'Basic',        icon: 'home-outline' },
+      { uiLevel: 2, title: 'Intermediate', icon: 'rocket-outline' },
+      { uiLevel: 3, title: 'Advanced',     icon: 'diamond-outline' }
     ],
     defaultTitle: 'Home',
     defaultIcon: 'home-outline',
@@ -72,7 +72,7 @@ export default function TabLayout() {
 
   // Helper function to get tab properties based on UI level
   const getTabProperties = (tab: typeof tabConfigurations[0]) => {
-    if ('variants' in tab) {
+    if ('variants' in tab && tab.variants) {
       // Find the highest matching variant for current UI level
       const matchingVariant = [...tab.variants]
         .reverse()
