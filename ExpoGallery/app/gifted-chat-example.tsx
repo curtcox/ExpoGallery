@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { GiftedChat, IMessage } from 'react-native-gifted-chat'
 
-export default function HomeScreen() {
+export default function Example() {
   const [messages, setMessages] = useState<IMessage[]>([])
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { info, error } from './log-example';
 import { oneButtonAlert } from './alert-example';
 
-export default function HomeScreen() {
+export default function Example() {
   const [region, setRegion] = useState<{
     latitude: number;
     longitude: number;

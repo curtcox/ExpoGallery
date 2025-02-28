@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 import * as Device from 'expo-device';
 
-export default function HomeScreen() {
+export default function Example() {
   return (
     <View>
       <Text> {Device.manufacturer}: {Device.modelName} </Text>

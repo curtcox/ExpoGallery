@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-export default function HomeScreen() {
+export default function Example() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Notice that the status bar has light text!</Text>

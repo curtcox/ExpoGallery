@@ -1,6 +1,6 @@
 import { Image, View } from 'react-native';
 
-export default function HomeScreen() {
+export default function Example() {
 
   return (
     <View>

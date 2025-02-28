@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { info, error } from './log-example';
 
-export default function HomeScreen() {
+export default function Example() {
   const [contents, setContents] = useState('');
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import { Platform, Text, View, StyleSheet } from 'react-native';
 import * as Device from 'expo-device';
 import * as Location from 'expo-location';
 
-export default function HomeScreen() {
+export default function Example() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 

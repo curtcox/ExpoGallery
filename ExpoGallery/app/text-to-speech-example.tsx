@@ -6,7 +6,7 @@ const speak = () => {
     Speech.speak(thingToSay);
 };
 
-export default function HomeScreen() {
+export default function Example() {
   return (
     <View style={styles.container}>
       <Button title="Text to speech" onPress={speak} />

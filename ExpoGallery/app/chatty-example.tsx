@@ -122,38 +122,40 @@ export default function Example() {
   };
 
   const onPressSend = React.useCallback(
-    ({ text, repliedTo }) => {
-      listRef.current.appendMessage({
-        id: messages.length + 1,
-        text,
-        me: Math.floor(Math.random() * 2) === 0,
-        createdAt: new Date(),
-        user: {
+    ({ text, repliedTo }: { text: string; repliedTo?: any }) => {
+      if (listRef.current) {
+        listRef.current.appendMessage({
           id: messages.length + 1,
-          name: "Jane Doe",
-          avatar: { uri: "https://i.pravatar.cc/300" },
-        },
-        repliedTo,
-      });
+          text,
+          me: Math.floor(Math.random() * 2) === 0,
+          createdAt: new Date(),
+          user: {
+            id: messages.length + 1,
+            name: "Jane Doe",
+            avatar: { uri: "https://i.pravatar.cc/300" },
+          },
+          repliedTo,
+        });
 
-      listRef.current.setIsTyping(false);
+        listRef.current.setIsTyping(false);
+      }
       setReplying(null);
     },
     [messages],
   );
 
-  const onChangeText = React.useCallback((text) => {
+  const onChangeText = React.useCallback((text: string) => {
     console.log(text);
     message.current = text;
     //@ts-ignore
-    listRef.current.setIsTyping(text.length > 0);
+    listRef.current?.setIsTyping(text.length > 0);
   }, []);
 
   const onPressLike = React.useCallback(() => {
     if (Platform.OS === "web")
       return alert("Liked a message (Custom logic and view)");
     Alert.alert("Liked a message (Custom logic and view)");
-  });
+  }, []);
 
   if (messages.length < 1) return <ActivityIndicator />;
 
@@ -201,8 +203,8 @@ export default function Example() {
             onLoadEarlier: onLoadEarlier,
             show: messages.length === 10 ? false : true,
           }}
-          onReply={(_message) => {
-            setReplying(_message);
+          onReply={(message) => {
+            setReplying(message as any);
           }}
           renderTypingBubble={() => <Text>Custom View (Typing...)</Text>}
           replyingTo={replying ?? undefined}
@@ -219,4 +221,4 @@ export default function Example() {
   );
 }
 
-AppRegistry.registerComponent("chatty", () => App);
+AppRegistry.registerComponent("chatty", () => Example);

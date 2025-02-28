@@ -38,7 +38,7 @@ const getValueFor = async (
   }
 };
 
-export default function HomeScreen() {
+export default function Example() {
   const [key, onChangeKey] = useState('Your key here');
   const [value, onChangeValue] = useState('Your value here');
   const [loadKey, setLoadKey] = useState(''); // New state for the load key input

@@ -21,7 +21,7 @@ export const oneButtonAlert = (message: string) => {
   }
 };
 
-export default function HomeScreen() {
+export default function Example() {
 
   useEffect(() => {
     info('Viewing Alert Example');

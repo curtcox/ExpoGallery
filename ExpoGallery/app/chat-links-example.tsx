@@ -3,7 +3,7 @@ import { GiftedChat, IMessage, MessageTextProps } from 'react-native-gifted-chat
 import { MessageText } from 'react-native-gifted-chat';
 import { oneButtonAlert } from './alert-example';
 
-export default function HomeScreen() {
+export default function Example() {
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function HomeScreen() {
   const CustomMessageText = (props: MessageTextProps<IMessage>) => {
     // The key is to provide a function that returns a properly formatted array
     // of patterns for ParsedText to use
-    const parsePatterns = useCallback((linkStyle) => {
+    const parsePatterns = useCallback((linkStyle: any) => {
       return [
         {
           pattern: /\bcalculator\b/i,
@@ -49,9 +49,9 @@ export default function HomeScreen() {
           },
         },
         // These are the default patterns that GiftedChat uses
-        { type: 'url',   style: linkStyle, onPress: (url)   => oneButtonAlert('Opening URL' + url) },
-        { type: 'phone', style: linkStyle, onPress: (phone) => oneButtonAlert('Calling ' +phone) },
-        { type: 'email', style: linkStyle, onPress: (email) => oneButtonAlert('Sending Email ' + email) },
+        { type: 'url',   style: linkStyle, onPress: (url: string)   => oneButtonAlert('Opening URL' + url) },
+        { type: 'phone', style: linkStyle, onPress: (phone: string) => oneButtonAlert('Calling ' +phone) },
+        { type: 'email', style: linkStyle, onPress: (email: string) => oneButtonAlert('Sending Email ' + email) },
       ];
     }, []);
 
@@ -61,7 +61,7 @@ export default function HomeScreen() {
   // Function to generate a bot response
   const generateBotResponse = useCallback((userMessage: string) => {
     let responseText = `You said: ${userMessage}`;
-    
+
     // Check if the message contains any of our keywords
     if (/calculator/i.test(userMessage)) {
       responseText = 'I see you mentioned calculator! Tap on "calculator" to open it.';

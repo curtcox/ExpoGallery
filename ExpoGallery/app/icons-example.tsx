@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 import { Link } from 'expo-router';
 
-export default function HomeScreen() {
+export default function Example() {
   return (
       <View>
         <ThemedText type="title">Icons Example</ThemedText>

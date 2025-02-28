@@ -15,7 +15,7 @@ async function getValueFor(key: string) {
   }
 }
 
-export default function HomeScreen() {
+export default function Example() {
   const [key, onChangeKey] = useState('Your key here');
   const [value, onChangeValue] = useState('Your value here');
 

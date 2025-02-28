@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import * as Crypto from 'expo-crypto';
 
-export default function HomeScreen() {
+export default function Example() {
   const [digest, setDigest] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
 

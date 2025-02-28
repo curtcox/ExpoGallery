@@ -6,11 +6,11 @@ import {
 } from "expo-speech-recognition";
 
 
-export default function HomeScreen() {
+export default function Example() {
 
   const [recognizing, setRecognizing] = useState(false);
   const [transcript, setTranscript] = useState("");
-  
+
   useSpeechRecognitionEvent("start", () => setRecognizing(true));
   useSpeechRecognitionEvent("end", () => setRecognizing(false));
   useSpeechRecognitionEvent("result", (event) => {
@@ -19,7 +19,7 @@ export default function HomeScreen() {
   useSpeechRecognitionEvent("error", (event) => {
     console.log("error code:", event.error, "error message:", event.message);
   });
-  
+
   const handleStart = async () => {
     const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
     if (!result.granted) {

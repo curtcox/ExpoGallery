@@ -39,11 +39,11 @@ function Item({ index }: ItemProps) {
   );
 }
 
-export default function HomeScreen() {
+export default function Example() {
   const { top, bottom } = useSafeAreaInsets();
   const scheme = useColorScheme();
   const isLight = scheme === 'light';
-  
+
   return (
     <FlashList
       data={DATA}

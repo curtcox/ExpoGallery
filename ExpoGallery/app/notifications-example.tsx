@@ -12,7 +12,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function HomeScreen() {
+export default function Example() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [channels, setChannels] = useState<Notifications.NotificationChannel[]>([]);
   const [notification, setNotification] = useState<Notifications.Notification | undefined>(
