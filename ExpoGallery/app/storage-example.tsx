@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, TextInput, Button } from 'react-native';
+import { Text, View, StyleSheet, TextInput, Button, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { info, error } from './log-example';
 import { useEffect } from 'react';
@@ -27,15 +27,36 @@ const getValueFor = async (key: string, setLastOperation: Function, onChangeKey:
   }
 };
 
+// New function to get all keys from AsyncStorage
+const getAllKeys = async (setStorageKeys: Function) => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    setStorageKeys(keys);
+    info('Retrieved all storage keys');
+  } catch (e) {
+    error('Error getting all keys', e);
+  }
+};
+
 export default function HomeScreen() {
   const [key, onChangeKey] = useState('Your key here');
   const [value, onChangeValue] = useState('Your value here');
   const [loadKey, setLoadKey] = useState(''); // New state for the load key input
   const [lastOperation, setLastOperation] = useState({ key: '', value: '', type: '' });
+  const [storageKeys, setStorageKeys] = useState<string[]>([]);
 
   useEffect(() => {
     info('Viewing Storage Example');
+    // Load all keys when component mounts
+    getAllKeys(setStorageKeys);
   }, []);
+
+  // Refresh keys after operations
+  useEffect(() => {
+    if (lastOperation.type) {
+      getAllKeys(setStorageKeys);
+    }
+  }, [lastOperation]);
 
   return (
     <View style={styles.container}>
@@ -89,6 +110,37 @@ export default function HomeScreen() {
           <Text>Value: {JSON.stringify(lastOperation.value)}</Text>
         </View>
       )}
+
+      <View style={styles.keysContainer}>
+        <View style={styles.keysHeader}>
+          <Text style={styles.keysTitle}>All Storage Keys:</Text>
+          <Button
+            title="Refresh"
+            onPress={() => getAllKeys(setStorageKeys)}
+          />
+        </View>
+
+        {storageKeys.length > 0 ? (
+          <FlatList
+            data={storageKeys}
+            renderItem={({ item }) => (
+              <Text
+                style={styles.keyItem}
+                onPress={() => {
+                  setLoadKey(item);
+                  getValueFor(item, setLastOperation, onChangeKey, onChangeValue);
+                }}
+              >
+                {item}
+              </Text>
+            )}
+            keyExtractor={(item) => item}
+            style={styles.keysList}
+          />
+        ) : (
+          <Text style={styles.noKeys}>No keys in storage</Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -132,5 +184,37 @@ const styles = StyleSheet.create({
   lastOperationTitle: {
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  // New styles for the keys display
+  keysContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    maxHeight: 200,
+  },
+  keysHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  keysTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  keysList: {
+    maxHeight: 150,
+  },
+  keyItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    color: '#0066cc',
+  },
+  noKeys: {
+    fontStyle: 'italic',
+    textAlign: 'center',
+    padding: 10,
   },
 });
