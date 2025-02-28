@@ -31,6 +31,7 @@ export default function HomeScreen() {
       {exampleRow('device-info',    'Device Info',    'information',            'versions/latest/sdk/device/')}
       {exampleRow('chatty',         'Chatty',         'chatbubble-outline',     'https://github.com/MuhammedKpln/react-native-chatty')}
       {exampleRow('gifted-chat',    'Gifted Chat',    'chatbubble-outline',     'https://github.com/FaridSafi/react-native-gifted-chat')}
+      {exampleRow('chat-links',     'Chat with links','chatbubble-outline',     'https://github.com/FaridSafi/react-native-gifted-chat')}
       {exampleRow('crypto',         'Crypto',         'key',                    'latest/sdk/crypto/')}
       {exampleRow('icons',          'Icons',          'images-sharp',           'guides/icons/')}
       {exampleRow('map',            'Map',            'map-outline',            'versions/latest/sdk/map-view/')}
