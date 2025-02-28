@@ -8,16 +8,26 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
 import { currentSettings, subscribeToSettingsChanges } from './settings';
 
-// Define tab configurations with UI levels
+// Define tab configurations with UI levels and variants
 const tabConfigurations = [
-  { name: 'index', title: 'Home', icon: 'home', uiLevel: 1 },
-  { name: 'explore', title: 'Explore', icon: 'airplane', uiLevel: 3 },
-  { name: 'focus', title: 'Focus', icon: 'search-outline', uiLevel: 2 },
-  { name: 'gallery', title: 'Gallery', icon: 'albums', uiLevel: 3 },
-  { name: 'map', title: 'Map', icon: 'map-outline', uiLevel: 1 },
-  { name: 'chat', title: 'Chat', icon: 'chatbubble-outline', uiLevel: 1 },
-  { name: 'settings', title: 'Settings', icon: 'settings-outline', uiLevel: 1 },
-  { name: 'profile', title: 'Profile', icon: 'person-outline', uiLevel: 1 },
+  {
+    name: 'index',
+    variants: [
+      { uiLevel: 1, title: 'Basic',    icon: 'home-outline' },
+      { uiLevel: 2, title: 'Advanced', icon: 'rocket-outline' },
+      { uiLevel: 3, title: 'Expert',   icon: 'diamond-outline' }
+    ],
+    defaultTitle: 'Home',
+    defaultIcon: 'home-outline',
+    uiLevel: 1
+  },
+  { name: 'explore',  title: 'Explore',  icon: 'airplane',           uiLevel: 3 },
+  { name: 'focus',    title: 'Focus',    icon: 'search-outline',     uiLevel: 2 },
+  { name: 'gallery',  title: 'Gallery',  icon: 'albums',             uiLevel: 3 },
+  { name: 'map',      title: 'Map',      icon: 'map-outline',        uiLevel: 1 },
+  { name: 'chat',     title: 'Chat',     icon: 'chatbubble-outline', uiLevel: 1 },
+  { name: 'settings', title: 'Settings', icon: 'settings-outline',   uiLevel: 1 },
+  { name: 'profile',  title: 'Profile',  icon: 'person-outline',     uiLevel: 1 },
 ];
 
 export default function TabLayout() {
@@ -60,6 +70,22 @@ export default function TabLayout() {
     }
   }, [segments, settings.UI_Level, visibleTabs, isLayoutMounted]);
 
+  // Helper function to get tab properties based on UI level
+  const getTabProperties = (tab: typeof tabConfigurations[0]) => {
+    if ('variants' in tab) {
+      // Find the highest matching variant for current UI level
+      const matchingVariant = [...tab.variants]
+        .reverse()
+        .find(variant => variant.uiLevel <= settings.UI_Level);
+
+      return {
+        title: matchingVariant?.title ?? tab.defaultTitle,
+        icon: matchingVariant?.icon ?? tab.defaultIcon
+      };
+    }
+    return { title: tab.title, icon: tab.icon };
+  };
+
   return (
     <Tabs
       screenOptions={{
@@ -75,18 +101,20 @@ export default function TabLayout() {
           default: {},
         }),
       }}>
-        {tabConfigurations.map(tab => (
-          <Tabs.Screen
-            key={tab.name}
-            name={tab.name}
-            options={{
-              title: tab.title,
-              tabBarIcon: ({ color }) => <Ionicons name={tab.icon as any} size={24} color={color} />,
-              // Hide tabs that exceed the current UI level
-              href: tab.uiLevel <= settings.UI_Level ? undefined : null,
-            }}
-          />
-        ))}
+        {tabConfigurations.map(tab => {
+          const { title, icon } = getTabProperties(tab);
+          return (
+            <Tabs.Screen
+              key={tab.name}
+              name={tab.name}
+              options={{
+                title,
+                tabBarIcon: ({ color }) => <Ionicons name={icon as any} size={24} color={color} />,
+                href: tab.uiLevel <= settings.UI_Level ? undefined : null,
+              }}
+            />
+          );
+        })}
     </Tabs>
   );
 }
