@@ -62,9 +62,9 @@ export default function GalleryScreen() {
         exampleRow(
           example.name,
           example.text,
-          example.icon as any, // Type assertion to fix TypeScript error
+          example.icon as any,
           example.url,
-          example.selected,
+          example.selected ?? false,
           () => toggleExample(index),
           index
         )
@@ -76,14 +76,14 @@ export default function GalleryScreen() {
 function exampleRow(
   name: string,
   text: string,
-  icon: any, // Changed type to any to fix TypeScript error
+  icon: any,
   url: string,
   selected: boolean,
   onToggle: () => void,
   key: number
 ) {
-  const examplePage = `/${name}-example` as const; // Type assertion to fix TypeScript error
-  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}` as const; // Type assertion to fix TypeScript error
+  const examplePage = `/${name}-example` as const;
+  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}` as const;
 
   return (
     <View style={styles.linkRow} key={key}>
