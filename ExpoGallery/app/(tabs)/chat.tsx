@@ -63,7 +63,7 @@ export default function ChatTab() {
     return <MessageText {...props} parsePatterns={parsePatterns} />;
   };
 
-  const onSend = useCallback((messages: IMessage[] = []) => {
+  const onSend = useCallback(async (messages: IMessage[] = []) => {
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, messages),
     );
@@ -72,13 +72,14 @@ export default function ChatTab() {
     if (messages.length > 0) {
       const userMessage = messages[0].text;
 
-      // Add a small delay to make it feel more natural
-      setTimeout(() => {
-        const botResponse = generateBotResponse(userMessage);
+      try {
+        const botResponse = await generateBotResponse(userMessage);
         setMessages(previousMessages =>
           GiftedChat.append(previousMessages, [botResponse]),
         );
-      }, 1000);
+      } catch (error) {
+        console.error('Failed to get bot response:', error);
+      }
     }
   }, []);
 
