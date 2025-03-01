@@ -1,4 +1,3 @@
-// Define a type for our example items
 export type ExampleItem = {
   name: string;
   text: string;
@@ -7,10 +6,6 @@ export type ExampleItem = {
   selected?: boolean;
 };
 
-// Define a constant for storage key
-export const FOCUSED_EXAMPLES_KEY = 'focusedExamples';
-
-// Define all examples in one place
 export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'alert', text: 'Alert', icon: 'alert-outline', url: 'https://reactnative.dev/docs/alert' },
   { name: 'asset', text: 'Asset', icon: 'alert-outline', url: 'versions/latest/sdk/asset/' },

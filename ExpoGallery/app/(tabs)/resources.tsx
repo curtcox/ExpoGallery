@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, FlatList, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, FlatList, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import resourcesData from '../../assets/json/resources.json';
 import { router } from 'expo-router';
