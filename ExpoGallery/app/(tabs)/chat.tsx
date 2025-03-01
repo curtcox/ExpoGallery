@@ -1,9 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GiftedChat, IMessage, MessageTextProps } from 'react-native-gifted-chat';
 import { MessageText } from 'react-native-gifted-chat';
-import { TextStyle } from 'react-native';
+import { TextStyle, Platform } from 'react-native';
 import { oneButtonAlert } from '@/utils/alerts';
 import { generateBotResponse } from '@/services/chat';
+
+const isServerSideRendering = () => {
+  return Platform.OS === 'web' && typeof window === 'undefined';
+};
 
 export default function ChatTab() {
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -77,6 +81,10 @@ export default function ChatTab() {
       }, 1000);
     }
   }, []);
+
+  if (isServerSideRendering()) {
+    return null;
+  }
 
   return (
     <GiftedChat
