@@ -62,7 +62,8 @@
     "react-native-chatty": "~0.2.7",
     "react-native-context-menu-view": "*",
     "react-native-parsed-text": "*",
-    "moment": "*"
+    "moment": "*",
+    "@react-native-picker/picker": "2.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
