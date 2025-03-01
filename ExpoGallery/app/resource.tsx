@@ -1,16 +1,16 @@
 import { Text, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import resourcesData from '../assets/json/resources.json';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Linking, Platform } from 'react-native';
 import { info, error, oneButtonAlert } from '../utils/index';
+import { getResourceById } from '@/services/data';
 
 export default function Route() {
   const { id } = useLocalSearchParams<{
     id: string;
   }>();
 
-  const resource = resourcesData.resources.find(r => r.id === id);
+  const resource = getResourceById(id);
 
   // If no resource is found, display a message
   if (!resource) {

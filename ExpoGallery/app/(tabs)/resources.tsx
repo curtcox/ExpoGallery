@@ -1,19 +1,20 @@
 import React from 'react';
 import { StyleSheet, FlatList, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import resourcesData from '../../assets/json/resources.json';
 import { router } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { Colors } from '@/constants/Colors';
+import { getAllResources, Resource } from '@/services/data';
 
 export default function ResourcesScreen() {
   const colorScheme = useColorScheme();
+  const resources = getAllResources();
 
   const navigateToResource = (id: string) => {
     router.push(`/resource?id=${id}`);
   };
 
-  const renderResourceItem = ({ item }: { item: typeof resourcesData.resources[0] }) => (
+  const renderResourceItem = ({ item }: { item: Resource }) => (
     <TouchableOpacity
       style={styles.resourceCard}
       onPress={() => navigateToResource(item.id)}
@@ -49,7 +50,7 @@ export default function ResourcesScreen() {
       <ThemedText type="title" style={styles.screenTitle}>Resources</ThemedText>
 
       <FlatList
-        data={resourcesData.resources}
+        data={resources}
         renderItem={renderResourceItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContainer}
