@@ -1,16 +1,20 @@
 import { error, storage } from '@/utils/index';
 
-// Define settings type to fix circular reference
-export type Settings = {
-  debug: boolean;
+export interface Settings {
   UI_Level: number;
+  debug: boolean;
+  tabLevels?: Record<string, number>;
+}
+
+// Default settings
+export const defaultSettings: Settings = {
+  UI_Level: 1,
+  debug: false,
+  tabLevels: {},
 };
 
-// Initialize settings with default values
-export let settings: Settings = {
-  debug: true,
-  UI_Level: 1,
-};
+// Current settings (in memory)
+export let settings: Settings = { ...defaultSettings };
 
 // Call loadSettings when the module is loaded
 loadSettings();
