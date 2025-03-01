@@ -25,6 +25,7 @@ const tabConfigurations = [
   { name: 'focus',    title: 'Focus',    icon: 'search-outline',     uiLevel: 2 },
   { name: 'gallery',  title: 'Gallery',  icon: 'albums',             uiLevel: 3 },
   { name: 'map',      title: 'Map',      icon: 'map-outline',        uiLevel: 1 },
+  { name: 'resources', title: 'Resources', icon: 'book-outline',     uiLevel: 1 },
   { name: 'chat',     title: 'Chat',     icon: 'chatbubble-outline', uiLevel: 1 },
   { name: 'settings', title: 'Settings', icon: 'settings-outline',   uiLevel: 1 },
   { name: 'profile',  title: 'Profile',  icon: 'person-outline',     uiLevel: 1 },

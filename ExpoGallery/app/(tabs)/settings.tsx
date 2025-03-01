@@ -10,6 +10,7 @@ const tabsToCustomize = [
   { name: 'focus', title: 'Focus', icon: 'search-outline', defaultLevel: 2 },
   { name: 'gallery', title: 'Gallery', icon: 'albums', defaultLevel: 3 },
   { name: 'map', title: 'Map', icon: 'map-outline', defaultLevel: 1 },
+  { name: 'resources', title: 'Resources', icon: 'book-outline', defaultLevel: 1 },
   { name: 'chat', title: 'Chat', icon: 'chatbubble-outline', defaultLevel: 1 },
   { name: 'profile', title: 'Profile', icon: 'person-outline', defaultLevel: 1 },
   { name: 'log', title: 'Log', icon: 'document-text-outline', defaultLevel: 3 },
