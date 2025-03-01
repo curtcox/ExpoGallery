@@ -4,6 +4,7 @@ export interface Settings {
   UI_Level: number;
   debug: boolean;
   tabLevels?: Record<string, number>;
+  focusedExamples: string[];
 }
 
 // Default settings
@@ -11,6 +12,7 @@ export const defaultSettings: Settings = {
   UI_Level: 1,
   debug: false,
   tabLevels: {},
+  focusedExamples: [],
 };
 
 // Current settings (in memory)

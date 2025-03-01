@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Link } from 'expo-router';
 import { info } from '@/utils/logger';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ALL_EXAMPLES, FOCUSED_EXAMPLES_KEY, ExampleItem } from '@/utils/examples';
+import { subscribeToSettingsChanges, currentSettings } from '@/storage/settings';
+import { ALL_EXAMPLES, ExampleItem } from '@/utils/examples';
 
 export default function FocusScreen() {
   const [focusedExamples, setFocusedExamples] = useState<ExampleItem[]>([]);
@@ -14,23 +14,18 @@ export default function FocusScreen() {
   useEffect(() => {
     info('Viewing Focus Screen');
 
-    const loadFocusedExamples = async () => {
+    const loadFocusedExamples = () => {
       try {
         setIsLoading(true);
-        const savedExampleNames = await AsyncStorage.getItem(FOCUSED_EXAMPLES_KEY);
+        const settings = currentSettings();
+        const selectedNames = settings.focusedExamples || [];
 
-        if (savedExampleNames) {
-          const selectedNames = JSON.parse(savedExampleNames) as string[];
+        // Filter to get only the selected examples
+        const selected = ALL_EXAMPLES.filter(example =>
+          selectedNames.includes(example.name)
+        );
 
-          // Filter to get only the selected examples
-          const selected = ALL_EXAMPLES.filter(example =>
-            selectedNames.includes(example.name)
-          );
-
-          setFocusedExamples(selected);
-        } else {
-          setFocusedExamples([]);
-        }
+        setFocusedExamples(selected);
       } catch (error) {
         console.error('Failed to load focused examples:', error);
         setFocusedExamples([]);
@@ -40,6 +35,13 @@ export default function FocusScreen() {
     };
 
     loadFocusedExamples();
+
+    // Subscribe to settings changes
+    const unsubscribe = subscribeToSettingsChanges(() => {
+      loadFocusedExamples();
+    });
+
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -67,18 +69,18 @@ export default function FocusScreen() {
 }
 
 function exampleRow(name: string, text: string, icon: any, url: string, key: number) {
-  const examplePage = `/${name}-example` as const; // Type assertion to fix TypeScript error
-  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}` as const; // Type assertion to fix TypeScript error
+  const examplePage = `/${name}-example`;
+  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}`;
 
   return (
     <View style={styles.linkRow} key={key}>
       <Ionicons name={icon} size={24} color="black" />
       <View style={styles.docsLinkContainer}>
-        <Link href={docUrl}>Docs</Link>
+        <Link href={docUrl as any}>Docs</Link>
       </View>
       <View style={styles.spacer} />
       <View style={styles.primaryLinkContainer}>
-        <Link href={examplePage}>{text} Example</Link>
+        <Link href={examplePage as any}>{text} Example</Link>
       </View>
     </View>
   );

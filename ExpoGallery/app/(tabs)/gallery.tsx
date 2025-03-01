@@ -5,8 +5,8 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Link } from 'expo-router';
 import { info } from '../../utils/logger';
 import { Checkbox } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ALL_EXAMPLES, FOCUSED_EXAMPLES_KEY, ExampleItem } from '@/utils/examples';
+import { ALL_EXAMPLES, ExampleItem } from '@/utils/examples';
+import { subscribeToSettingsChanges, updateSettings, currentSettings } from '@/storage/settings';
 
 export default function GalleryScreen() {
   const [examples, setExamples] = useState<ExampleItem[]>(
@@ -16,23 +16,29 @@ export default function GalleryScreen() {
   useEffect(() => {
     info('Viewing Gallery');
 
-    // Load saved focused examples
-    const loadFocusedExamples = async () => {
-      try {
-        const savedExamples = await AsyncStorage.getItem(FOCUSED_EXAMPLES_KEY);
-        if (savedExamples) {
-          const selectedNames = JSON.parse(savedExamples) as string[];
-          setExamples(prev => prev.map(example => ({
-            ...example,
-            selected: selectedNames.includes(example.name)
-          })));
-        }
-      } catch (error) {
-        console.error('Failed to load focused examples:', error);
-      }
+    // Load saved focused examples from settings
+    const loadFocusedExamples = () => {
+      const settings = currentSettings();
+      const selectedNames = settings.focusedExamples || [];
+
+      setExamples(prev => prev.map(example => ({
+        ...example,
+        selected: selectedNames.includes(example.name)
+      })));
     };
 
     loadFocusedExamples();
+
+    // Subscribe to settings changes
+    const unsubscribe = subscribeToSettingsChanges((settings) => {
+      const selectedNames = settings.focusedExamples || [];
+      setExamples(prev => prev.map(example => ({
+        ...example,
+        selected: selectedNames.includes(example.name)
+      })));
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const toggleExample = (index: number) => {
@@ -40,12 +46,12 @@ export default function GalleryScreen() {
     updatedExamples[index].selected = !updatedExamples[index].selected;
     setExamples(updatedExamples);
 
-    // Save to AsyncStorage
+    // Save to settings
     const selectedNames = updatedExamples
       .filter(example => example.selected)
       .map(example => example.name);
 
-    AsyncStorage.setItem(FOCUSED_EXAMPLES_KEY, JSON.stringify(selectedNames))
+    updateSettings({ focusedExamples: selectedNames })
       .catch(error => console.error('Failed to save focused examples:', error));
   };
 
@@ -82,8 +88,8 @@ function exampleRow(
   onToggle: () => void,
   key: number
 ) {
-  const examplePage = `/${name}-example` as const;
-  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}` as const;
+  const examplePage = `/${name}-example`;
+  const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}`;
 
   return (
     <View style={styles.linkRow} key={key}>
@@ -93,11 +99,11 @@ function exampleRow(
       />
       <Ionicons name={icon} size={24} color="black" />
       <View style={styles.docsLinkContainer}>
-        <Link href={docUrl}>Docs</Link>
+        <Link href={docUrl as any}>Docs</Link>
       </View>
       <View style={styles.spacer} />
       <View style={styles.primaryLinkContainer}>
-        <Link href={examplePage}>{text} Example</Link>
+        <Link href={examplePage as any}>{text} Example</Link>
       </View>
     </View>
   );
