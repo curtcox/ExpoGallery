@@ -2,9 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { GiftedChat, IMessage, MessageTextProps } from 'react-native-gifted-chat';
 import { MessageText } from 'react-native-gifted-chat';
 import { TextStyle, Platform } from 'react-native';
-import { oneButtonAlert } from '@/utils/alerts';
 import { generateBotResponse } from '@/services/chat';
-
+import { router } from 'expo-router';
 const isServerSideRendering = () => {
   return Platform.OS === 'web' && typeof window === 'undefined';
 };
@@ -27,36 +26,16 @@ export default function ChatTab() {
     ]);
   }, []);
 
-  // Custom component that properly handles custom keywords
-  const CustomMessageText = (props: MessageTextProps<IMessage>) => {
-    // Fixed type annotation to match what MessageText expects
-    const parsePatterns = useCallback((linkStyle: TextStyle) => {
+  const RouteLinker = (props: MessageTextProps<IMessage>) => {
+    const parsePatterns = useCallback((_linkStyle: TextStyle) => {
       return [
         {
-          pattern: /\bcalculator\b/i,
-          style: { color: '#0366d6', textDecorationLine: 'underline' },
-          onPress: () => {
-            oneButtonAlert('Calculator : Opening calculator feature');
+          pattern: /(\/\w+(?:\/\w+)*(?:\?\w+=[\w-]+(?:&\w+=[\w-]+)*)?)/g,
+          style: { color: '#9c27b0', textDecorationLine: 'underline' },
+          onPress: (route: string) => {
+            router.push(route as any);
           },
         },
-        {
-          pattern: /\bweather\b/i,
-          style: { color: '#2c974b', textDecorationLine: 'underline' },
-          onPress: () => {
-            oneButtonAlert('Weather: Checking weather information');
-          },
-        },
-        {
-          pattern: /\bcalendar\b/i,
-          style: { color: '#a0522d', textDecorationLine: 'underline' },
-          onPress: () => {
-            oneButtonAlert('Calendar: Opening your calendar');
-          },
-        },
-        // These are the default patterns that GiftedChat uses
-        { type: 'url',   style: linkStyle, onPress: (url: string)   => oneButtonAlert('Opening URL' + url) },
-        { type: 'phone', style: linkStyle, onPress: (phone: string) => oneButtonAlert('Calling ' +phone) },
-        { type: 'email', style: linkStyle, onPress: (email: string) => oneButtonAlert('Sending Email ' + email) },
       ] as any; // Using type assertion to resolve type mismatch
     }, []);
 
@@ -94,7 +73,7 @@ export default function ChatTab() {
       user={{
         _id: 1,
       }}
-      renderMessageText={props => <CustomMessageText {...props} />}
+      renderMessageText={props => <RouteLinker {...props} />}
     />
   );
 }
