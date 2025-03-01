@@ -7,30 +7,7 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
 import { subscribeToSettingsChanges, currentSettings } from '@/storage/settings';
-
-// Define tab configurations with UI levels and variants
-const tabConfigurations = [
-  {
-    name: 'index',
-    variants: [
-      { uiLevel: 1, title: 'Basic',        icon: 'home-outline' },
-      { uiLevel: 2, title: 'Intermediate', icon: 'rocket-outline' },
-      { uiLevel: 3, title: 'Advanced',     icon: 'diamond-outline' }
-    ],
-    defaultTitle: 'Home',
-    defaultIcon: 'home-outline',
-    uiLevel: 1
-  },
-  { name: 'explore',  title: 'Explore',  icon: 'airplane',           uiLevel: 3 },
-  { name: 'focus',    title: 'Focus',    icon: 'search-outline',     uiLevel: 2 },
-  { name: 'gallery',  title: 'Gallery',  icon: 'albums',             uiLevel: 3 },
-  { name: 'map',      title: 'Map',      icon: 'map-outline',        uiLevel: 1 },
-  { name: 'resources', title: 'Resources', icon: 'book-outline',     uiLevel: 1 },
-  { name: 'chat',     title: 'Chat',     icon: 'chatbubble-outline', uiLevel: 1 },
-  { name: 'settings', title: 'Settings', icon: 'settings-outline',   uiLevel: 1 },
-  { name: 'profile',  title: 'Profile',  icon: 'person-outline',     uiLevel: 1 },
-  { name: 'log',      title: 'Log',      icon: 'document-text-outline',  uiLevel: 3 },
-];
+import { TAB_DEFINITIONS, getTabProperties } from '@/constants/TabConfig';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -54,9 +31,9 @@ export default function TabLayout() {
   }, []);
 
   // Filter tabs based on UI level and custom tab levels
-  const visibleTabs = tabConfigurations.filter(tab => {
-    // Index and settings are always visible
-    if (tab.name === 'index' || tab.name === 'settings') {
+  const visibleTabs = TAB_DEFINITIONS.filter(tab => {
+    // Always visible tabs
+    if (tab.alwaysVisible) {
       return true;
     }
 
@@ -81,22 +58,6 @@ export default function TabLayout() {
     }
   }, [segments, settings.UI_Level, visibleTabs, isLayoutMounted]);
 
-  // Helper function to get tab properties based on UI level
-  const getTabProperties = (tab: typeof tabConfigurations[0]) => {
-    if ('variants' in tab && tab.variants) {
-      // Find the highest matching variant for current UI level
-      const matchingVariant = [...tab.variants]
-        .reverse()
-        .find(variant => variant.uiLevel <= settings.UI_Level);
-
-      return {
-        title: matchingVariant?.title ?? tab.defaultTitle,
-        icon: matchingVariant?.icon ?? tab.defaultIcon
-      };
-    }
-    return { title: tab.title, icon: tab.icon };
-  };
-
   return (
     <Tabs
       screenOptions={{
@@ -112,12 +73,12 @@ export default function TabLayout() {
           default: {},
         }),
       }}>
-        {tabConfigurations.map(tab => {
-          const { title, icon } = getTabProperties(tab);
+        {TAB_DEFINITIONS.map(tab => {
+          const { title, icon } = getTabProperties(tab, settings.UI_Level);
 
           // Determine if tab should be visible based on custom settings
-          let isVisible = true;
-          if (tab.name !== 'index' && tab.name !== 'settings') {
+          let isVisible = tab.alwaysVisible;
+          if (!isVisible) {
             const tabLevel = settings.tabLevels?.[tab.name] ?? tab.uiLevel;
             isVisible = tabLevel <= settings.UI_Level;
           }

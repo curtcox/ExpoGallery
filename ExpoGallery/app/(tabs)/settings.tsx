@@ -3,18 +3,7 @@ import { View, StyleSheet, Switch, ScrollView, TouchableOpacity } from 'react-na
 import { ThemedText } from '@/components/ThemedText';
 import { updateSettings, subscribeToSettingsChanges, settings } from '@/storage/settings';
 import { Ionicons } from '@expo/vector-icons';
-
-// Tab configuration for UI level settings
-const tabsToCustomize = [
-  { name: 'explore', title: 'Explore', icon: 'airplane', defaultLevel: 3 },
-  { name: 'focus', title: 'Focus', icon: 'search-outline', defaultLevel: 2 },
-  { name: 'gallery', title: 'Gallery', icon: 'albums', defaultLevel: 3 },
-  { name: 'map', title: 'Map', icon: 'map-outline', defaultLevel: 1 },
-  { name: 'resources', title: 'Resources', icon: 'book-outline', defaultLevel: 1 },
-  { name: 'chat', title: 'Chat', icon: 'chatbubble-outline', defaultLevel: 1 },
-  { name: 'profile', title: 'Profile', icon: 'person-outline', defaultLevel: 1 },
-  { name: 'log', title: 'Log', icon: 'document-text-outline', defaultLevel: 3 },
-];
+import { getCustomizableTabs, TAB_DEFINITIONS } from '@/constants/TabConfig';
 
 // Update the updateSettings function to persist changes
 export default function SettingsScreen() {
@@ -53,8 +42,8 @@ export default function SettingsScreen() {
   // Initialize tab levels from settings or defaults
   useEffect(() => {
     const initialTabLevels: Record<string, number> = {};
-    tabsToCustomize.forEach(tab => {
-      initialTabLevels[tab.name] = settings.tabLevels?.[tab.name] || tab.defaultLevel;
+    getCustomizableTabs().forEach(tab => {
+      initialTabLevels[tab.name] = settings.tabLevels?.[tab.name] || tab.uiLevel;
     });
 
     if (!settings.tabLevels) {
@@ -97,7 +86,7 @@ export default function SettingsScreen() {
         <ThemedText type="subtitle">Tab Visibility Settings</ThemedText>
         <ThemedText type="default">Set the minimum UI level required to see each tab</ThemedText>
 
-        {tabsToCustomize.map(tab => (
+        {getCustomizableTabs().map(tab => (
           <View key={tab.name} style={styles.tabLevelOption}>
             <View style={styles.tabInfo}>
               <Ionicons name={tab.icon as any} size={20} style={styles.tabIcon} />
@@ -152,12 +141,15 @@ export default function SettingsScreen() {
 }
 
 function getVisibleTabsDescription(level: number, tabLevels: Record<string, number>): string {
-  const alwaysVisibleTabs = ["Home", "Settings"];
+  // Get tabs that are always visible
+  const alwaysVisibleTabs = TAB_DEFINITIONS
+    .filter(tab => tab.alwaysVisible)
+    .map(tab => tab.title ?? tab.name);
 
   // Get tabs visible at current UI level
-  const visibleCustomTabs = tabsToCustomize
+  const visibleCustomTabs = getCustomizableTabs()
     .filter(tab => tabLevels[tab.name] <= level)
-    .map(tab => tab.title);
+    .map(tab => tab.title ?? tab.name);
 
   const allVisibleTabs = [...alwaysVisibleTabs, ...visibleCustomTabs];
 
