@@ -28,6 +28,7 @@ const tabConfigurations = [
   { name: 'chat',     title: 'Chat',     icon: 'chatbubble-outline', uiLevel: 1 },
   { name: 'settings', title: 'Settings', icon: 'settings-outline',   uiLevel: 1 },
   { name: 'profile',  title: 'Profile',  icon: 'person-outline',     uiLevel: 1 },
+  { name: 'log',      title: 'Log',      icon: 'document-text-outline',  uiLevel: 3 },
 ];
 
 export default function TabLayout() {

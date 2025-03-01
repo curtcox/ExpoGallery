@@ -14,7 +14,7 @@ const categoryImages: { [key: string]: any } = {
   other: require('../../assets/images/react-logo.png'),
 };
 
-export default function HomeScreen() {
+export default function MapScreen() {
   const [region, setRegion] = useState<{
     latitude: number;
     longitude: number;

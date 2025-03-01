@@ -12,6 +12,7 @@ const tabsToCustomize = [
   { name: 'map', title: 'Map', icon: 'map-outline', defaultLevel: 1 },
   { name: 'chat', title: 'Chat', icon: 'chatbubble-outline', defaultLevel: 1 },
   { name: 'profile', title: 'Profile', icon: 'person-outline', defaultLevel: 1 },
+  { name: 'log', title: 'Log', icon: 'document-text-outline', defaultLevel: 3 },
 ];
 
 // Update the updateSettings function to persist changes
