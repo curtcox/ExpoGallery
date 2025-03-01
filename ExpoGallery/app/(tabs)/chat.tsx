@@ -1,7 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GiftedChat, IMessage, MessageTextProps } from 'react-native-gifted-chat';
 import { MessageText } from 'react-native-gifted-chat';
+import { TextStyle } from 'react-native';
 import { oneButtonAlert } from '@/utils/alerts';
+import { generateBotResponse } from '@/services/chat';
 
 export default function ChatTab() {
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -10,7 +12,7 @@ export default function ChatTab() {
     setMessages([
       {
         _id: 1,
-        text: 'Hello! Ask me about calculator, weather, or any other services.',
+        text: 'How can I help you?',
         createdAt: new Date(),
         user: {
           _id: 2,
@@ -23,9 +25,8 @@ export default function ChatTab() {
 
   // Custom component that properly handles custom keywords
   const CustomMessageText = (props: MessageTextProps<IMessage>) => {
-    // The key is to provide a function that returns a properly formatted array
-    // of patterns for ParsedText to use
-    const parsePatterns = useCallback((linkStyle: any) => {
+    // Fixed type annotation to match what MessageText expects
+    const parsePatterns = useCallback((linkStyle: TextStyle) => {
       return [
         {
           pattern: /\bcalculator\b/i,
@@ -52,38 +53,11 @@ export default function ChatTab() {
         { type: 'url',   style: linkStyle, onPress: (url: string)   => oneButtonAlert('Opening URL' + url) },
         { type: 'phone', style: linkStyle, onPress: (phone: string) => oneButtonAlert('Calling ' +phone) },
         { type: 'email', style: linkStyle, onPress: (email: string) => oneButtonAlert('Sending Email ' + email) },
-      ];
+      ] as any; // Using type assertion to resolve type mismatch
     }, []);
 
     return <MessageText {...props} parsePatterns={parsePatterns} />;
   };
-
-  // Function to generate a bot response
-  const generateBotResponse = useCallback((userMessage: string) => {
-    let responseText = `You said: ${userMessage}`;
-
-    // Check if the message contains any of our keywords
-    if (/calculator/i.test(userMessage)) {
-      responseText = 'I see you mentioned calculator! Tap on "calculator" to open it.';
-    } else if (/weather/i.test(userMessage)) {
-      responseText = 'Would you like to check the weather? Tap on "weather" to see the forecast.';
-    } else if (/calendar/i.test(userMessage)) {
-      responseText = 'Would you like to check your calendar? Tap on "calendar" to open it.';
-    }
-
-    const botResponse: IMessage = {
-      _id: Math.round(Math.random() * 1000000),
-      text: responseText,
-      createdAt: new Date(),
-      user: {
-        _id: 2,
-        name: 'React Native',
-        avatar: 'https://placeimg.com/140/140/any',
-      },
-    };
-
-    return botResponse;
-  }, []);
 
   const onSend = useCallback((messages: IMessage[] = []) => {
     setMessages(previousMessages =>
@@ -102,7 +76,7 @@ export default function ChatTab() {
         );
       }, 1000);
     }
-  }, [generateBotResponse]);
+  }, []);
 
   return (
     <GiftedChat
