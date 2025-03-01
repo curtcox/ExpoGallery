@@ -2,7 +2,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useColorScheme, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
-import { info, ItemProps, LOG, subscribeToLogs } from '@/utils/logger';
+import { info, ItemProps, subscribeToLogs } from '@/utils/logger';
 import { ThemedText } from '@/components/ThemedText';
 
 function Item({ index, timestamp, message, error }: ItemProps) {
