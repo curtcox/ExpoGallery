@@ -4,8 +4,7 @@ import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
 import { info, error, oneButtonAlert } from '@/utils/index';
 import { router } from 'expo-router';
-// Import resources data from JSON file
-import resourcesData from '../../assets/json/resources.json';
+import { getAllResources, Resource } from '@/services/data';
 
 // Map of resource categories to specific pin images
 const categoryImages: { [key: string]: any } = {
@@ -23,6 +22,13 @@ export default function MapScreen() {
   } | null>(null);
   const mapRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  // Create state to hold resources
+  const [resources, setResources] = useState<Resource[]>([]);
+
+  // Load resources on component mount
+  useEffect(() => {
+    setResources(getAllResources());
+  }, []);
 
   // Request permission and fetch the device's current location
   useEffect(() => {
@@ -75,7 +81,7 @@ export default function MapScreen() {
     }
   };
 
-  const handleMarkerPress = (resource: any) => {
+  const handleMarkerPress = (resource: Resource) => {
     console.log({resource});
     router.push({
       pathname: '/resource',
@@ -94,7 +100,7 @@ export default function MapScreen() {
           showsUserLocation={true}
           onMapReady={() => setMapLoaded(true)}
         >
-          {resourcesData.resources.map(resource => (
+          {resources.map(resource => (
             <Marker
               key={resource.id}
               coordinate={{
