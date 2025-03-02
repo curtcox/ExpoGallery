@@ -34,6 +34,7 @@ export default function MapScreen() {
   const mapRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [followsUserLocation, setFollowsUserLocation] = useState(true);
   const { resourceId, lat, lng } = useLocalSearchParams<{
     resourceId?: string;
     lat?: string;
@@ -74,6 +75,8 @@ export default function MapScreen() {
       const longitude = parseFloat(lng);
 
       if (!isNaN(latitude) && !isNaN(longitude)) {
+        setFollowsUserLocation(false);
+
         const resourceRegion = {
           latitude,
           longitude,
@@ -93,6 +96,8 @@ export default function MapScreen() {
 
   const focusMapOnUserLocation = async () => {
     try {
+      setFollowsUserLocation(true);
+
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
       const newRegion = {
@@ -133,7 +138,7 @@ export default function MapScreen() {
           ref={mapRef}
           style={styles.map}
           region={region}
-          followsUserLocation={true}
+          followsUserLocation={followsUserLocation}
           showsUserLocation={true}
           onMapReady={() => setMapLoaded(true)}
         >
