@@ -1,17 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Button, Image } from 'react-native';
+import { StyleSheet, View, Button } from 'react-native';
 import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
 import { info, error, oneButtonAlert } from '@/utils/index';
 import { router } from 'expo-router';
 import { getAllResources, Resource } from '@/services/data';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Map of resource categories to specific pin images
-const categoryImages: { [key: string]: any } = {
-  shelter: require('../../assets/images/react-logo.png'),
-  food: require('../../assets/images/react-logo.png'),
-  other: require('../../assets/images/react-logo.png'),
+const iconFor = (category: string): keyof typeof MaterialIcons.glyphMap => {
+  switch (category) {
+    case 'shelter':    return 'night-shelter';
+    case 'food':       return 'soup-kitchen';
+    case 'employment': return 'person-search';
+    default:           return 'circle';
+  }
 };
+
+function materialIcon(name: keyof typeof MaterialIcons.glyphMap) {
+  return (
+      <MaterialIcons name={name} size={24} color="black" />
+  );
+}
 
 export default function MapScreen() {
   const [region, setRegion] = useState<{
@@ -22,10 +32,8 @@ export default function MapScreen() {
   } | null>(null);
   const mapRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  // Create state to hold resources
   const [resources, setResources] = useState<Resource[]>([]);
 
-  // Load resources on component mount
   useEffect(() => {
     setResources(getAllResources());
   }, []);
@@ -58,8 +66,7 @@ export default function MapScreen() {
     }
   }, [mapLoaded, region]);
 
-  // Function to recenter the map on the device's location
-  const centerMap = async () => {
+  const focusMapOnUserLocation = async () => {
     try {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
@@ -82,7 +89,7 @@ export default function MapScreen() {
   };
 
   const handleMarkerPress = (resource: Resource) => {
-    console.log({resource});
+    info(JSON.stringify(resource));
     router.push({
       pathname: '/resource',
       params: { id: resource.id },
@@ -109,16 +116,13 @@ export default function MapScreen() {
               }}
               onPress={() => handleMarkerPress(resource)}
             >
-              <Image
-                source={categoryImages[resource.category] || categoryImages['other']}
-                style={{ width: 30, height: 30 }}
-              />
+              {materialIcon(iconFor(resource.category))}
             </Marker>
           ))}
         </MapView>
       )}
       <View style={styles.buttonContainer}>
-        <Button title="Center Map" onPress={centerMap} />
+        <Button title="Center Map" onPress={focusMapOnUserLocation} />
       </View>
     </View>
   );
