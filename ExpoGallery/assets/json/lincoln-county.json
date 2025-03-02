@@ -1,0 +1,172 @@
+{
+    "resources": [
+      {
+        "id": "res-1001",
+        "name": "Bridgeway Behavioral Health",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.7890,
+          "longitude": -90.4987,
+          "address": "Lincoln and St. Charles Counties, MO"
+        },
+        "details": "Provides emergency shelter, therapy, and support services for women and children experiencing intimate partner violence, including provision of personal hygiene items and emergency clothing.",
+        "contact": {
+          "phone": "636-224-1850",
+          "website": "http://www.bridgewaybh.com/"
+        },
+        "hours": "24/7",
+        "capacity": 24,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "res-1002",
+        "name": "Turning Point",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.9500,
+          "longitude": -90.7800,
+          "address": "PO Box 426, Warrenton, MO 63383"
+        },
+        "details": "Offers community-based shelter with counseling, case management, referrals, support groups, and life skills classes for survivors of abuse and their children.",
+        "contact": {
+          "phone": "636-456-1186 / 636-456-1656 / 888-873-7233",
+          "website": "http://www.turningpointdvs.com/"
+        },
+        "hours": "24/7",
+        "capacity": 35,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.1
+      },
+      {
+        "id": "res-1003",
+        "name": "Halo Home",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.5767,
+          "longitude": -92.1735,
+          "address": "Jefferson City, MO"
+        },
+        "details": "Provides long-term shelter and emergency housing with counseling, medical checkups, tutoring, and professional development for high-risk youth.",
+        "contact": {
+          "phone": "573-418-9912",
+          "website": "https://haloworldwide.org"
+        },
+        "hours": "24/7",
+        "capacity": 24,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "res-1004",
+        "name": "On-Time Ministries",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.2500,
+          "longitude": -93.6000,
+          "address": "Confidential location, Southwest Missouri"
+        },
+        "details": "Offers residential housing, counseling, healthcare access, job training, and education for adult women survivors of human trafficking.",
+        "contact": {
+          "phone": "417-252-0357",
+          "website": "https://www.ontimeministry.com/"
+        },
+        "hours": "24/7",
+        "capacity": 11,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.2
+      },
+      {
+        "id": "res-1005",
+        "name": "Saint Martha’s Hall",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.5000,
+          "longitude": -90.5000,
+          "address": "Undisclosed location, serves all counties in MO"
+        },
+        "details": "Provides shelter, meals, personal hygiene items, emergency clothing, school supplies, and support services for women and children experiencing intimate partner violence.",
+        "contact": {
+          "phone": "314-533-1313",
+          "website": "http://saintmarthas.org/"
+        },
+        "hours": "24/7",
+        "capacity": 24,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.3
+      },
+      {
+        "id": "res-2001",
+        "name": "Bread of Life",
+        "category": "food",
+        "location": {
+          "latitude": 38.9700,
+          "longitude": -90.7000,
+          "address": "820 Cap-Au-Gris, Troy, MO 63379"
+        },
+        "details": "Offers food distribution on Wednesdays with additional Salvation Army services on Tuesdays. Photo ID is required.",
+        "contact": {
+          "phone": "636-528-3646",
+          "website": "N/A"
+        },
+        "hours": "Wednesdays: 10am-1pm (last Wednesday: 4-6:30pm), Tuesdays: 9:30am-12pm",
+        "capacity": 100,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "res-3001",
+        "name": "Warrenton Job Center",
+        "category": "employment",
+        "location": {
+          "latitude": 38.9500,
+          "longitude": -90.7800,
+          "address": "111 Steinhagen Road, Warrenton, MO 63383"
+        },
+        "details": "Assists with job readiness, resume building, interview preparation, job placements, and supports employment initiatives for veterans and youth.",
+        "contact": {
+          "phone": "636-456-9467 / 1-888-728-5627",
+          "website": "https://jobs.mo.gov/career-centers"
+        },
+        "hours": "Mon-Fri 9am-5pm",
+        "capacity": 50,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "res-4001",
+        "name": "The Child Center, Inc - Hannibal",
+        "category": "legal",
+        "location": {
+          "latitude": 39.7100,
+          "longitude": -91.4000,
+          "address": "8965 Hwy 36 West #2, Hannibal, MO 63401"
+        },
+        "details": "Provides child-focused legal services including forensic interviews, advocacy, therapeutic services, and sexual abuse forensic exams.",
+        "contact": {
+          "phone": "573-221-2256",
+          "website": "https://thechildcenter.com"
+        },
+        "hours": "Mon-Fri 9am-6pm",
+        "capacity": 10,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.1
+      }
+    ]
+  }
