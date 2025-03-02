@@ -4,6 +4,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Linking, Platform } from 'react-native';
 import { info, error, oneButtonAlert } from '../utils/index';
 import { getResourceById } from '@/services/data';
+import { router } from 'expo-router';
 
 export default function Route() {
   const { id } = useLocalSearchParams<{
@@ -67,6 +68,18 @@ export default function Route() {
     }
   };
 
+  const showOnMap = () => {
+    info('Showing resource on map');
+    router.push({
+      pathname: '/(tabs)/map',
+      params: {
+        resourceId: resource.id,
+        lat: resource.location.latitude,
+        lng: resource.location.longitude
+      }
+    });
+  };
+
   return (
     <ParallaxScrollView
     headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -81,6 +94,9 @@ export default function Route() {
     <Text>Location: {resource.location.address}</Text>
     <TouchableOpacity onPress={openDirections} style={styles.button}>
       <Text style={styles.buttonText}>Get Directions</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={showOnMap} style={styles.button}>
+      <Text style={styles.buttonText}>Show on Map</Text>
     </TouchableOpacity>
     <Text>Details: {resource.details}</Text>
     <Text>Contact: {resource.contact.phone}</Text>

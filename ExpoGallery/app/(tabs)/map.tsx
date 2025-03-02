@@ -3,7 +3,7 @@ import { StyleSheet, View, Button } from 'react-native';
 import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
 import { info, error, oneButtonAlert } from '@/utils/index';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { getAllResources, Resource } from '@/services/data';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -24,6 +24,7 @@ function materialIcon(name: keyof typeof MaterialIcons.glyphMap) {
 }
 
 export default function MapScreen() {
+
   const [region, setRegion] = useState<{
     latitude: number;
     longitude: number;
@@ -33,38 +34,62 @@ export default function MapScreen() {
   const mapRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [resources, setResources] = useState<Resource[]>([]);
+  const { resourceId, lat, lng } = useLocalSearchParams<{
+    resourceId?: string;
+    lat?: string;
+    lng?: string;
+  }>();
 
-  useEffect(() => {
+  function loadResourceData() {
     setResources(getAllResources());
-  }, []);
+  }
 
-  // Request permission and fetch the device's current location
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        const message = 'Permission to access location was denied';
-        info(message);
-        oneButtonAlert(message);
-        return;
-      }
-      const location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-      setRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      });
-    })();
-  }, []);
+  async function requestLocationAndSetInitialRegion() {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      const message = 'Permission to access location was denied';
+      info(message);
+      oneButtonAlert(message);
+      return;
+    }
+    const location = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = location.coords;
+    setRegion({
+      latitude,
+      longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    });
+  }
 
-  // Effect to center map once both the map is loaded and region is set
-  useEffect(() => {
+  function centerMapOnRegion() {
     if (mapLoaded && region && mapRef.current) {
       mapRef.current.animateToRegion(region, 1000);
     }
-  }, [mapLoaded, region]);
+  }
+
+  function focusOnSpecificResource() {
+    if (mapLoaded && mapRef.current && lat && lng) {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lng);
+
+      if (!isNaN(latitude) && !isNaN(longitude)) {
+        const resourceRegion = {
+          latitude,
+          longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        };
+
+        setRegion(resourceRegion);
+        mapRef.current.animateToRegion(resourceRegion, 1000);
+
+        if (resourceId) {
+          info(`Focusing on resource: ${resourceId}`);
+        }
+      }
+    }
+  }
 
   const focusMapOnUserLocation = async () => {
     try {
@@ -95,6 +120,11 @@ export default function MapScreen() {
       params: { id: resource.id },
     });
   };
+
+  useEffect(() => { loadResourceData(); }, []);
+  useEffect(() => { requestLocationAndSetInitialRegion(); }, []);
+  useEffect(() => { centerMapOnRegion(); }, [mapLoaded, region]);
+  useEffect(() => { focusOnSpecificResource(); }, [mapLoaded, lat, lng, resourceId]);
 
   return (
     <View style={styles.container}>
