@@ -1,11 +1,12 @@
+import React from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, ScrollView, View } from 'react-native';
 import { Link } from 'expo-router';
 
 export default function Example() {
   return (
-      <View>
+      <ScrollView style={styles.container}>
         <ThemedText type="title">Icons Example</ThemedText>
         <Link href='https://ionic.io/ionicons'>Iconicons</Link>
         {ionIcon('images-sharp')}
@@ -29,7 +30,7 @@ export default function Example() {
         {materialIcon('add-shopping-cart')}
         {materialIcon('shop')}
         {materialIcon('shop-two')}
-      </View>
+      </ScrollView>
   );
 }
 
@@ -52,6 +53,10 @@ function materialIcon(name: keyof typeof MaterialIcons.glyphMap) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
   iconRow: {
     flexDirection: 'row',
     alignItems: 'center',
