@@ -21,6 +21,9 @@ export default function Example() {
 
         <ThemedText type="title" style={styles.sectionTitle}>Material Icons</ThemedText>
         <Link href='https://fonts.google.com/icons'>Material Icons</Link>
+        {materialIcon('soup-kitchen')}
+        {materialIcon('night-shelter')}
+        {materialIcon('person-search')}
         {materialIcon('home')}
         {materialIcon('favorite')}
         {materialIcon('settings')}
