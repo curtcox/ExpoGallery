@@ -1,16 +1,14 @@
-import { IMessage } from 'react-native-gifted-chat';
 import { error } from '@/utils/index';
 
 export const CHAT_API_ENDPOINT = 'https://example.com/api/chat';
 const EXTERNAL = false;
 
-export const generateBotResponse = async (userMessage: string): Promise<IMessage> => {
+export const generateBotResponse = async (userMessage: string): Promise<string> => {
   try {
-    const responseText = await getResponseText(userMessage);
-    return createBotMessage(responseText);
+    return await getResponseText(userMessage);
   } catch (e) {
     error('Error generating bot response:', e);
-    return createErrorMessage();
+    return getErrorMessage();
   }
 };
 
@@ -33,21 +31,8 @@ const fetchExternal = async (userMessage: string): Promise<string> => {
   return data.response || 'Sorry, I could not process your request.';
 };
 
-const createBotMessage = (text: string): IMessage => {
-  return {
-    _id: Math.round(Math.random() * 1000000),
-    text: text,
-    createdAt: new Date(),
-    user: {
-      _id: 2,
-      name: 'React Native',
-      avatar: 'https://placeimg.com/140/140/any',
-    },
-  };
-};
-
-const createErrorMessage = (): IMessage => {
-  return createBotMessage('Sorry, I encountered an error processing your message. Please try again later.');
+const getErrorMessage = (): string => {
+  return 'Sorry, I encountered an error processing your message. Please try again later.';
 };
 
 const generateLocal = (userMessage: string): string => {

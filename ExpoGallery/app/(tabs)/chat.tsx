@@ -4,6 +4,7 @@ import { MessageText } from 'react-native-gifted-chat';
 import { TextStyle, Platform } from 'react-native';
 import { generateBotResponse } from '@/services/chat';
 import { router } from 'expo-router';
+
 const isServerSideRendering = () => {
   return Platform.OS === 'web' && typeof window === 'undefined';
 };
@@ -20,7 +21,7 @@ export default function ChatTab() {
         user: {
           _id: 2,
           name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
+          avatar: 'https://placecats.com/140/140',
         },
       },
     ]);
@@ -52,9 +53,19 @@ export default function ChatTab() {
       const userMessage = messages[0].text;
 
       try {
-        const botResponse = await generateBotResponse(userMessage);
+        const botResponseText = await generateBotResponse(userMessage);
+        const botMessage: IMessage = {
+          _id: Math.round(Math.random() * 1000000),
+          text: botResponseText,
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://placecats.com/140/140',
+          },
+        };
         setMessages(previousMessages =>
-          GiftedChat.append(previousMessages, [botResponse]),
+          GiftedChat.append(previousMessages, [botMessage]),
         );
       } catch (error) {
         console.error('Failed to get bot response:', error);
