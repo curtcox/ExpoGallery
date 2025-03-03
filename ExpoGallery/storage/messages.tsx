@@ -28,8 +28,8 @@ export async function initMessages(): Promise<void> {
 
 // Update messages with new values
 export async function updateMessages(newMessages: Messages): Promise<void> {
-  // Update the in-memory messages
-  messages = newMessages;
+  // Keep only the last 250 messages
+  messages = newMessages.slice(-250);
 
   try {
     // Save to storage
