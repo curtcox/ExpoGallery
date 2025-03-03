@@ -30,7 +30,7 @@ export default function ChatScreen() {
         setMessages([welcomeMessage]);
         updateMessages([welcomeMessage]);
       } else {
-        setMessages(storedMessages);
+        setMessages(storedMessages as IMessage[]);
       }
     });
 
@@ -71,7 +71,7 @@ export default function ChatScreen() {
     }
   }, [messages]);
 
-  const RouteLinker = (props: MessageTextProps<IMessage>) => {
+  const RouteLinker = (props: MessageTextProps) => {
     const parsePatterns = useCallback((_linkStyle: TextStyle) => {
       return [
         {

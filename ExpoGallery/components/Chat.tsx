@@ -1,21 +1,22 @@
 import React from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, TextStyle } from 'react-native';
 
 // Define the interfaces to match those exported by the other Chat components
 export interface IMessage {
   _id: string | number;
   text: string;
-  createdAt: Date;
+  createdAt: Date | number;
   user: {
     _id: number | string;
     name?: string;
-    avatar?: string;
+    avatar?: string | number | (() => React.ReactNode);
   };
   [key: string]: any;
 }
 
 export interface MessageTextProps {
   currentMessage?: IMessage;
+  parsePatterns?: (linkStyle: TextStyle) => any[];
   [key: string]: any;
 }
 
@@ -74,7 +75,10 @@ export default function Chat(props: {
             <MessageText {...messageProps} />
           }
           <Text style={styles.timestamp}>
-            {item.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {typeof item.createdAt === 'number'
+              ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              : item.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
           </Text>
         </View>
       </View>
@@ -115,6 +119,11 @@ export default function Chat(props: {
     </SafeAreaView>
   );
 }
+
+// Add static append method to the Chat component
+Chat.append = (currentMessages: IMessage[] = [], newMessages: IMessage[] = []): IMessage[] => {
+  return [...newMessages, ...currentMessages];
+};
 
 const styles = StyleSheet.create({
   container: {
