@@ -1,4 +1,4 @@
-import resourcesData from '../assets/json/resources.json';
+import resourcesData from '../assets/json/lincoln-county.json';
 
 // Define the types based on the structure of your resources
 export interface ResourceLocation {
