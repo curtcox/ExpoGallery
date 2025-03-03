@@ -9,6 +9,7 @@ export interface Profile {
   state: string;
   age: number;
   gender: string;
+  privateFields: string[];
 }
 
 export const defaultProfile: Profile = {
@@ -20,6 +21,7 @@ export const defaultProfile: Profile = {
   state: '',
   age: 0,
   gender: '',
+  privateFields: [],
 };
 
 // Current profile state
@@ -43,6 +45,7 @@ export async function initProfile(): Promise<void> {
 
 // Update profile with new values
 export async function updateProfile(newProfileData: Partial<Profile>): Promise<void> {
+
   // Update the in-memory profile
   Object.assign(profile, newProfileData);
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Switch } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Profile, profile, updateProfile, subscribeToProfileChanges } from '@/storage/profile';
 import { Picker } from '@react-native-picker/picker';
@@ -37,6 +37,20 @@ export default function ProfileScreen() {
     }
   };
 
+  const toggleFieldPrivacy = (field: keyof Profile) => {
+    const newPrivateFields = [...profileData.privateFields];
+    const fieldIndex = newPrivateFields.indexOf(field);
+    if (fieldIndex !== -1) {
+      newPrivateFields.splice(fieldIndex, 1);
+    } else {
+      newPrivateFields.push(field);
+    }
+    setProfileData(prev => ({
+      ...prev,
+      privateFields: newPrivateFields
+    }));
+  };
+
   const renderEditButton = () => (
     <TouchableOpacity
       style={styles.button}
@@ -50,16 +64,36 @@ export default function ProfileScreen() {
   );
 
   const renderField = (label: string, field: keyof Profile, type: 'text' | 'number' | 'gender' = 'text') => {
+    const isPrivate = profileData.privateFields.includes(field);
+
+    const privacyToggle = (
+      <View style={styles.privacyToggle}>
+        <ThemedText type="default" style={styles.privacyLabel}>
+          {isPrivate ? 'Private' : 'Public'}
+        </ThemedText>
+        <Switch
+          value={isPrivate}
+          onValueChange={() => toggleFieldPrivacy(field)}
+          disabled={!isEditing}
+        />
+      </View>
+    );
+
     // For view mode
     if (!isEditing) {
       return (
         <View style={styles.fieldContainer}>
           <ThemedText type="subtitle" style={styles.label}>{label}</ThemedText>
-          <ThemedText type="default" style={styles.value}>
-            {type === 'number' && profileData[field] === 0
-              ? '-'
-              : String(profileData[field] || '-')}
-          </ThemedText>
+          <View style={styles.valueContainer}>
+            <ThemedText type="default" style={[styles.value, isPrivate && styles.privateValue]}>
+              {isPrivate ? '••••••' : (
+                type === 'number' && profileData[field] === 0
+                  ? '-'
+                  : String(profileData[field] || '-')
+              )}
+            </ThemedText>
+            {privacyToggle}
+          </View>
         </View>
       );
     }
@@ -69,39 +103,22 @@ export default function ProfileScreen() {
       return (
         <View style={styles.fieldContainer}>
           <ThemedText type="subtitle" style={styles.label}>{label}</ThemedText>
-          <View style={styles.inputContainer}>
-            <Picker
-              selectedValue={profileData.gender}
-              onValueChange={(value) => handleChange('gender', value)}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select" value="" />
-              <Picker.Item label="Male" value="male" />
-              <Picker.Item label="Female" value="female" />
-              <Picker.Item label="Non-binary" value="non-binary" />
-              <Picker.Item label="Prefer not to say" value="unspecified" />
-            </Picker>
+          <View style={styles.valueContainer}>
+            <View style={[styles.inputContainer, { flex: 1 }]}>
+              <Picker
+                selectedValue={profileData.gender}
+                onValueChange={(value) => handleChange('gender', value)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Select" value="" />
+                <Picker.Item label="Male" value="male" />
+                <Picker.Item label="Female" value="female" />
+                <Picker.Item label="Non-binary" value="non-binary" />
+                <Picker.Item label="Prefer not to say" value="unspecified" />
+              </Picker>
+            </View>
+            {privacyToggle}
           </View>
-        </View>
-      );
-    }
-
-    if (type === 'number') {
-      return (
-        <View style={styles.fieldContainer}>
-          <ThemedText type="subtitle" style={styles.label}>{label}</ThemedText>
-          <TextInput
-            style={styles.input}
-            value={profileData[field] ? String(profileData[field]) : ''}
-            onChangeText={(text) => {
-              const numValue = text === '' ? 0 : parseInt(text, 10);
-              if (!isNaN(numValue)) {
-                handleChange(field, numValue);
-              }
-            }}
-            keyboardType="numeric"
-            placeholder={`Enter your ${label.toLowerCase()}`}
-          />
         </View>
       );
     }
@@ -109,13 +126,29 @@ export default function ProfileScreen() {
     return (
       <View style={styles.fieldContainer}>
         <ThemedText type="subtitle" style={styles.label}>{label}</ThemedText>
-        <TextInput
-          style={styles.input}
-          value={String(profileData[field] || '')}
-          onChangeText={(text) => handleChange(field, text)}
-          placeholder={`Enter your ${label.toLowerCase()}`}
-          keyboardType={field === 'email' ? 'email-address' : field === 'phone' ? 'phone-pad' : 'default'}
-        />
+        <View style={styles.valueContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            value={type === 'number' ? (profileData[field] ? String(profileData[field]) : '') : String(profileData[field] || '')}
+            onChangeText={(text) => {
+              if (type === 'number') {
+                const numValue = text === '' ? 0 : parseInt(text, 10);
+                if (!isNaN(numValue)) {
+                  handleChange(field, numValue);
+                }
+              } else {
+                handleChange(field, text);
+              }
+            }}
+            keyboardType={
+              type === 'number' ? 'numeric' :
+              field === 'email' ? 'email-address' :
+              field === 'phone' ? 'phone-pad' : 'default'
+            }
+            placeholder={`Enter your ${label.toLowerCase()}`}
+          />
+          {privacyToggle}
+        </View>
       </View>
     );
   };
@@ -186,6 +219,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 10,
   },
+  valueContainer: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   value: {
     flex: 2,
     paddingVertical: 8,
@@ -226,5 +265,15 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: 'bold',
+  },
+  privacyToggle: {
+    alignItems: 'center',
+  },
+  privacyLabel: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  privateValue: {
+    opacity: 0.7,
   },
 });
