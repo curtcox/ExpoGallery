@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Platform, TextStyle } from 'react-native';
-import { GiftedChat, IMessage, MessageTextProps, MessageText } from 'react-native-gifted-chat';
+import GiftedChat, { IMessage, MessageTextProps, MessageText } from '@/components/Chat';
 import { generateBotResponse } from '@/services/chat';
 import { router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';

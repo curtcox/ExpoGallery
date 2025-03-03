@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { GiftedChat, IMessage, MessageTextProps } from 'react-native-gifted-chat';
-import { MessageText } from 'react-native-gifted-chat';
+import GiftedChat from '@/components/Chat';
+import { IMessage, MessageTextProps, MessageText } from '@/components/Chat';
 import { oneButtonAlert } from '../utils/alerts';
 
 export default function Example() {
