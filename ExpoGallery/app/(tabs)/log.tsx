@@ -1,6 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { useColorScheme, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
 import { info, ItemProps, subscribeToLogs } from '@/utils/logger';
 import { ThemedText } from '@/components/ThemedText';
@@ -46,7 +46,7 @@ export default function LogScreen() {
   }, []);
 
   return (
-    <View>
+    <SafeAreaView style={{ flex: 1 }}>
       <ThemedText type="title">Log</ThemedText>
       <FlashList
         data={logEntries}
@@ -58,6 +58,6 @@ export default function LogScreen() {
         renderItem={({ item }) => <Item {...item} />}
         estimatedItemSize={100}
       />
-    </View>
+    </SafeAreaView>
   );
 }
