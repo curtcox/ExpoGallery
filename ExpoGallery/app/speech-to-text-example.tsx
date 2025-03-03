@@ -1,57 +1,29 @@
 import React, { useState } from "react";
-import { Button, ScrollView, Text, View, StyleSheet } from "react-native";
-import {
-  ExpoSpeechRecognitionModule,
-  useSpeechRecognitionEvent,
-} from "expo-speech-recognition";
-
+import { View, StyleSheet, Text } from "react-native";
+import SpeechToText from "@/components/SpeechToText";
 
 export default function Example() {
-
-  const [recognizing, setRecognizing] = useState(false);
   const [transcript, setTranscript] = useState("");
 
-  useSpeechRecognitionEvent("start", () => setRecognizing(true));
-  useSpeechRecognitionEvent("end", () => setRecognizing(false));
-  useSpeechRecognitionEvent("result", (event) => {
-    setTranscript(event.results[0]?.transcript);
-  });
-  useSpeechRecognitionEvent("error", (event) => {
-    console.log("error code:", event.error, "error message:", event.message);
-  });
-
-  const handleStart = async () => {
-    const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    if (!result.granted) {
-      console.warn("Permissions not granted", result);
-      return;
-    }
-    // Start speech recognition
-    ExpoSpeechRecognitionModule.start({
-      lang: "en-US",
-      interimResults: true,
-      maxAlternatives: 1,
-      continuous: false,
-      requiresOnDeviceRecognition: false,
-      addsPunctuation: false,
-      contextualStrings: ["Carlsen", "Nepomniachtchi", "Praggnanandhaa"],
-    });
+  const handleTranscriptChange = (newTranscript: string) => {
+    setTranscript(newTranscript);
   };
 
   return (
     <View style={styles.container}>
-      {!recognizing ? (
-        <Button title="Start" onPress={handleStart} />
-      ) : (
-        <Button
-          title="Stop"
-          onPress={() => ExpoSpeechRecognitionModule.stop()}
-        />
-      )}
+      <Text style={styles.title}>Speech to Text Example</Text>
 
-      <ScrollView>
-        <Text>{transcript}</Text>
-      </ScrollView>
+      <SpeechToText
+        onTranscriptChange={handleTranscriptChange}
+        buttonStartTitle="Start Recording"
+        buttonStopTitle="Stop Recording"
+        showTranscript={false}
+      />
+
+      <View style={styles.transcriptContainer}>
+        <Text style={styles.transcriptLabel}>Transcript:</Text>
+        <Text style={styles.transcriptText}>{transcript || "No transcript yet. Press Start to begin recording."}</Text>
+      </View>
     </View>
   );
 }
@@ -61,6 +33,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#ecf0f1',
-    padding: 8,
+    padding: 16,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  transcriptContainer: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  transcriptLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  transcriptText: {
+    fontSize: 16,
+    lineHeight: 24,
+  }
 });
