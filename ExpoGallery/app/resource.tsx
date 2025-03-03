@@ -82,7 +82,7 @@ export default function Route() {
 
   return (
     <ParallaxScrollView
-    headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+    headerBackgroundColor={{ light: '#C80021', dark: '#C80021' }}
     headerImage={
       <Image
         source={require('@/assets/images/logo.png')}
