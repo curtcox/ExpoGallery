@@ -1,12 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { GiftedChat, IMessage, MessageTextProps } from 'react-native-gifted-chat';
-import { MessageText } from 'react-native-gifted-chat';
-import { TextStyle } from 'react-native';
+import { Platform, TextStyle } from 'react-native';
+import { GiftedChat, IMessage, MessageTextProps, MessageText } from 'react-native-gifted-chat';
 import { generateBotResponse } from '@/services/chat';
 import { router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 
-export default function ChatTab() {
+const isServerSideRendering = () => {
+  return Platform.OS === 'web' && typeof window === 'undefined';
+};
+
+export default function ChatScreen() {
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
@@ -83,13 +86,15 @@ export default function ChatTab() {
     return <MessageText {...props} parsePatterns={parsePatterns} />;
   };
 
+  if (isServerSideRendering()) {
+    return null;
+  }
+
   return (
     <GiftedChat
       messages={messages}
       onSend={onSend}
-      user={{
-        _id: 1,
-      }}
+      user={{ _id: 1 }}
       renderMessageText={props => <RouteLinker {...props} />}
     />
   );
