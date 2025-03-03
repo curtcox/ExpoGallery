@@ -72,7 +72,7 @@ export default function ChatTab() {
     const parsePatterns = useCallback((_linkStyle: TextStyle) => {
       return [
         {
-          pattern: /(\/\w+(?:\/\w+)*(?:\?\w+=[\w-]+(?:&\w+=[\w-]+)*)?)/g,
+          pattern: /(?<!\/)(\/\w+(?:\/\w+)*(?:\?\w+=[\w-]+(?:&\w+=[\w-]+)*)?)/g,
           style: { color: '#9c27b0', textDecorationLine: 'underline' },
           onPress: (route: string) => {
             router.push(route as any);
