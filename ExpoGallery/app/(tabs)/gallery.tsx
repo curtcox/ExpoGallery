@@ -1,12 +1,12 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Link } from 'expo-router';
 import { info } from '../../utils/logger';
 import { Checkbox } from 'react-native-paper';
 import { ALL_EXAMPLES, ExampleItem } from '@/utils/examples';
 import { subscribeToSettingsChanges, updateSettings, currentSettings } from '@/storage/settings';
+import { ThemedScrollView } from '@/components/ThemedScrollView';
 
 export default function GalleryScreen() {
   const [examples, setExamples] = useState<ExampleItem[]>(
@@ -56,14 +56,7 @@ export default function GalleryScreen() {
   };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
+    <ThemedScrollView>
       {examples.map((example, index) => (
         exampleRow(
           example.name,
@@ -75,7 +68,7 @@ export default function GalleryScreen() {
           index
         )
       ))}
-    </ParallaxScrollView>
+    </ThemedScrollView>
   );
 }
 
@@ -133,12 +126,5 @@ const styles = StyleSheet.create({
   stepContainer: {
     gap: 8,
     marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
   },
 });

@@ -1,10 +1,10 @@
-import { Text, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { Linking, Platform } from 'react-native';
 import { info, error, oneButtonAlert } from '../utils/index';
 import { getResourceById } from '@/services/data';
 import { router } from 'expo-router';
+import { ThemedScrollView } from '@/components/ThemedScrollView';
 
 export default function Route() {
   const { id } = useLocalSearchParams<{
@@ -81,50 +81,36 @@ export default function Route() {
   };
 
   return (
-    <ParallaxScrollView
-    headerBackgroundColor={{ light: '#C80021', dark: '#C80021' }}
-    headerImage={
-      <Image
-        source={require('@/assets/images/logo.png')}
-        style={styles.reactLogo}
-      />
-    }>
-    <Text>Resource: {resource.name}</Text>
-    <Text>Category: {resource.category}</Text>
-    <Text>Location: {resource.location.address}</Text>
-    <TouchableOpacity onPress={openDirections} style={styles.button}>
-      <Text style={styles.buttonText}>Get Directions</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={showOnMap} style={styles.button}>
-      <Text style={styles.buttonText}>Show on Map</Text>
-    </TouchableOpacity>
-    <Text>Details: {resource.details}</Text>
-    <Text>Contact: {resource.contact.phone}</Text>
-    <Text>Hours: {resource.hours}</Text>
-    <Text>Languages Supported: {resource.languagesSupported.join(', ')}</Text>
-    <Text>Average Rating: {resource.averageRating}</Text>
-
-    {resource.contact.website && (
-      <TouchableOpacity onPress={openWebsite} style={styles.button}>
-        <Text style={styles.buttonText}>Visit Website</Text>
+    <ThemedScrollView>
+      <Text>Resource: {resource.name}</Text>
+      <Text>Category: {resource.category}</Text>
+      <Text>Location: {resource.location.address}</Text>
+      <TouchableOpacity onPress={openDirections} style={styles.button}>
+        <Text style={styles.buttonText}>Get Directions</Text>
       </TouchableOpacity>
-    )}
+      <TouchableOpacity onPress={showOnMap} style={styles.button}>
+        <Text style={styles.buttonText}>Show on Map</Text>
+      </TouchableOpacity>
+      <Text>Details: {resource.details}</Text>
+      <Text>Contact: {resource.contact.phone}</Text>
+      <Text>Hours: {resource.hours}</Text>
+      <Text>Languages Supported: {resource.languagesSupported.join(', ')}</Text>
+      <Text>Average Rating: {resource.averageRating}</Text>
 
-    <TouchableOpacity onPress={callPhone} style={styles.button}>
-      <Text style={styles.buttonText}>Call Phone</Text>
-    </TouchableOpacity>
-  </ParallaxScrollView>)
+      {resource.contact.website && (
+        <TouchableOpacity onPress={openWebsite} style={styles.button}>
+          <Text style={styles.buttonText}>Visit Website</Text>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity onPress={callPhone} style={styles.button}>
+        <Text style={styles.buttonText}>Call Phone</Text>
+      </TouchableOpacity>
+    </ThemedScrollView>)
   ;
 }
 
 const styles = StyleSheet.create({
-    reactLogo: {
-      height: 491,
-      width: 800,
-      bottom: 0,
-      left: 0,
-      position: 'absolute',
-    },
     button: {
       backgroundColor: '#2196F3',
       padding: 10,

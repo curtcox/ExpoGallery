@@ -1,29 +1,22 @@
-import { Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ThemedScrollView } from '@/components/ThemedScrollView';
 import { Link } from 'expo-router';
 
 export default function HomeScreen_3() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
+    <ThemedScrollView>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Connecting people to services</ThemedText>
       </ThemedView>
       <ThemedView style={styles.linksContainer}>
         <Link href="/map" style={styles.link}>
-          <ThemedText type="link" style={styles.linkText}>Look at the map</ThemedText>
+          <ThemedText type="link" style={styles.linkText}>Find Support Near Me</ThemedText>
         </Link>
         <Link href="/resources" style={styles.link}>
-          <ThemedText type="link" style={styles.linkText}>Look at the resources</ThemedText>
+          <ThemedText type="link" style={styles.linkText}>Find A Place to Stay</ThemedText>
         </Link>
         <Link href="/chat" style={styles.link}>
           <ThemedText type="link" style={styles.linkText}>Chat with the bot</ThemedText>
@@ -32,7 +25,7 @@ export default function HomeScreen_3() {
           <ThemedText type="link" style={styles.linkText}>View your profile</ThemedText>
         </Link>
       </ThemedView>
-    </ParallaxScrollView>
+    </ThemedScrollView>
   );
 }
 
@@ -55,13 +48,6 @@ const styles = StyleSheet.create({
   },
   featureItem: {
     marginVertical: 5,
-  },
-  reactLogo: {
-    height: 491,
-    width: 800,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
   },
   linksContainer: {
     padding: 16,
