@@ -1,27 +1,34 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect } from 'react';
+import { info, error } from '@/utils/index';
+import { GOOGLE_MAPS_API_KEY } from '../constants/Env';
 
-// Add type declarations for the missing exports
-declare module "@teovilla/react-native-web-maps" {
-  const MapView: React.ComponentType<any>;
-  export const Marker: React.ComponentType<any>;
-  export const Callout: React.ComponentType<any>;
-  export default MapView; // The warning on export default seems to work anyway
-}
-
-// Import after declaring the module
+// Import the map components
+// @ts-ignore - Ignoring type issues with this web package
 import MapView from "@teovilla/react-native-web-maps";
+// @ts-ignore - Ignoring type issues with this web package
 import { Marker, Callout } from "@teovilla/react-native-web-maps";
 
 // Export the components and enhanced MapView
 export { Marker, Callout };
 
-const MapViewComponent = forwardRef((props: any, ref) => {
+// Create a MapView wrapper that injects the API key
+const MapViewComponent = forwardRef((props: any, ref: any) => {
+  // Debug log for the API key (will show in browser console)
+  useEffect(() => {
+    if (!GOOGLE_MAPS_API_KEY) {
+      error('No API key found',null);
+    } else {
+      info('MapView API key is set (**********' + GOOGLE_MAPS_API_KEY.slice(-4) + ')');
+    }
+  }, []);
+
   return (
+    // @ts-ignore - Ignore TypeScript errors for the web component
     <MapView
       {...props}
       ref={ref}
       provider="google"
-      googleMapsApiKey='your-api-key-here'
+      googleMapsApiKey={GOOGLE_MAPS_API_KEY}
     />
   );
 });
