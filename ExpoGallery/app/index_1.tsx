@@ -20,10 +20,10 @@ export default function HomeScreen_1() {
       </ThemedView>
       <ThemedView style={styles.linksContainer}>
         <Link href="/map" style={styles.link}>
-          <ThemedText type="link" style={styles.linkText}>Look at the map</ThemedText>
+          <ThemedText type="link" style={styles.linkText}>Find Support Near Me</ThemedText>
         </Link>
         <Link href="/resources" style={styles.link}>
-          <ThemedText type="link" style={styles.linkText}>Look at the resources</ThemedText>
+          <ThemedText type="link" style={styles.linkText}>Find A Place to Stay</ThemedText>
         </Link>
         <Link href="/chat" style={styles.link}>
           <ThemedText type="link" style={styles.linkText}>Chat with the bot</ThemedText>
