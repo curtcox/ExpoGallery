@@ -19,7 +19,7 @@ export default function HomeScreen_1() {
           <ThemedText type="link" style={styles.linkText}>Find A Place to Stay</ThemedText>
         </Link>
         <Link href="/chat" style={styles.link}>
-          <ThemedText type="link" style={styles.linkText}>Chat with the bot</ThemedText>
+          <ThemedText type="link" style={styles.linkText}>Chat with our Artificial Assistant</ThemedText>
         </Link>
         <Link href="/profile" style={styles.link}>
           <ThemedText type="link" style={styles.linkText}>View your profile</ThemedText>
