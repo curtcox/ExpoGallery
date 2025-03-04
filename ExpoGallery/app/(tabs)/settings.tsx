@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Switch, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Switch, ScrollView, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { updateSettings, subscribeToSettingsChanges, settings } from '@/storage/settings';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,8 @@ export default function SettingsScreen() {
   const [uiLevel, setUiLevel] = useState(settings.UI_Level);
   const [debug, setDebug] = useState(settings.debug);
   const [tabLevels, setTabLevels] = useState<Record<string, number>>({});
+  const [tabRenames, setTabRenames] = useState<Record<string, string>>({});
+  const [editingTabName, setEditingTabName] = useState<string | null>(null);
 
   const handleUILevelChange = (level: number) => {
     setUiLevel(level);
@@ -28,18 +30,35 @@ export default function SettingsScreen() {
     updateSettings({ tabLevels: newTabLevels });
   };
 
+  const handleTabNameChange = (tabName: string, newTitle: string) => {
+    // If empty string is provided, remove the custom title (revert to default)
+    const newTabRenames = { ...tabRenames };
+
+    if (newTitle.trim() === '') {
+      delete newTabRenames[tabName];
+    } else {
+      newTabRenames[tabName] = newTitle.trim();
+    }
+
+    setTabRenames(newTabRenames);
+    updateSettings({ tabRenames: newTabRenames });
+    setEditingTabName(null);
+    Keyboard.dismiss();
+  };
+
   // Load settings when component mounts
   useEffect(() => {
     const unsubscribe = subscribeToSettingsChanges((newSettings) => {
       setUiLevel(newSettings.UI_Level);
       setDebug(newSettings.debug);
       setTabLevels(newSettings.tabLevels || {});
+      setTabRenames(newSettings.tabRenames || {});
     });
 
     return unsubscribe;
   }, []);
 
-  // Initialize tab levels from settings or defaults
+  // Initialize tab levels and renames from settings or defaults
   useEffect(() => {
     const initialTabLevels: Record<string, number> = {};
     getCustomizableTabs().forEach(tab => {
@@ -51,6 +70,7 @@ export default function SettingsScreen() {
     }
 
     setTabLevels(settings.tabLevels || initialTabLevels);
+    setTabRenames(settings.tabRenames || {});
   }, []);
 
   return (
@@ -121,6 +141,87 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
+        <ThemedText type="subtitle">Custom Tab Names</ThemedText>
+        <ThemedText type="default">Customize the tab titles shown in the navigation bar</ThemedText>
+
+        {TAB_DEFINITIONS.map(tab => {
+          const defaultTitle = tab.title || tab.name;
+          const currentTitle = tabRenames[tab.name] || defaultTitle;
+          const isEditing = editingTabName === tab.name;
+
+          return (
+            <View key={tab.name} style={styles.tabRenameOption}>
+              <View style={styles.tabInfo}>
+                <Ionicons name={tab.icon as any} size={20} style={styles.tabIcon} />
+                {isEditing ? (
+                  <TextInput
+                    style={styles.tabNameInput}
+                    value={tabRenames[tab.name] || ''}
+                    placeholder={defaultTitle}
+                    placeholderTextColor="rgba(150, 150, 150, 0.8)"
+                    onChangeText={(text) => {
+                      const newTabRenames = { ...tabRenames, [tab.name]: text };
+                      setTabRenames(newTabRenames);
+                    }}
+                    onBlur={() => handleTabNameChange(tab.name, tabRenames[tab.name] || '')}
+                    onSubmitEditing={() => handleTabNameChange(tab.name, tabRenames[tab.name] || '')}
+                    autoFocus
+                  />
+                ) : (
+                  <ThemedText type="default">
+                    {currentTitle}
+                    {tabRenames[tab.name] &&
+                      <ThemedText type="default" style={styles.customLabel}> (custom)</ThemedText>
+                    }
+                  </ThemedText>
+                )}
+              </View>
+
+              <View style={styles.tabRenameActions}>
+                {isEditing ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleTabNameChange(tab.name, tabRenames[tab.name] || '')}
+                    >
+                      <Ionicons name="checkmark" size={20} color="#4CAF50" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => {
+                        setEditingTabName(null);
+                        // Revert to previous value
+                        setTabRenames({ ...tabRenames });
+                      }}
+                    >
+                      <Ionicons name="close" size={20} color="#F44336" />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => setEditingTabName(tab.name)}
+                    >
+                      <Ionicons name="pencil" size={20} color="#2196F3" />
+                    </TouchableOpacity>
+                    {tabRenames[tab.name] && (
+                      <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => handleTabNameChange(tab.name, '')}
+                      >
+                        <Ionicons name="refresh" size={20} color="#9E9E9E" />
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+              </View>
+            </View>
+          );
+        })}
+      </View>
+
+      <View style={styles.section}>
         <ThemedText type="subtitle">Developer Options</ThemedText>
         <View style={styles.option}>
           <ThemedText type="default">Debug Mode</ThemedText>
@@ -141,15 +242,17 @@ export default function SettingsScreen() {
 }
 
 function getVisibleTabsDescription(level: number, tabLevels: Record<string, number>): string {
+  const tabRenames = settings.tabRenames || {};
+
   // Get tabs that are always visible
   const alwaysVisibleTabs = TAB_DEFINITIONS
     .filter(tab => tab.alwaysVisible)
-    .map(tab => tab.title ?? tab.name);
+    .map(tab => tabRenames[tab.name] || tab.title || tab.name);
 
   // Get tabs visible at current UI level
   const visibleCustomTabs = getCustomizableTabs()
     .filter(tab => tabLevels[tab.name] <= level)
-    .map(tab => tab.title ?? tab.name);
+    .map(tab => tabRenames[tab.name] || tab.title || tab.name);
 
   const allVisibleTabs = [...alwaysVisibleTabs, ...visibleCustomTabs];
 
@@ -231,5 +334,35 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontStyle: 'italic',
     opacity: 0.7,
+  },
+  tabRenameOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(200, 200, 200, 0.2)',
+  },
+  tabNameInput: {
+    flex: 1,
+    padding: 8,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(200, 200, 200, 0.3)',
+    color: '#000',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  },
+  tabRenameActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  actionButton: {
+    padding: 8,
+    marginLeft: 8,
+  },
+  customLabel: {
+    fontStyle: 'italic',
+    opacity: 0.7,
+    fontSize: 12,
   },
 });

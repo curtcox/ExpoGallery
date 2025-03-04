@@ -75,8 +75,7 @@ export default function TabLayout() {
       }}>
         {TAB_DEFINITIONS.map(tab => {
           const { title, icon } = getTabProperties(tab, settings.UI_Level);
-
-          // Determine if tab should be visible based on custom settings
+          const customTitle = settings.tabRenames?.[tab.name];
           let isVisible = tab.alwaysVisible;
           if (!isVisible) {
             const tabLevel = settings.tabLevels?.[tab.name] ?? tab.uiLevel;
@@ -88,7 +87,7 @@ export default function TabLayout() {
               key={tab.name}
               name={tab.name}
               options={{
-                title,
+                title: customTitle || title,
                 tabBarIcon: ({ color }) => <Ionicons name={icon as any} size={24} color={color} />,
                 href: isVisible ? undefined : null,
               }}
