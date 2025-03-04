@@ -32,13 +32,19 @@ jobs:
           cd ExpoGallery
           npm ci
 
+      - name: Set environment variables
+        run: |
+          cd ExpoGallery
+          node ./scripts/set-env.js
+
       - name: Build Expo web
         run: |
           cd ExpoGallery
           npx expo export --platform web
           touch dist/.nojekyll
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096" # Increase memory limit if needed
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          EXPO_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
