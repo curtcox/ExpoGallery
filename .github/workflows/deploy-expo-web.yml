@@ -35,7 +35,7 @@ jobs:
       - name: Build Expo web
         run: |
           cd ExpoGallery
-          npx expo export --platform web
+          npx expo export --dev --platform web
         env:
           NODE_OPTIONS: "--max_old_space_size=4096" # Increase memory limit if needed
 
