@@ -15,7 +15,7 @@ type ThemedScrollViewProps = {
 
 export function ThemedScrollView({
   children,
-  headerBackgroundColor = { light: '#A1CEDC', dark: '#1D3D47' },
+  headerBackgroundColor = { light: '#BFEEBF', dark: '#1D3D47' },
   headerImage,
   headerImageSource = DEFAULT_HEADER_IMAGE,
   headerImageStyle,
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   defaultHeaderImage: {
     flex: 1,
     width: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     alignSelf: 'center',
     position: 'relative',
   }
