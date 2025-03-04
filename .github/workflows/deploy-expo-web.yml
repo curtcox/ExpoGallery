@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: '18' # Use the Node.js version compatible with your Expo version
           cache: 'npm'
+          cache-dependency-path: 'ExpoGallery/package-lock.json'
 
       - name: Install dependencies
         run: |
