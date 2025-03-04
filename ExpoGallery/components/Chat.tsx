@@ -30,6 +30,24 @@ export function MessageText(props: MessageTextProps) {
   );
 }
 
+export const formatTimestamp = (createdAt: Date | number): string => {
+  if (typeof createdAt === 'number') {
+    return new Date(createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  if (createdAt instanceof Date) {
+    return createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  return '';
+};
+
+export const renderTimestamp = (createdAt: Date | number) => {
+  return (
+    <Text style={styles.timestamp}>
+      {formatTimestamp(createdAt)}
+    </Text>
+  );
+};
+
 // Main Chat component
 export default function Chat(props: {
   messages: IMessage[];
@@ -74,12 +92,7 @@ export default function Chat(props: {
             renderMessageText({ ...messageProps }) :
             <MessageText {...messageProps} />
           }
-          <Text style={styles.timestamp}>
-            {typeof item.createdAt === 'number'
-              ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              : item.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            }
-          </Text>
+          {renderTimestamp(item.createdAt)}
         </View>
       </View>
     );
