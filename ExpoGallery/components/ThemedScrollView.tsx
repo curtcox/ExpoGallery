@@ -7,6 +7,10 @@ const DEFAULT_HEADER_IMAGE = require('@/assets/images/logo.png');
 type ThemedScrollViewProps = {
   children: ReactNode;
   headerBackgroundColor?: { light: string; dark: string };
+  headerGradient?: {
+    light: { start: string; end: string };
+    dark: { start: string; end: string };
+  };
   headerImage?: ReactElement;
   headerImageSource?: ImageSourcePropType;
   headerImageStyle?: StyleProp<ImageStyle>;
@@ -16,6 +20,10 @@ type ThemedScrollViewProps = {
 export function ThemedScrollView({
   children,
   headerBackgroundColor = { light: '#BFEEBF', dark: '#1D3D47' },
+  headerGradient = {
+    light: { start: '#4468DA', end: '#BBFFD0' },
+    dark: { start: '#1D3D47', end: '#0A1A1F' },
+  },
   headerImage,
   headerImageSource = DEFAULT_HEADER_IMAGE,
   headerImageStyle,
@@ -33,6 +41,7 @@ export function ThemedScrollView({
   return (
     <ParallaxScrollView
       headerBackgroundColor={headerBackgroundColor}
+      headerGradient={headerGradient}
       headerImage={renderedHeaderImage}>
       {children}
     </ParallaxScrollView>
@@ -46,5 +55,5 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     alignSelf: 'center',
     position: 'relative',
-  }
+  },
 });

@@ -14,6 +14,7 @@ export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'location',          text: 'Location',               icon: 'locate-outline',         url: 'versions/latest/sdk/location/' },
   { name: 'status-bar',        text: 'Status Bar',             icon: 'locate-outline',         url: 'versions/latest/sdk/status-bar/' },
   { name: 'image',             text: 'Image',                  icon: 'image-outline',          url: 'versions/latest/sdk/flash-list/' },
+  { name: 'gradient',          text: 'Gradient',               icon: 'image-outline',          url: 'versions/latest/sdk/linear-gradient/' },
   { name: 'storage',           text: 'Storage',                icon: 'folder-outline',         url: 'versions/latest/sdk/async-storage/' },
   { name: 'device-id',         text: 'Device ID',              icon: 'pricetag',               url: 'https://stackoverflow.com/questions/46863644/expo-get-unique-device-id-without-ejecting' },
   { name: 'device-info',       text: 'Device Info',            icon: 'information',            url: 'versions/latest/sdk/device/' },

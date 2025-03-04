@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedStyle,
   useScrollViewOffset,
 } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
@@ -16,12 +17,17 @@ const HEADER_HEIGHT = 250;
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
   headerBackgroundColor: { dark: string; light: string };
+  headerGradient?: {
+    light: { start: string; end: string };
+    dark: { start: string; end: string };
+  };
 }>;
 
 export default function ParallaxScrollView({
   children,
   headerImage,
   headerBackgroundColor,
+  headerGradient,
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -44,6 +50,23 @@ export default function ParallaxScrollView({
     };
   });
 
+  // Determine whether to use gradient or solid background
+  const renderHeaderBackground = () => {
+    if (headerGradient) {
+      const { start, end } = headerGradient[colorScheme];
+      return (
+        <LinearGradient
+          colors={[start, end]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        />
+      );
+    }
+
+    return null;
+  };
+
   return (
     <ThemedView style={styles.container}>
       <Animated.ScrollView
@@ -54,9 +77,11 @@ export default function ParallaxScrollView({
         <Animated.View
           style={[
             styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
+            // Only apply backgroundColor if not using gradient
+            !headerGradient ? { backgroundColor: headerBackgroundColor[colorScheme] } : {},
             headerAnimatedStyle,
           ]}>
+          {renderHeaderBackground()}
           {headerImage}
         </Animated.View>
         <ThemedView style={styles.content}>{children}</ThemedView>
