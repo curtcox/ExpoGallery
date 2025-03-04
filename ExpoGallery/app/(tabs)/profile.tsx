@@ -75,6 +75,7 @@ export default function ProfileScreen() {
           value={isPrivate}
           onValueChange={() => toggleFieldPrivacy(field)}
           disabled={!isEditing}
+          style={styles.switch}
         />
       </View>
     );
@@ -145,7 +146,7 @@ export default function ProfileScreen() {
               field === 'email' ? 'email-address' :
               field === 'phone' ? 'phone-pad' : 'default'
             }
-            placeholder={`Enter your ${label.toLowerCase()}`}
+            placeholder={`Enter ${label.toLowerCase()}`}
           />
           {privacyToggle}
         </View>
@@ -157,9 +158,9 @@ export default function ProfileScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={100}
+      keyboardVerticalOffset={80}
     >
-      <ScrollView style={styles.scrollContainer}>
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.contentContainer}>
         <ThemedText type="title" style={styles.header}>Profile</ThemedText>
 
         <View style={styles.profileSection}>
@@ -173,19 +174,21 @@ export default function ProfileScreen() {
           {renderField('Gender', 'gender', 'gender')}
         </View>
 
-        {renderEditButton()}
+        <View style={styles.buttonContainer}>
+          {renderEditButton()}
 
-        {isEditing && (
-          <TouchableOpacity
-            style={[styles.button, styles.cancelButton]}
-            onPress={() => {
-              setProfileData({ ...profile }); // Reset to current profile
-              setIsEditing(false);
-            }}
-          >
-            <ThemedText type="default" style={styles.buttonText}>Cancel</ThemedText>
-          </TouchableOpacity>
-        )}
+          {isEditing && (
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={() => {
+                setProfileData({ ...profile }); // Reset to current profile
+                setIsEditing(false);
+              }}
+            >
+              <ThemedText type="default" style={styles.buttonText}>Cancel</ThemedText>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -197,47 +200,53 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    padding: 16,
+    padding: 12,
+  },
+  contentContainer: {
+    paddingBottom: 16,
   },
   header: {
-    marginTop: 60,
-    marginBottom: 20,
+    marginTop: 30,
+    marginBottom: 10,
+    fontSize: 22,
   },
   profileSection: {
     backgroundColor: 'rgba(200, 200, 200, 0.1)',
     borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
+    padding: 10,
+    marginBottom: 8,
   },
   fieldContainer: {
-    marginBottom: 16,
+    marginBottom: 6,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   label: {
-    flex: 1,
-    marginRight: 10,
+    flex: 0.8,
+    marginRight: 6,
+    fontSize: 13,
   },
   valueContainer: {
-    flex: 2,
+    flex: 2.2,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
   },
   value: {
     flex: 2,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     backgroundColor: 'rgba(200, 200, 200, 0.05)',
     borderRadius: 4,
+    fontSize: 13,
   },
   input: {
     flex: 2,
-    padding: 12,
+    padding: 6,
     backgroundColor: 'rgba(200, 200, 200, 0.1)',
     borderRadius: 4,
-    fontSize: 16,
+    fontSize: 13,
   },
   inputContainer: {
     flex: 2,
@@ -250,30 +259,38 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   picker: {
-    height: 50,
+    height: 40,
     width: '100%',
   },
   button: {
     backgroundColor: 'rgba(100, 100, 255, 0.2)',
-    padding: 16,
+    padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 6,
   },
   cancelButton: {
     backgroundColor: 'rgba(255, 100, 100, 0.2)',
   },
   buttonText: {
     fontWeight: 'bold',
+    fontSize: 14,
   },
   privacyToggle: {
     alignItems: 'center',
+    width: 50,
   },
   privacyLabel: {
-    fontSize: 12,
-    marginBottom: 4,
+    fontSize: 10,
+    marginBottom: 2,
   },
   privateValue: {
     opacity: 0.7,
+  },
+  switch: {
+    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+  },
+  buttonContainer: {
+    marginTop: 4,
   },
 });
