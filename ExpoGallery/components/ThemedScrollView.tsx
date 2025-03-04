@@ -41,10 +41,10 @@ export function ThemedScrollView({
 
 const styles = StyleSheet.create({
   defaultHeaderImage: {
-    height: 491,
-    width: 800,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    flex: 1,
+    width: '100%',
+    resizeMode: 'cover',
+    alignSelf: 'center',
+    position: 'relative',
+  }
 });
