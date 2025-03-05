@@ -1,10 +1,8 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle, Dimensions } from 'react-native';
+import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle, View } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 const DEFAULT_HEADER_IMAGE = require('@/assets/images/logo.png');
-const { width } = Dimensions.get('window');
-const IS_SMALL_SCREEN = width < 390;
 
 type ThemedScrollViewProps = {
   children: ReactNode;
@@ -31,26 +29,18 @@ export function ThemedScrollView({
   headerImageStyle,
   style,
 }: ThemedScrollViewProps) {
-  // Determine the header image to use
+  // Create a non-animated image element
   const renderedHeaderImage = headerImage ||
     (headerImageSource ? (
-      <Image
-        source={headerImageSource}
-        style={[
-          styles.defaultHeaderImage,
-          IS_SMALL_SCREEN && styles.smallScreenImage,
-          headerImageStyle
-        ]}
-        // Ensure image loads properly with a key to force re-render
-        key="header-image"
-        // Force layout measurement
-        onLayout={() => {}}
-        // Ensure image is loaded before displaying
-        fadeDuration={0}
-        // Prioritize image loading
-        progressiveRenderingEnabled={true}
-      />
-    ) : <></>);
+      <View style={styles.imageWrapper}>
+        <Image
+          source={headerImageSource}
+          style={[styles.defaultHeaderImage, headerImageStyle]}
+          // Add key to force re-renders
+          key="header-image"
+        />
+      </View>
+    ) : null);
 
   return (
     <ParallaxScrollView
@@ -63,23 +53,20 @@ export function ThemedScrollView({
 }
 
 const styles = StyleSheet.create({
-  defaultHeaderImage: {
-    width: IS_SMALL_SCREEN ? '80%' : '100%',
-    height: IS_SMALL_SCREEN ? '80%' : '100%',
-    resizeMode: 'contain',
-    // Use absolute positioning to ensure it stays visible
+  imageWrapper: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'absolute',
-    // Center the image
+    top: 0,
     left: 0,
     right: 0,
-    top: 0,
     bottom: 0,
-    // Ensure the image is always visible
-    zIndex: 30,
   },
-  smallScreenImage: {
-    // Additional adjustments for very small screens
-    maxWidth: '80%',
-    maxHeight: '70%',
-  }
+  defaultHeaderImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
 });

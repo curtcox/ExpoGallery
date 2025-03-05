@@ -1,14 +1,7 @@
 import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet, Dimensions, View } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-  useSharedValue,
-} from 'react-native-reanimated';
+import { StyleSheet, Dimensions, View, ScrollView } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useState } from 'react';
 
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
@@ -16,7 +9,6 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 const HEADER_HEIGHT = 250;
 const { width } = Dimensions.get('window');
-const IS_MOBILE = width < 768;
 const IS_SMALL_SCREEN = width < 390;
 
 type Props = PropsWithChildren<{
@@ -35,63 +27,23 @@ export default function ParallaxScrollView({
   headerGradient,
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
+  const scrollRef = useRef<ScrollView>(null);
   const bottom = useBottomTabOverflow();
 
-  // Track if component is mounted and fully rendered
-  const [isReady, setIsReady] = useState(false);
-  // Force scroll to top on mount for consistency
-  const initialOffset = useSharedValue(0);
+  // Simple state to track scroll position
+  const [scrollY, setScrollY] = useState(0);
+
+  // Calculate header height based on screen size
+  const headerHeight = IS_SMALL_SCREEN ? 180 : HEADER_HEIGHT;
 
   useEffect(() => {
-    // Ensure header is properly positioned on mount
-    const timer = setTimeout(() => {
-      setIsReady(true);
-
-      // Reset scroll position to ensure header is visible
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({ y: 0, animated: false });
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
+    // Reset scroll position on mount
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ y: 0, animated: false });
+    }
   }, []);
 
-  // Adjust animation based on screen size and device type
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    // Make animation less aggressive on smaller screens
-    const translateFactor = IS_SMALL_SCREEN ? 0.4 : 0.75;
-    const scaleFactor = IS_SMALL_SCREEN ? 1.5 : 2;
-
-    // Use a smaller range for the animation on mobile
-    const animationRange = IS_MOBILE ?
-      [-HEADER_HEIGHT/2, 0, HEADER_HEIGHT/2] :
-      [-HEADER_HEIGHT, 0, HEADER_HEIGHT];
-
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffset.value,
-            animationRange,
-            [-HEADER_HEIGHT / 3, 0, HEADER_HEIGHT * translateFactor]
-          ),
-        },
-        {
-          scale: interpolate(
-            scrollOffset.value,
-            animationRange,
-            [scaleFactor, 1, 1]
-          ),
-        },
-      ],
-      // Ensure header is initially visible
-      opacity: isReady ? 1 : 0,
-    };
-  });
-
-  // Determine whether to use gradient or solid background
+  // Determine background
   const renderHeaderBackground = () => {
     if (headerGradient) {
       const { start, end } = headerGradient[colorScheme];
@@ -104,47 +56,49 @@ export default function ParallaxScrollView({
         />
       );
     }
-
     return null;
   };
 
-  // Use View wrapper to ensure header is rendered properly
-  // even when scrolling happens during initial loading
-  const headerHeight = IS_SMALL_SCREEN ? 180 : HEADER_HEIGHT;
+  // Simply calculate transform styles based on scroll position
+  const headerStyle = {
+    height: headerHeight,
+    backgroundColor: !headerGradient ? headerBackgroundColor[colorScheme] : undefined,
+    transform: [
+      // Apply minimal transform for testing
+      { translateY: scrollY * 0.5 }, // Move header at half the speed of scrolling
+    ],
+  };
 
   return (
     <ThemedView style={styles.container}>
-      <Animated.ScrollView
+      <ScrollView
         ref={scrollRef}
         scrollEventThrottle={16}
-        contentInsetAdjustmentBehavior="automatic"
+        contentInsetAdjustmentBehavior="never"
         automaticallyAdjustContentInsets={false}
-        scrollIndicatorInsets={{ bottom }}
-        contentOffset={{ x: 0, y: initialOffset.value }}
-        contentContainerStyle={{ paddingBottom: bottom }}
-        onLayout={() => {
-          // Make sure we're scrolled to top initially
-          if (scrollRef.current) {
-            scrollRef.current.scrollTo({ y: 0, animated: false });
-          }
-        }}>
-        {/* Wrap header in regular View to ensure consistent rendering */}
+        onScroll={(event) => {
+          // Get scroll position
+          const offsetY = event.nativeEvent.contentOffset.y;
+          setScrollY(offsetY);
+        }}
+        contentContainerStyle={{ paddingBottom: bottom }}>
+
+        {/* Fixed height container for header */}
         <View style={{ height: headerHeight, overflow: 'hidden' }}>
-          <Animated.View
-            style={[
-              styles.header,
-              { height: headerHeight },
-              !headerGradient ? { backgroundColor: headerBackgroundColor[colorScheme] } : {},
-              headerAnimatedStyle,
-            ]}>
+          {/* Header with background */}
+          <View style={[styles.header, headerStyle]}>
             {renderHeaderBackground()}
-            <View style={styles.headerImageContainer}>
-              {headerImage}
-            </View>
-          </Animated.View>
+          </View>
+
+          {/* Image layer - separate from animation */}
+          <View style={styles.headerImageContainer}>
+            {headerImage}
+          </View>
         </View>
+
+        {/* Content */}
         <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -159,7 +113,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     overflow: 'hidden',
-    zIndex: 10,
   },
   headerImageContainer: {
     position: 'absolute',
@@ -169,7 +122,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 20,
+    zIndex: 10, // Keep image above the background
   },
   content: {
     flex: 1,
