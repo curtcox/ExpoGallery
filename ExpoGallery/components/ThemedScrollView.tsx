@@ -1,8 +1,10 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle } from 'react-native';
+import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle, Dimensions, Platform } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 const DEFAULT_HEADER_IMAGE = require('@/assets/images/logo.png');
+const { width } = Dimensions.get('window');
+const IS_SMALL_SCREEN = width < 390;
 
 type ThemedScrollViewProps = {
   children: ReactNode;
@@ -34,7 +36,12 @@ export function ThemedScrollView({
     (headerImageSource ? (
       <Image
         source={headerImageSource}
-        style={[styles.defaultHeaderImage, headerImageStyle]}
+        style={[
+          styles.defaultHeaderImage,
+          // Apply different styles based on screen size
+          IS_SMALL_SCREEN && styles.smallScreenImage,
+          headerImageStyle
+        ]}
       />
     ) : <></>); // Empty fragment as fallback to avoid null
 
@@ -56,4 +63,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     position: 'relative',
   },
+  smallScreenImage: {
+    // Adjust image for smaller screens
+    width: '80%',
+    maxHeight: '80%',
+    // Ensure the image stays visible even with parallax effect
+    marginTop: 20,
+  }
 });
