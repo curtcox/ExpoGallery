@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle, Dimensions, Platform } from 'react-native';
+import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle, Dimensions } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 const DEFAULT_HEADER_IMAGE = require('@/assets/images/logo.png');
@@ -38,12 +38,19 @@ export function ThemedScrollView({
         source={headerImageSource}
         style={[
           styles.defaultHeaderImage,
-          // Apply different styles based on screen size
           IS_SMALL_SCREEN && styles.smallScreenImage,
           headerImageStyle
         ]}
+        // Ensure image loads properly with a key to force re-render
+        key="header-image"
+        // Force layout measurement
+        onLayout={() => {}}
+        // Ensure image is loaded before displaying
+        fadeDuration={0}
+        // Prioritize image loading
+        progressiveRenderingEnabled={true}
       />
-    ) : <></>); // Empty fragment as fallback to avoid null
+    ) : <></>);
 
   return (
     <ParallaxScrollView
@@ -57,17 +64,22 @@ export function ThemedScrollView({
 
 const styles = StyleSheet.create({
   defaultHeaderImage: {
-    flex: 1,
-    width: '100%',
+    width: IS_SMALL_SCREEN ? '80%' : '100%',
+    height: IS_SMALL_SCREEN ? '80%' : '100%',
     resizeMode: 'contain',
-    alignSelf: 'center',
-    position: 'relative',
+    // Use absolute positioning to ensure it stays visible
+    position: 'absolute',
+    // Center the image
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    // Ensure the image is always visible
+    zIndex: 30,
   },
   smallScreenImage: {
-    // Adjust image for smaller screens
-    width: '80%',
-    maxHeight: '80%',
-    // Ensure the image stays visible even with parallax effect
-    marginTop: 20,
+    // Additional adjustments for very small screens
+    maxWidth: '80%',
+    maxHeight: '70%',
   }
 });

@@ -1,38 +1,23 @@
 import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { StyleSheet, Dimensions, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedRef,
   useAnimatedStyle,
   useScrollViewOffset,
+  useSharedValue,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useState } from 'react';
 
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-// Make header height responsive based on screen width
+const HEADER_HEIGHT = 250;
 const { width } = Dimensions.get('window');
-const IS_SMALL_SCREEN = width < 390; // iPhone SE, mini, etc.
-const BASE_HEADER_HEIGHT = 250;
-const HEADER_HEIGHT = IS_SMALL_SCREEN ? 180 : BASE_HEADER_HEIGHT;
-
-// Adjust animation factors for smaller screens
-const getAnimationFactors = () => {
-  // Less aggressive animation on small screens
-  if (IS_SMALL_SCREEN) {
-    return {
-      translateFactor: 0.4, // Reduced from 0.75
-      minScale: 1.5, // Reduced from 2
-    };
-  }
-
-  return {
-    translateFactor: 0.75,
-    minScale: 2,
-  };
-};
+const IS_MOBILE = width < 768;
+const IS_SMALL_SCREEN = width < 390;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
@@ -53,26 +38,56 @@ export default function ParallaxScrollView({
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
   const bottom = useBottomTabOverflow();
-  const { translateFactor, minScale } = getAnimationFactors();
 
+  // Track if component is mounted and fully rendered
+  const [isReady, setIsReady] = useState(false);
+  // Force scroll to top on mount for consistency
+  const initialOffset = useSharedValue(0);
+
+  useEffect(() => {
+    // Ensure header is properly positioned on mount
+    const timer = setTimeout(() => {
+      setIsReady(true);
+
+      // Reset scroll position to ensure header is visible
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({ y: 0, animated: false });
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Adjust animation based on screen size and device type
   const headerAnimatedStyle = useAnimatedStyle(() => {
+    // Make animation less aggressive on smaller screens
+    const translateFactor = IS_SMALL_SCREEN ? 0.4 : 0.75;
+    const scaleFactor = IS_SMALL_SCREEN ? 1.5 : 2;
+
+    // Use a smaller range for the animation on mobile
+    const animationRange = IS_MOBILE ?
+      [-HEADER_HEIGHT/2, 0, HEADER_HEIGHT/2] :
+      [-HEADER_HEIGHT, 0, HEADER_HEIGHT];
+
     return {
       transform: [
         {
           translateY: interpolate(
             scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
+            animationRange,
             [-HEADER_HEIGHT / 3, 0, HEADER_HEIGHT * translateFactor]
           ),
         },
         {
           scale: interpolate(
             scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [minScale, 1, 1]
+            animationRange,
+            [scaleFactor, 1, 1]
           ),
         },
       ],
+      // Ensure header is initially visible
+      opacity: isReady ? 1 : 0,
     };
   });
 
@@ -93,24 +108,41 @@ export default function ParallaxScrollView({
     return null;
   };
 
+  // Use View wrapper to ensure header is rendered properly
+  // even when scrolling happens during initial loading
+  const headerHeight = IS_SMALL_SCREEN ? 180 : HEADER_HEIGHT;
+
   return (
     <ThemedView style={styles.container}>
       <Animated.ScrollView
         ref={scrollRef}
         scrollEventThrottle={16}
+        contentInsetAdjustmentBehavior="automatic"
+        automaticallyAdjustContentInsets={false}
         scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            // Only apply backgroundColor if not using gradient
-            !headerGradient ? { backgroundColor: headerBackgroundColor[colorScheme] } : {},
-            headerAnimatedStyle,
-            { height: HEADER_HEIGHT }, // Apply dynamic height
-          ]}>
-          {renderHeaderBackground()}
-          {headerImage}
-        </Animated.View>
+        contentOffset={{ x: 0, y: initialOffset.value }}
+        contentContainerStyle={{ paddingBottom: bottom }}
+        onLayout={() => {
+          // Make sure we're scrolled to top initially
+          if (scrollRef.current) {
+            scrollRef.current.scrollTo({ y: 0, animated: false });
+          }
+        }}>
+        {/* Wrap header in regular View to ensure consistent rendering */}
+        <View style={{ height: headerHeight, overflow: 'hidden' }}>
+          <Animated.View
+            style={[
+              styles.header,
+              { height: headerHeight },
+              !headerGradient ? { backgroundColor: headerBackgroundColor[colorScheme] } : {},
+              headerAnimatedStyle,
+            ]}>
+            {renderHeaderBackground()}
+            <View style={styles.headerImageContainer}>
+              {headerImage}
+            </View>
+          </Animated.View>
+        </View>
         <ThemedView style={styles.content}>{children}</ThemedView>
       </Animated.ScrollView>
     </ThemedView>
@@ -122,8 +154,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
     overflow: 'hidden',
-    // Height is now set dynamically in the component
+    zIndex: 10,
+  },
+  headerImageContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
   },
   content: {
     flex: 1,
