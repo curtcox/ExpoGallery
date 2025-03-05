@@ -1,0 +1,299 @@
+{
+    "resources": [
+      {
+        "id": "9yzgg98uv4",
+        "name": "Biddle Housing Opportunities Center",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.637,
+          "longitude": -90.1965,
+          "address": "1212 N 13th St, St. Louis, MO 63106"
+        },
+        "details": "Provides emergency shelter and comprehensive services to men experiencing homelessness.",
+        "contact": {
+          "phone": "(314) 802-0700",
+          "website": "https://www.stlouis-mo.gov/homeless-services/biddle-house.cfm"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 50,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9yzgg3fccm",
+        "name": "Gateway 180",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.6378748856277,
+          "longitude": -90.2049061796763,
+          "address": "1000 N 19th St, St. Louis, MO 63106"
+        },
+        "details": "Offers emergency shelter and supportive services to women, children, and families facing homelessness.",
+        "contact": {
+          "phone": "(314) 231-1515",
+          "website": "gateway180.org"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 40,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9yzgdfk507",
+        "name": "Peter & Paul Community Services",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.5968756878511,
+          "longitude": -90.2252001613903,
+          "address": "2612 Wyoming St, St. Louis, MO 63118"
+        },
+        "details": "Provides shelter, meals, and supportive programs for individuals experiencing homelessness.",
+        "contact": {
+          "phone": "(314) 588-7111",
+          "website": "ppcsinc.org"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 35,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9yzgg913m6",
+        "name": "St. Patrick Center",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.6336518276426,
+          "longitude": -90.1958035876161,
+          "address": "800 N Tucker Blvd, St. Louis, MO 63101"
+        },
+        "details": "Offers housing, employment, and health programs to assist individuals and families in achieving self-sufficiency.",
+        "contact": {
+          "phone": "(314) 802-0700",
+          "website": "stpatrickcenter.org"
+        },
+        "hours": "Monday–Friday: 8:00 AM – 4:00 PM",
+        "capacity": 45,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.2
+      },
+      {
+        "id": "9yzsngtt53",
+        "name": "Salvation Army Family Haven",
+        "category": "shelter",
+        "location": {
+          "latitude": 38.69197,
+          "longitude": -90.3988,
+          "address": "10740 Page Ave, St. Louis, MO 63132"
+        },
+        "details": "Provides emergency shelter and supportive services for families experiencing homelessness.",
+        "contact": {
+          "phone": "(314) 423-7770",
+          "website": "salvationarmystlouis.org"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 30,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.1
+      },
+      {
+        "id": "9yzsp4866k",
+        "name": "Harvey Kornblum Jewish Food Pantry",
+        "category": "food",
+        "location": {
+          "latitude": 38.68602,
+          "longitude": -90.39506,
+          "address": "10601 Baur Blvd, St. Louis, MO 63132"
+        },
+        "details": "Provides food assistance to individuals and families in need.",
+        "contact": {
+          "phone": "(314) 513-1672",
+          "website": "https://jfsstl.org/get-help/our-services/food-pantry/"
+        },
+        "hours": "Monday–Friday: 8:30 AM – 4:30 PM Appointments 9 a.m. - 2p.m.",
+        "capacity": 100,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.3
+      },
+      {
+        "id": "9yzu13pzrg",
+        "name": "St. Augustine Wellston Center",
+        "category": "food",
+        "location": {
+          "latitude": 38.67863,
+          "longitude": -90.28565,
+          "address": "1705 Kienlen Ave, St. Louis, MO 63133"
+        },
+        "details": "Offers a food pantry and other supportive services to the community.",
+        "contact": {
+          "phone": "(314) 382-7158",
+          "website": "https://www.wellstoncenter.org"
+        },
+        "hours": "Tuesday & Thursday: 9:00 AM – 12:00 PM",
+        "capacity": 75,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9yzgdfkjwd",
+        "name": "Guardian Angel Settlement Association",
+        "category": "food",
+        "location": {
+          "latitude": 38.5973,
+          "longitude": -90.22494,
+          "address": "3300 S Jefferson Ave, St. Louis, MO 63118"
+        },
+        "details": "Provides food pantry services, clothing assistance, and other community programs.",
+        "contact": {
+          "phone": "(314) 773-9027",
+          "website": "gasastl.org"
+        },
+        "hours": "Monday–Friday: 9:00 AM – 5:00 PM",
+        "capacity": 80,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.1
+      },
+      {
+        "id": "9yzgfh1s69",
+        "name": "Trinity Episcopal Church",
+        "category": "food",
+        "location": {
+          "latitude": 38.65064,
+          "longitude": -90.2615,
+          "address": "600 N Euclid Ave, St. Louis, MO 63108"
+        },
+        "details": "Offers a food pantry and hot meals to those in need.",
+        "contact": {
+          "phone": "(314) 361-4655",
+          "website": "https://www.trinitycwe.org/trinity-food-ministry"
+        },
+        "hours": "Food Pantry: Tuesday: 1:30 PM – 3:00 PM; Hot Meals: Sunday: 2:00 PM",
+        "capacity": 60,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.2
+      },
+      {
+        "id": "9yzg6k1mnm",
+        "name": "Carondelet St. Joseph Outreach",
+        "category": "food",
+        "location": {
+          "latitude": 38.5629,
+          "longitude": -90.2507,
+          "address": "6408 Michigan Ave, St. Louis, MO 63111"
+        },
+        "details": "Provides food assistance and other supportive services to the community.",
+        "contact": {
+          "phone": "(314) 752-6339",
+          "website": "csjsl.org"
+        },
+        "hours": "Tuesday & Thursday: 9:00 AM – 12:00 PM",
+        "capacity": 65,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9yzgg7j827",
+        "name": "Affinia Healthcare",
+        "category": "legal",
+        "location": {
+          "latitude": 38.64447,
+          "longitude": -90.20117,
+          "address": "1717 Biddle St, St. Louis, MO 63106"
+        },
+        "details": "Provides comprehensive medical, dental, and behavioral health services.",
+        "contact": {
+          "phone": "(314) 814-8700",
+          "website": "affiniahealthcare.org"
+        },
+        "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
+        "capacity": 40,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.3
+      },
+      {
+        "id": "9yzgcz3wg3",
+        "name": "CareSTL Health",
+        "category": "legal",
+        "location": {
+          "latitude": 38.66892,
+          "longitude": -90.27245,
+          "address": "5471 Dr Martin Luther King Dr, St. Louis, MO 63112"
+        },
+        "details": "Offers medical, dental, and behavioral health services to the community.",
+        "contact": {
+          "phone": "(314) 367-5820",
+          "website": "carestlhealth.org"
+        },
+        "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
+        "capacity": 35,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.1
+      },
+      {
+        "id": "9yzgdz27em",
+        "name": "Casa de Salud",
+        "category": "legal",
+        "location": {
+          "latitude": 38.62444,
+          "longitude": -90.23022,
+          "address": "3200 Chouteau Ave, St. Louis, MO 63103"
+        },
+        "details": "Provides clinical and mental health services, primarily to the immigrant and refugee communities.",
+        "contact": {
+          "phone": "(314) 977-1250",
+          "website": "casadesaludstl.org"
+        },
+        "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
+        "capacity": 25,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.4
+      },
+      {
+        "id": "9yzu2r5185",
+        "name": "St. Louis County Department of Public Health",
+        "category": "legal",
+        "location": {
+          "latitude": 38.75455,
+          "longitude": -90.33645,
+          "address": "6121 N Hanley Rd, Berkeley, MO 63134"
+        },
+        "details": "Offers a wide range of health services, including immunizations and STD testing.",
+        "contact": {
+          "phone": "(314) 615-0500",
+          "website": "stlouiscountymo.gov/st-louis-county-departments/public-health"
+        },
+        "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
+        "capacity": 50,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      }
+    ]
+  }

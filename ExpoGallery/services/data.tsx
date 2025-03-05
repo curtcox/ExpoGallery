@@ -1,4 +1,9 @@
-import resourcesData from '../assets/json/lincoln-county.json';
+import lincolnCounty from '../assets/json/lincoln-county.json';
+import stLouisCityCounty from '../assets/json/st-louis-city-county.json';
+
+const resourcesData = {
+  resources: [...stLouisCityCounty.resources, ...lincolnCounty.resources]
+};
 
 // Define the types based on the structure of your resources
 export interface ResourceLocation {
