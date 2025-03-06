@@ -22,7 +22,7 @@ export const TAB_DEFINITIONS: TabDefinition[] = [
   {
     name: 'index',
     variants: [
-      { uiLevel: 1, title: 'Help',         icon: 'information-circle-outline' },
+      { uiLevel: 1, title: 'Support',      icon: 'information-circle-outline' },
       { uiLevel: 2, title: 'Intermediate', icon: 'rocket-outline' },
       { uiLevel: 3, title: 'Advanced',     icon: 'diamond-outline' }
     ],
