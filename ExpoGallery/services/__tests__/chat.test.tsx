@@ -1,4 +1,4 @@
-import { localBot } from '../chat';
+import { localBot } from '../localBot';
 
 // npx jest services/__tests__/chat.test.tsx
 jest.mock('@/utils/index', () => ({
