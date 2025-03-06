@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Button } from 'react-native';
-import MapView, { Marker } from '@/components/MapView';
+import MapView, { Marker } from '@/components/FixedMap';
 import * as Location from 'expo-location';
 import { info, error, oneButtonAlert } from '@/utils/index';
 import { router, useLocalSearchParams } from 'expo-router';
