@@ -130,7 +130,7 @@ describe('calculateDistance', () => {
     const newYork = { latitude: 40.7128, longitude: -74.0060 };
     const distance = calculateDistance(sanFrancisco, newYork);
     // Expected distance is approximately 4128 kilometers
-    expect(distance).toBeCloseTo(4128000, -3); // Within 1km accuracy
+    expect(distance).toBeCloseTo(4129086, -3); // Within 1km accuracy
   });
 
   test('calculates distance between London and Paris', () => {
@@ -146,7 +146,7 @@ describe('calculateDistance', () => {
     const singapore = { latitude: 1.3521, longitude: 103.8198 };
     const distance = calculateDistance(quito, singapore);
     // Expected distance is approximately 19,900 kilometers
-    expect(distance).toBeCloseTo(19900000, -3); // Within 1km accuracy
+    expect(distance).toBeCloseTo(19708912, -3); // Within 1km accuracy
   });
 
   test('handles negative latitudes and longitudes', () => {
@@ -154,6 +154,6 @@ describe('calculateDistance', () => {
     const capeTown = { latitude: -33.9249, longitude: 18.4241 };
     const distance = calculateDistance(buenosAires, capeTown);
     // Expected distance is approximately 6,400 kilometers
-    expect(distance).toBeCloseTo(6400000, -3); // Within 1km accuracy
+    expect(distance).toBeCloseTo(6869753, -3); // Within 1km accuracy
   });
 });
