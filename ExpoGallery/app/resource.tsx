@@ -5,6 +5,7 @@ import { info, error, oneButtonAlert } from '../utils/index';
 import { getResourceById } from '@/services/data';
 import { router } from 'expo-router';
 import { ThemedScrollView } from '@/components/ThemedScrollView';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Route() {
   const { id } = useLocalSearchParams<{
@@ -81,36 +82,61 @@ export default function Route() {
   };
 
   return (
-    <ThemedScrollView>
-      <Text>Resource: {resource.name}</Text>
-      <Text>Category: {resource.category}</Text>
-      <Text>Location: {resource.location.address}</Text>
-      <TouchableOpacity onPress={openDirections} style={styles.button}>
-        <Text style={styles.buttonText}>Get Directions</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={showOnMap} style={styles.button}>
-        <Text style={styles.buttonText}>Show on Map</Text>
-      </TouchableOpacity>
-      <Text>Details: {resource.details}</Text>
-      <Text>Contact: {resource.contact.phone}</Text>
-      <Text>Hours: {resource.hours}</Text>
-      <Text>Languages Supported: {resource.languagesSupported.join(', ')}</Text>
-      <Text>Average Rating: {resource.averageRating}</Text>
+    <View style={styles.container}>
+      <ThemedScrollView style={styles.scrollView}>
+        <Text style={styles.title}>{resource.name}</Text>
+        <Text style={styles.sectionText}>Category: {resource.category}</Text>
+        <Text style={styles.sectionText}>Location: {resource.location.address}</Text>
+        <Text style={styles.sectionText}>Details: {resource.details}</Text>
+        <Text style={styles.sectionText}>Contact: {resource.contact.phone}</Text>
+        <Text style={styles.sectionText}>Hours: {resource.hours}</Text>
+        <Text style={styles.sectionText}>Languages Supported: {resource.languagesSupported.join(', ')}</Text>
+        <Text style={styles.sectionText}>Average Rating: {resource.averageRating}</Text>
+      </ThemedScrollView>
 
-      {resource.contact.website && (
-        <TouchableOpacity onPress={openWebsite} style={styles.button}>
-          <Text style={styles.buttonText}>Visit Website</Text>
+      <View style={styles.iconButtonContainer}>
+        <TouchableOpacity onPress={openDirections} style={styles.iconButton}>
+          <MaterialIcons name="directions" size={24} color="#2196F3" />
+          <Text style={styles.iconText}>Directions</Text>
         </TouchableOpacity>
-      )}
 
-      <TouchableOpacity onPress={callPhone} style={styles.button}>
-        <Text style={styles.buttonText}>Call Phone</Text>
-      </TouchableOpacity>
-    </ThemedScrollView>)
-  ;
+        <TouchableOpacity onPress={showOnMap} style={styles.iconButton}>
+          <MaterialIcons name="map" size={24} color="#2196F3" />
+          <Text style={styles.iconText}>Map</Text>
+        </TouchableOpacity>
+
+        {resource.contact.website && (
+          <TouchableOpacity onPress={openWebsite} style={styles.iconButton}>
+            <MaterialIcons name="language" size={24} color="#2196F3" />
+            <Text style={styles.iconText}>Website</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity onPress={callPhone} style={styles.iconButton}>
+          <MaterialIcons name="phone" size={24} color="#2196F3" />
+          <Text style={styles.iconText}>Call</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      marginBottom: 10,
+    },
+    sectionText: {
+      fontSize: 16,
+      marginVertical: 5,
+    },
     button: {
       backgroundColor: '#2196F3',
       padding: 10,
@@ -122,7 +148,25 @@ const styles = StyleSheet.create({
       color: 'white',
       fontWeight: 'bold',
     },
-    // Add new styles for the "no resource" message
+    // Styles for the icon buttons at the bottom
+    iconButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      borderTopWidth: 1,
+      borderTopColor: '#e0e0e0',
+      backgroundColor: '#f8f8f8',
+      paddingVertical: 10,
+    },
+    iconButton: {
+      alignItems: 'center',
+      padding: 10,
+    },
+    iconText: {
+      fontSize: 12,
+      marginTop: 5,
+      color: '#2196F3',
+    },
+    // Styles for the "no resource" message
     noResourceContainer: {
       flex: 1,
       justifyContent: 'center',
