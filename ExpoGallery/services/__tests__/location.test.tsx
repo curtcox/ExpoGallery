@@ -1,4 +1,4 @@
-import { latLongToGeohash, geohashToLatLong } from '../location';
+import { calculateDistance, latLongToGeohash, geohashToLatLong } from '../location';
 
 // npx jest services/__tests__/location.test.tsx
 
@@ -116,5 +116,44 @@ describe('Round-trip conversion', () => {
       const roundTripGeohash = latLongToGeohash(result.latitude, result.longitude);
       expect(roundTripGeohash).toBe(geohash);
     });
+  });
+});
+
+describe('calculateDistance', () => {
+  test('calculates distance between two identical points as 0', () => {
+    const point = { latitude: 0, longitude: 0 };
+    expect(calculateDistance(point, point)).toBe(0);
+  });
+
+  test('calculates distance between San Francisco and New York', () => {
+    const sanFrancisco = { latitude: 37.7749, longitude: -122.4194 };
+    const newYork = { latitude: 40.7128, longitude: -74.0060 };
+    const distance = calculateDistance(sanFrancisco, newYork);
+    // Expected distance is approximately 4128 kilometers
+    expect(distance).toBeCloseTo(4128000, -3); // Within 1km accuracy
+  });
+
+  test('calculates distance between London and Paris', () => {
+    const london = { latitude: 51.5074, longitude: -0.1278 };
+    const paris = { latitude: 48.8566, longitude: 2.3522 };
+    const distance = calculateDistance(london, paris);
+    // Expected distance is approximately 344 kilometers
+    expect(distance).toBeCloseTo(344000, -3); // Within 1km accuracy
+  });
+
+  test('calculates distance across the equator', () => {
+    const quito = { latitude: 0.1807, longitude: -78.4678 };
+    const singapore = { latitude: 1.3521, longitude: 103.8198 };
+    const distance = calculateDistance(quito, singapore);
+    // Expected distance is approximately 19,900 kilometers
+    expect(distance).toBeCloseTo(19900000, -3); // Within 1km accuracy
+  });
+
+  test('handles negative latitudes and longitudes', () => {
+    const buenosAires = { latitude: -34.6037, longitude: -58.3816 };
+    const capeTown = { latitude: -33.9249, longitude: 18.4241 };
+    const distance = calculateDistance(buenosAires, capeTown);
+    // Expected distance is approximately 6,400 kilometers
+    expect(distance).toBeCloseTo(6400000, -3); // Within 1km accuracy
   });
 });

@@ -1,5 +1,8 @@
 import { error } from '@/utils/index';
-import { localBot } from './localBot';
+import { localBot, ChatContext } from './localBot';
+import { profile } from '../storage/profile';
+import { getAllResources } from './data';
+import * as Location from 'expo-location';
 
 export const CHAT_API_ENDPOINT = 'https://example.com/api/chat';
 const EXTERNAL = false;
@@ -13,7 +16,34 @@ export const generateBotResponse = async (userMessage: string): Promise<string> 
   }
 };
 
-const getResponseText = async (userMessage: string): Promise<string> => EXTERNAL ? await fetchExternal(userMessage) : localBot(userMessage)
+const getResponseText = async (userMessage: string): Promise<string> => {
+  if (EXTERNAL) {
+    return await fetchExternal(userMessage);
+  }
+
+  // Create context with current data
+  const context: ChatContext = {
+    timestamp: new Date(),
+    userProfile: { ...profile },
+    resources: getAllResources()
+  };
+
+  // Try to get location if available
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      const location = await Location.getCurrentPositionAsync({});
+      context.location = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      };
+    }
+  } catch (e) {
+    error('Error getting location:', e);
+  }
+
+  return localBot(userMessage, context);
+};
 
 const fetchExternal = async (userMessage: string): Promise<string> => {
   const response = await fetch(CHAT_API_ENDPOINT, {
