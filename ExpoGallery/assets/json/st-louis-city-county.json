@@ -33,7 +33,7 @@
         "details": "Offers emergency shelter and supportive services to women, children, and families facing homelessness.",
         "contact": {
           "phone": "(314) 231-1515",
-          "website": "gateway180.org"
+          "website": "https://gateway180.org"
         },
         "hours": "Open 24 hours",
         "capacity": 40,
@@ -54,7 +54,7 @@
         "details": "Provides shelter, meals, and supportive programs for individuals experiencing homelessness.",
         "contact": {
           "phone": "(314) 588-7111",
-          "website": "ppcsinc.org"
+          "website": "https://ppcsinc.org"
         },
         "hours": "Open 24 hours",
         "capacity": 35,
@@ -75,7 +75,7 @@
         "details": "Offers housing, employment, and health programs to assist individuals and families in achieving self-sufficiency.",
         "contact": {
           "phone": "(314) 802-0700",
-          "website": "stpatrickcenter.org"
+          "website": "https://stpatrickcenter.org"
         },
         "hours": "Monday–Friday: 8:00 AM – 4:00 PM",
         "capacity": 45,
@@ -96,7 +96,7 @@
         "details": "Provides emergency shelter and supportive services for families experiencing homelessness.",
         "contact": {
           "phone": "(314) 423-7770",
-          "website": "salvationarmystlouis.org"
+          "website": "https://salvationarmystlouis.org"
         },
         "hours": "Open 24 hours",
         "capacity": 30,
@@ -159,7 +159,7 @@
         "details": "Provides food pantry services, clothing assistance, and other community programs.",
         "contact": {
           "phone": "(314) 773-9027",
-          "website": "gasastl.org"
+          "website": "https://gasastl.org"
         },
         "hours": "Monday–Friday: 9:00 AM – 5:00 PM",
         "capacity": 80,
@@ -201,7 +201,7 @@
         "details": "Provides food assistance and other supportive services to the community.",
         "contact": {
           "phone": "(314) 752-6339",
-          "website": "csjsl.org"
+          "website": "https://csjsl.org"
         },
         "hours": "Tuesday & Thursday: 9:00 AM – 12:00 PM",
         "capacity": 65,
@@ -222,7 +222,7 @@
         "details": "Provides comprehensive medical, dental, and behavioral health services.",
         "contact": {
           "phone": "(314) 814-8700",
-          "website": "affiniahealthcare.org"
+          "website": "https://affiniahealthcare.org"
         },
         "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
         "capacity": 40,
@@ -243,7 +243,7 @@
         "details": "Offers medical, dental, and behavioral health services to the community.",
         "contact": {
           "phone": "(314) 367-5820",
-          "website": "carestlhealth.org"
+          "website": "https://carestlhealth.org"
         },
         "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
         "capacity": 35,
@@ -264,7 +264,7 @@
         "details": "Provides clinical and mental health services, primarily to the immigrant and refugee communities.",
         "contact": {
           "phone": "(314) 977-1250",
-          "website": "casadesaludstl.org"
+          "website": "https://casadesaludstl.org"
         },
         "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
         "capacity": 25,
@@ -286,7 +286,7 @@
         "details": "Offers a wide range of health services, including immunizations and STD testing.",
         "contact": {
           "phone": "(314) 615-0500",
-          "website": "stlouiscountymo.gov/st-louis-county-departments/public-health"
+          "website": "https://stlouiscountymo.gov/st-louis-county-departments/public-health"
         },
         "hours": "Monday–Friday: 8:00 AM – 5:00 PM",
         "capacity": 50,
