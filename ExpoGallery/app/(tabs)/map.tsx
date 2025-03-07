@@ -13,6 +13,7 @@ const iconFor = (category: string): keyof typeof MaterialIcons.glyphMap => {
     case 'shelter':    return 'night-shelter';
     case 'food':       return 'soup-kitchen';
     case 'employment': return 'person-search';
+    case 'legal':      return 'gavel';
     default:           return 'circle';
   }
 };
