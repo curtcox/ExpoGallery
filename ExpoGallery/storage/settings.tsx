@@ -6,6 +6,7 @@ export interface Settings {
   tabLevels?: Record<string, number>;
   tabRenames?: Record<string, string>;
   focusedExamples: string[];
+  overrides?: string; // JSON string containing custom overrides
 }
 
 // Default settings
@@ -15,6 +16,7 @@ export const defaultSettings: Settings = {
   tabLevels: {},
   tabRenames: {},
   focusedExamples: [],
+  overrides: '',
 };
 
 // Current settings (in memory)

@@ -227,6 +227,23 @@ export default function SettingsScreen() {
           <ThemedText type="default">Debug Mode</ThemedText>
           <Switch value={debug} onValueChange={toggleDebug} />
         </View>
+
+        <TouchableOpacity
+          style={styles.overridesLink}
+          onPress={() => {
+            // Navigate to overrides screen
+            const { router } = require('expo-router');
+            router.navigate('/overrides');
+          }}
+        >
+          <View style={styles.linkContent}>
+            <ThemedText type="default">App Overrides</ThemedText>
+            <Ionicons name="chevron-forward" size={20} color="#2196F3" />
+          </View>
+          <ThemedText type="default" style={styles.linkDescription}>
+            Edit advanced configuration overrides
+          </ThemedText>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -364,5 +381,23 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     opacity: 0.7,
     fontSize: 12,
+  },
+  overridesLink: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(200, 200, 200, 0.2)',
+    borderRadius: 8,
+    marginTop: 12,
+    backgroundColor: 'rgba(33, 150, 243, 0.05)',
+  },
+  linkContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  linkDescription: {
+    marginTop: 4,
+    fontSize: 12,
+    opacity: 0.7,
   },
 });
