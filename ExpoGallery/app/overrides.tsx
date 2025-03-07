@@ -18,6 +18,11 @@ export default function OverridesScreen() {
     return unsubscribe;
   }, []);
 
+  // Run validation on initial load
+  useEffect(() => {
+    validateJSON(overrides);
+  }, []);
+
   const validateJSON = (jsonString: string): boolean => {
     if (!jsonString.trim()) {
       setIsValid(true);
@@ -62,6 +67,8 @@ export default function OverridesScreen() {
           onPress: () => {
             setOverrides('');
             updateSettings({ overrides: '' });
+            setIsValid(true);
+            setErrorMessage('');
           },
           style: 'destructive'
         }
@@ -78,6 +85,13 @@ export default function OverridesScreen() {
           <ThemedText type="default">
             Enter JSON overrides for advanced app customization.
             Only edit if you know what you're doing.
+          </ThemedText>
+        </View>
+
+        <View style={styles.validationStatusContainer}>
+          <View style={[styles.statusIndicator, isValid ? styles.validIndicator : styles.invalidIndicator]} />
+          <ThemedText type="default" style={isValid ? styles.validText : styles.errorText}>
+            {isValid ? 'Valid JSON' : 'Invalid JSON'}
           </ThemedText>
         </View>
 
@@ -146,6 +160,26 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderLeftWidth: 4,
     borderLeftColor: 'rgba(100, 100, 255, 0.5)',
+  },
+  validationStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statusIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  validIndicator: {
+    backgroundColor: '#4CAF50',
+  },
+  invalidIndicator: {
+    backgroundColor: '#F44336',
+  },
+  validText: {
+    color: '#4CAF50',
   },
   editor: {
     borderWidth: 1,
