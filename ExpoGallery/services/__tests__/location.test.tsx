@@ -1,6 +1,6 @@
 import { calculateDistance, latLongToGeohash, geohashToLatLong } from '../location';
 
-// npx jest services/__tests__/location.test.tsx
+// npx jest --config jest.config.js services/__tests__/location.test.tsx
 
 describe('latLongToGeohash', () => {
   test('should convert valid latitude and longitude to geohash for San Francisco', () => {
