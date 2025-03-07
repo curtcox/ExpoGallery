@@ -18,15 +18,11 @@ describe('localBot', () => {
   test('Show shelter link when message contains a request for shelter', () => {
     const result = localBot('I need shelter', mockContext);
     expect(result).toContain('shelter');
-    // expect(result).toContain('Turning Point');
-    // expect(result).toContain('PO Box 426, Warrenton, MO 63383');
   });
 
   test('Show food link when message contains a request for food', () => {
     const result = localBot('I need food', mockContext);
     expect(result).toContain('food');
-    // expect(result).toContain('Bread of Life');
-    // expect(result).toContain('820 Cap-Au-Gris, Troy, MO 63379');
   });
 
   test('help message when message contains "help"', () => {
