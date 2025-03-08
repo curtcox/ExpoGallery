@@ -301,7 +301,19 @@ export default function Example() {
       // Get values from storage
       await getValueFor(metadataKey, setLastOperation,
         () => {}, // No need to update key input
-        handleMetadataLoaded
+        (value: string) => {
+          try {
+            const parsedMetadata = JSON.parse(value);
+            setMetadata(parsedMetadata);
+
+            // Set the original URL in the URL input field
+            if (parsedMetadata.originalUrl) {
+              setUrl(parsedMetadata.originalUrl);
+            }
+          } catch (e) {
+            handleError(e, 'Error parsing metadata JSON');
+          }
+        }
       );
 
       await getValueFor(contentKey, setLastOperation,
