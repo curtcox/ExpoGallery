@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, TextInput, Button, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { ScrollView, View, TextInput, Button, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { save, getValueFor, getAllKeys } from '../utils/index';
 import { error } from '@/utils/logger';
@@ -37,6 +37,34 @@ const isCorsError = (err: any) =>
   err?.message?.includes('cross-origin') ||
   (err?.name === 'TypeError' && err?.message?.includes('Failed to fetch')) ||
   err?.message?.includes('access-control-allow-origin');
+
+// Sanitize URL for storage key
+const sanitizeUrlForStorage = (url: string): string => {
+  return url.replace(/(^\w+:|^)\/\//, '').replace(/[^a-zA-Z0-9]/g, '_');
+};
+
+// Create metadata from fetch response
+const createMetadataFromResponse = (url: string, response: Response): any => {
+  return {
+    originalUrl: url,
+    fetchedAt: new Date().toISOString(),
+    contentType: response.headers.get('content-type'),
+    status: response.status,
+    statusText: response.statusText,
+    headers: Object.fromEntries(response.headers.entries())
+  };
+};
+
+// Create error object from HTTP error
+const createHttpErrorObject = (url: string, response: Response): any => {
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    message: `HTTP error ${response.status}: ${response.statusText}`,
+    headers: Object.fromEntries(response.headers.entries()),
+    url: url
+  };
+};
 
 // UI Components
 interface ErrorDisplayProps {
@@ -168,107 +196,81 @@ export default function Example() {
     setErrorInfo(null);
   };
 
+  // Handle errors and update error state
+  const handleError = (e: any, context: string) => {
+    error(context, e);
+    setErrorInfo({
+      error: e,
+      context
+    });
+  };
+
+  // Extract URLs from storage keys
+  const extractUrlsFromKeys = (keys: readonly string[]): string[] => {
+    return keys
+      .filter((key: string) => key.startsWith(METADATA_PREFIX))
+      .map((key: string) => key.replace(METADATA_PREFIX, ''));
+  };
+
   // Storage operations
   const setupStorage = async () => {
     try {
-      // Convert keys to non-readonly before setting state
       await getAllKeys((keys: readonly string[]) => {
-        // Filter keys that start with the metadata prefix and extract the URL ID
-        const urls = keys
-          .filter((key: string) => key.startsWith(METADATA_PREFIX))
-          .map((key: string) => key.replace(METADATA_PREFIX, ''));
-
+        const urls = extractUrlsFromKeys(keys);
         setSavedUrls(urls);
       });
     } catch (e: any) {
-      error('Error setting up storage:', e);
-      setErrorInfo({
-        error: e,
-        context: 'Error initializing storage'
-      });
+      handleError(e, 'Error initializing storage');
     }
   };
 
   const loadSavedUrls = async () => {
     try {
-      // Clear any previous errors
       clearError();
-
       await getAllKeys((keys: readonly string[]) => {
-        // Filter keys that start with the metadata prefix and extract the URL ID
-        const urls = keys
-          .filter((key: string) => key.startsWith(METADATA_PREFIX))
-          .map((key: string) => key.replace(METADATA_PREFIX, ''));
-
+        const urls = extractUrlsFromKeys(keys);
         setSavedUrls(urls);
       });
     } catch (e: any) {
-      error('Error loading saved URLs:', e);
-      setErrorInfo({
-        error: e,
-        context: 'Error loading saved URLs'
-      });
+      handleError(e, 'Error loading saved URLs');
     }
+  };
+
+  // Process response from fetch
+  const processResponse = async (response: Response, url: string): Promise<string> => {
+    if (!response.ok) {
+      throw createHttpErrorObject(url, response);
+    }
+    return await response.text();
+  };
+
+  // Save URL content and metadata
+  const saveUrlData = async (sanitizedUrl: string, responseText: string, meta: any) => {
+    await save(CONTENT_PREFIX + sanitizedUrl, responseText, setLastOperation);
+    await save(METADATA_PREFIX + sanitizedUrl, JSON.stringify(meta), setLastOperation);
   };
 
   const fetchUrl = async () => {
     if (!url.trim()) return;
 
     setLoading(true);
-    // Clear any previous errors
     clearError();
 
     try {
-      // Sanitize URL for storage key (remove protocol and special chars)
-      const sanitizedUrl = url.replace(/(^\w+:|^)\/\//, '').replace(/[^a-zA-Z0-9]/g, '_');
-
-      // Fetch the URL
+      const sanitizedUrl = sanitizeUrlForStorage(url);
       const response = await fetch(url);
+      const responseText = await processResponse(response, url);
+      const meta = createMetadataFromResponse(url, response);
 
-      // Check for HTTP error status
-      if (!response.ok) {
-        throw {
-          status: response.status,
-          statusText: response.statusText,
-          message: `HTTP error ${response.status}: ${response.statusText}`,
-          headers: Object.fromEntries(response.headers.entries()),
-          url: url
-        };
-      }
-
-      const responseText = await response.text();
-
-      // Create metadata
-      const meta = {
-        originalUrl: url,
-        fetchedAt: new Date().toISOString(),
-        contentType: response.headers.get('content-type'),
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries())
-      };
-
-      // Save content and metadata using the storage utility
-      await save(CONTENT_PREFIX + sanitizedUrl, responseText, setLastOperation);
-      await save(METADATA_PREFIX + sanitizedUrl, JSON.stringify(meta), setLastOperation);
-
-      // Refresh list of saved URLs
-      loadSavedUrls();
+      await saveUrlData(sanitizedUrl, responseText, meta);
+      await loadSavedUrls();
 
       // Update state
       setMetadata(meta);
       setContent(responseText);
       setSelectedUrl(sanitizedUrl);
-
     } catch (e: any) {
-      error('Error fetching URL:', e);
-
-      // Store raw error information
-      setErrorInfo({
-        error: e,
-        context: 'Error fetching URL'
-      });
-
+      handleError(e, 'Error fetching URL');
       setMetadata({ error: 'Failed to fetch URL. See error details above.' });
       setContent('');
     } finally {
@@ -276,32 +278,25 @@ export default function Example() {
     }
   };
 
+  const handleMetadataLoaded = (value: string) => {
+    try {
+      setMetadata(JSON.parse(value));
+    } catch (e) {
+      handleError(e, 'Error parsing metadata JSON');
+    }
+  };
+
+  const handleContentLoaded = (value: string) => {
+    setContent(value);
+  };
+
   const loadUrlContent = async (urlId: string) => {
     setLoading(true);
-    // Clear any previous errors
     clearError();
 
     try {
       const metadataKey = METADATA_PREFIX + urlId;
       const contentKey = CONTENT_PREFIX + urlId;
-
-      // Helper function to update state after metadata is loaded
-      const handleMetadataLoaded = (value: string) => {
-        try {
-          setMetadata(JSON.parse(value));
-        } catch (e) {
-          error('Error parsing metadata JSON:', e);
-          setErrorInfo({
-            error: e,
-            context: 'Error parsing metadata JSON'
-          });
-        }
-      };
-
-      // Helper function to update content state
-      const handleContentLoaded = (value: string) => {
-        setContent(value);
-      };
 
       // Get values from storage
       await getValueFor(metadataKey, setLastOperation,
@@ -316,11 +311,7 @@ export default function Example() {
 
       setSelectedUrl(urlId);
     } catch (e: any) {
-      error('Error loading URL content:', e);
-      setErrorInfo({
-        error: e,
-        context: 'Error loading URL content'
-      });
+      handleError(e, 'Error loading URL content');
       setMetadata({ error: 'Failed to load content. See error details above.' });
       setContent('');
     } finally {
