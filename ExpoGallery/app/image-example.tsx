@@ -1,4 +1,4 @@
-import { Image, ScrollView, View } from 'react-native';
+import { Image, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 export default function Example() {
 
