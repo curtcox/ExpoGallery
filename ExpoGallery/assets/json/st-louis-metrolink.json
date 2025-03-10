@@ -1,0 +1,217 @@
+{
+    "resources": [
+      {
+        "id": "9yzggbrn63",
+        "name": "Civic Center Transit Center",
+        "category": "transit",
+        "location": {
+          "latitude": 38.6272,
+          "longitude": -90.2067,
+          "address": "401 S 14th St, St. Louis, MO 63103"
+        },
+        "details": "Major transit hub serving Red and Blue lines with bus connections and covered waiting areas. Features ticket vending machines, security cameras, and digital arrival displays.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/civic-center-transit-center/"
+        },
+        "hours": "4:00 AM - 1:00 AM daily",
+        "capacity": 100,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9yzggbvz2d",
+        "name": "Union Station",
+        "category": "transit",
+        "location": {
+          "latitude": 38.6278,
+          "longitude": -90.2076,
+          "address": "1820 Market St, St. Louis, MO 63103"
+        },
+        "details": "Historic station serving Red and Blue lines with indoor waiting area, ticket machines, and connection to Union Station attractions. Features amenities including restrooms and food options nearby.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/union-station/"
+        },
+        "hours": "4:30 AM - 1:00 AM daily",
+        "capacity": 150,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.3
+      },
+      {
+        "id": "9yzgc3xk68",
+        "name": "Central West End",
+        "category": "transit",
+        "location": {
+          "latitude": 38.6359,
+          "longitude": -90.2594,
+          "address": "4500 Children's Pl, St. Louis, MO 63110"
+        },
+        "details": "Busy station serving Blue line with covered platform and direct connections to BJC Medical Campus and Washington University School of Medicine. Features bike racks and security presence.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/central-west-end/"
+        },
+        "hours": "4:20 AM - 1:00 AM daily",
+        "capacity": 120,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.2
+      },
+      {
+        "id": "9yzg6fmw31",
+        "name": "Shrewsbury-Lansdowne I-44",
+        "category": "transit",
+        "location": {
+          "latitude": 38.5687,
+          "longitude": -90.3298,
+          "address": "7201 Lansdowne Ave, St. Louis, MO 63119"
+        },
+        "details": "End-of-line station for Blue line with large park-and-ride lot (815 spaces), bus connections, and covered waiting areas. Features bike lockers and ticket vending machines.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/shrewsbury-lansdowne-i-44/"
+        },
+        "hours": "4:10 AM - 1:15 AM daily",
+        "capacity": 200,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.1
+      },
+      {
+        "id": "9yzsp18fmz",
+        "name": "Lambert Airport Terminal 1",
+        "category": "transit",
+        "location": {
+          "latitude": 38.7475,
+          "longitude": -90.3689,
+          "address": "10701 Lambert International Blvd, St. Louis, MO 63145"
+        },
+        "details": "Airport station serving Red line with covered platform and direct access to Terminal 1. Features luggage-friendly design, digital information displays, and heightened security presence.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/lambert-airport-terminal-1/"
+        },
+        "hours": "4:00 AM - 1:00 AM daily",
+        "capacity": 150,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.4
+      },
+      {
+        "id": "9yzsp0mrtx",
+        "name": "Lambert Airport Terminal 2",
+        "category": "transit",
+        "location": {
+          "latitude": 38.7356,
+          "longitude": -90.3614,
+          "address": "10701 Lambert International Blvd, St. Louis, MO 63145"
+        },
+        "details": "End-of-line station for Red line with covered platform and direct access to Terminal 2. Features luggage racks, enhanced lighting, and security cameras.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/lambert-airport-terminal-2/"
+        },
+        "hours": "4:05 AM - 1:05 AM daily",
+        "capacity": 120,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.3
+      },
+      {
+        "id": "9yzggb6skd",
+        "name": "8th & Pine",
+        "category": "transit",
+        "location": {
+          "latitude": 38.6281,
+          "longitude": -90.1916,
+          "address": "720 Pine St, St. Louis, MO 63101"
+        },
+        "details": "Underground station serving Red and Blue lines in downtown with access to business district. Features ticket machines, security cameras, and nearby attractions including City Garden.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/8th-pine/"
+        },
+        "hours": "4:25 AM - 1:10 AM daily",
+        "capacity": 100,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 3.9
+      },
+      {
+        "id": "9yzgg74vcf",
+        "name": "Stadium",
+        "category": "transit",
+        "location": {
+          "latitude": 38.6240,
+          "longitude": -90.1926,
+          "address": "300 S 8th St, St. Louis, MO 63102"
+        },
+        "details": "Station serving Red and Blue lines with direct access to Busch Stadium. Features extended hours during sporting events and concerts, ticket vending machines, and enhanced security during events.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/stadium/"
+        },
+        "hours": "4:30 AM - 1:15 AM daily, extended during events",
+        "capacity": 250,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.2
+      },
+      {
+        "id": "9yzu47fpnq",
+        "name": "UMSL South",
+        "category": "transit",
+        "location": {
+          "latitude": 38.7072,
+          "longitude": -90.3111,
+          "address": "7798 Natural Bridge Rd, St. Louis, MO 63121"
+        },
+        "details": "Campus station serving Red line with covered platform, ticket machines, and direct access to University of Missouri-St. Louis south campus. Features bike racks and nearby student housing.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/umsl-south/"
+        },
+        "hours": "4:15 AM - 12:45 AM daily",
+        "capacity": 80,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 3.8
+      },
+      {
+        "id": "9yzgsm47x2",
+        "name": "Forest Park-DeBaliviere",
+        "category": "transit",
+        "location": {
+          "latitude": 38.6475,
+          "longitude": -90.2855,
+          "address": "250 DeBaliviere Ave, St. Louis, MO 63112"
+        },
+        "details": "Transfer station for Red and Blue lines with bus connections and parking. Features covered waiting areas, ticket machines, and access to Forest Park attractions.",
+        "contact": {
+          "phone": "(314) 982-1400",
+          "website": "https://www.metrostlouis.org/metrolink-station/forest-park-debaliviere/"
+        },
+        "hours": "4:10 AM - 1:20 AM daily",
+        "capacity": 120,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 4.0
+      }
+    ]
+  }
