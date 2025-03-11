@@ -12,3 +12,12 @@ appJson.expo.extra.googleMapsApiKey = googleMapsApiKey;
 
 // Write the updated app.json file
 fs.writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2));
+
+// Replace the Git SHA placeholder in the about.tsx file
+const gitSha = process.env.GITHUB_SHA || 'development';
+const aboutFilePath = path.join(__dirname, '..', 'app', 'about.tsx');
+let aboutFileContent = fs.readFileSync(aboutFilePath, 'utf8');
+aboutFileContent = aboutFileContent.replace('__GIT_SHA__', gitSha.substring(0, 7));
+fs.writeFileSync(aboutFilePath, aboutFileContent);
+
+console.log(`Environment variables set successfully. Git SHA: ${gitSha.substring(0, 7)}`);

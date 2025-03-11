@@ -254,6 +254,25 @@ export default function SettingsScreen() {
           Visible tabs: {getVisibleTabsDescription(uiLevel, tabLevels)}
         </ThemedText>
       </View>
+
+      <View style={styles.section}>
+        <ThemedText type="subtitle">About</ThemedText>
+        <TouchableOpacity
+          style={styles.overridesLink}
+          onPress={() => {
+            const { router } = require('expo-router');
+            router.navigate('/about');
+          }}
+        >
+          <View style={styles.linkContent}>
+            <ThemedText type="default">About ExpoGallery</ThemedText>
+            <Ionicons name="chevron-forward" size={20} color="#2196F3" />
+          </View>
+          <ThemedText type="default" style={styles.linkDescription}>
+            View app information and credits
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
