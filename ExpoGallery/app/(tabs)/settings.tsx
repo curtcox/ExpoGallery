@@ -244,6 +244,22 @@ export default function SettingsScreen() {
             Edit advanced configuration overrides
           </ThemedText>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.overridesLink}
+          onPress={() => {
+            const { router } = require('expo-router');
+            router.navigate('/reset');
+          }}
+        >
+          <View style={styles.linkContent}>
+            <ThemedText type="default">Reset Settings</ThemedText>
+            <Ionicons name="chevron-forward" size={20} color="#2196F3" />
+          </View>
+          <ThemedText type="default" style={styles.linkDescription}>
+            Reset all settings to default values
+          </ThemedText>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
