@@ -39,7 +39,11 @@ export async function initProfile(): Promise<void> {
       Object.assign(profile, parsedProfile);
     }
   } catch (e) {
+    // Log the error but continue with default profile
     error('Failed to load profile:', e);
+
+    // Ensure the application can continue with default values
+    Object.assign(profile, defaultProfile);
   }
 }
 

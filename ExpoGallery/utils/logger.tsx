@@ -1,5 +1,4 @@
-import { oneButtonAlert } from './alerts';
-import { settings } from '@/storage/settings';
+import { Alert, Platform} from 'react-native';
 
 export interface LogEntry {
   index: number;
@@ -9,6 +8,26 @@ export interface LogEntry {
 }
 
 export const LOG: LogEntry[] = [];
+
+// Just like in alerts.tsx, but this way there is no import cycle
+const handlePress = (buttonType: string) => {
+  const message = `${buttonType} Pressed`;
+  info(message);
+};
+
+const oneButtonAlert = (message: string) => {
+  if (Platform.OS === 'web') {
+    window.alert(message);
+    handlePress('OK');
+  } else {
+    Alert.alert('Alert Title', message, [
+      {text: 'OK', onPress: () => handlePress('OK')},
+    ]);
+  }
+};
+
+// Ideally this should be set in settings.tsx, but this way there is no import cycle
+const DEBUG = true;
 
 // Add subscribers mechanism
 const subscribers: Set<(logs: LogEntry[]) => void> = new Set();
@@ -55,7 +74,7 @@ export function error(message: string, error: any) {
     error
   });
   notifySubscribers();
-  if (settings.debug) {
+  if (DEBUG) {
     oneButtonAlert(message);
   }
 }

@@ -4,10 +4,13 @@ import GiftedChat, { IMessage, MessageTextProps, MessageText } from '@/component
 import { generateBotResponse } from '@/services/chat';
 import { router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
-import { error } from '@/utils/logger';
+import { error, info } from '@/utils/logger';
 
 const isServerSideRendering = () => {
-  return Platform.OS === 'web' && typeof window === 'undefined';
+  const isSSR = Platform.OS === 'web' && typeof window === 'undefined';
+  info(`isServerSideRendering check: ${isSSR}`);
+  info(`Platform.OS: ${Platform.OS}, window defined: ${typeof window !== 'undefined'}`);
+  return isSSR;
 };
 
 // Timeout duration in milliseconds (30 seconds)
@@ -20,11 +23,21 @@ const TIMEOUT_MESSAGE = 'Sorry, the response took too long. Please try again.';
 export default function ChatScreen() {
   const [messages, setMessages] = useState<IMessage[]>([]);
 
+  info('ChatScreen rendering, environment details:');
+  info(`Platform: ${Platform.OS}, running in: ${typeof window !== 'undefined' ? 'browser' : 'server'}`);
+  if (typeof window !== 'undefined') {
+    info(`User Agent: ${window.navigator.userAgent}`);
+    info(`Is Content Script Context: ${window.location.protocol === 'chrome-extension:' ? 'Yes' : 'No'}`);
+  }
+
   useEffect(() => {
+    info('ChatScreen useEffect - Setting up message subscription');
     // Subscribe to message changes
     const unsubscribe = subscribeToMessageChanges((storedMessages) => {
+      info(`Received ${storedMessages.length} messages from storage`);
       if (storedMessages.length === 0) {
         // If no stored messages, set the initial welcome message
+        info('No stored messages found, creating welcome message');
         const welcomeMessage = {
           _id: 1,
           text: 'How can I help you?',
@@ -36,14 +49,21 @@ export default function ChatScreen() {
           },
         };
         setMessages([welcomeMessage]);
-        updateMessages([welcomeMessage]);
+        info('Updating storage with welcome message');
+        updateMessages([welcomeMessage]).catch(e =>
+          error('Failed to update storage with welcome message:', e)
+        );
       } else {
+        info('Setting messages from storage');
         setMessages(storedMessages as IMessage[]);
       }
     });
 
     // Cleanup subscription on unmount
-    return () => unsubscribe();
+    return () => {
+      info('ChatScreen cleanup - unsubscribing from messages');
+      unsubscribe();
+    };
   }, []);
 
   /**
