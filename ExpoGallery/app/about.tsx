@@ -102,7 +102,10 @@ export default function AboutScreen() {
                     style={styles.linkButton}
                     onPress={() => router.push('/reset')}
                   >
-                    <ThemedText type="default" style={styles.linkText}>Reset Screen</ThemedText>
+                    <View style={styles.linkContent}>
+                      <ThemedText type="default" style={styles.linkText}>Reset Screen</ThemedText>
+                      <Ionicons name="arrow-forward" size={16} color="#2196F3" style={styles.linkIcon} />
+                    </View>
                   </TouchableOpacity>
                   <ThemedText type="default" style={styles.buildInfo}>
                     Current: {APP_BUILD_SHA}
