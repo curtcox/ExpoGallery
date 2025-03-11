@@ -3,33 +3,50 @@ import { View, Text, StyleSheet, Button, ScrollView, Platform } from 'react-nati
 import { useCallback } from 'react';
 
 interface StorageInfo {
-  localStorageKeys: string[];
-  sessionStorageKeys: string[];
+  localStorageKeys: Array<{key: string, size: number, value: string}>;
+  sessionStorageKeys: Array<{key: string, size: number, value: string}>;
+  localStorageTotalSize: number;
+  sessionStorageTotalSize: number;
 }
 
 function useAppReset() {
   const getStorageInfo = useCallback((): StorageInfo => {
-    const localStorageKeys = Object.keys(localStorage);
-    const sessionStorageKeys = Object.keys(sessionStorage);
+    // Calculate size for localStorage
+    const localStorageItems = Object.keys(localStorage).map(key => {
+      const value = localStorage.getItem(key) || '';
+      const size = new Blob([value]).size;
+      return { key, size, value };
+    });
+
+    // Calculate size for sessionStorage
+    const sessionStorageItems = Object.keys(sessionStorage).map(key => {
+      const value = sessionStorage.getItem(key) || '';
+      const size = new Blob([value]).size;
+      return { key, size, value };
+    });
+
+    // Calculate total sizes
+    const localStorageTotalSize = localStorageItems.reduce((total, item) => total + item.size, 0);
+    const sessionStorageTotalSize = sessionStorageItems.reduce((total, item) => total + item.size, 0);
 
     return {
-      localStorageKeys,
-      sessionStorageKeys
+      localStorageKeys: localStorageItems,
+      sessionStorageKeys: sessionStorageItems,
+      localStorageTotalSize,
+      sessionStorageTotalSize
     };
   }, []);
 
   const clearStorageData = useCallback(() => {
-    const localStorageKeys = Object.keys(localStorage);
-    const sessionStorageKeys = Object.keys(sessionStorage);
+    // Get storage info before clearing
+    const storageInfo = getStorageInfo();
 
-    localStorageKeys.forEach(key => localStorage.removeItem(key));
-    sessionStorageKeys.forEach(key => sessionStorage.removeItem(key));
+    // Clear storage
+    storageInfo.localStorageKeys.forEach(item => localStorage.removeItem(item.key));
+    storageInfo.sessionStorageKeys.forEach(item => sessionStorage.removeItem(item.key));
 
-    return {
-      localStorageKeys,
-      sessionStorageKeys
-    };
-  }, []);
+    return storageInfo;
+  }, [getStorageInfo]);
 
   const reloadPage = useCallback(() => {
     // Reload the page to reset React state
@@ -47,11 +64,22 @@ function useAppReset() {
     return clearedData;
   }, [clearStorageData, reloadPage]);
 
-  return { resetAppState, getStorageInfo };
+  // Helper function to format bytes to a human-readable format
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  return { resetAppState, getStorageInfo, formatBytes };
 }
 
 export default function ResetScreen() {
-  const { resetAppState, getStorageInfo } = useAppReset();
+  const { resetAppState, getStorageInfo, formatBytes } = useAppReset();
   const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
 
   // Load storage information when the screen mounts
@@ -80,10 +108,14 @@ export default function ResetScreen() {
           <Text style={styles.sectionTitle}>Storage Information:</Text>
 
           <View style={styles.storageSection}>
-            <Text style={styles.storageTitle}>LocalStorage ({storageInfo.localStorageKeys.length} items)</Text>
+            <Text style={styles.storageTitle}>
+              LocalStorage ({storageInfo.localStorageKeys.length} items, {formatBytes(storageInfo.localStorageTotalSize)} total)
+            </Text>
             {storageInfo.localStorageKeys.length > 0 ? (
-              storageInfo.localStorageKeys.map((key: string) => (
-                <Text key={key} style={styles.keyItem}>• {key}</Text>
+              storageInfo.localStorageKeys.map((item: {key: string, size: number, value: string}) => (
+                <Text key={item.key} style={styles.keyItem}>
+                  • {item.key} - {formatBytes(item.size)}
+                </Text>
               ))
             ) : (
               <Text style={styles.emptyMessage}>No items found</Text>
@@ -91,10 +123,14 @@ export default function ResetScreen() {
           </View>
 
           <View style={styles.storageSection}>
-            <Text style={styles.storageTitle}>SessionStorage ({storageInfo.sessionStorageKeys.length} items)</Text>
+            <Text style={styles.storageTitle}>
+              SessionStorage ({storageInfo.sessionStorageKeys.length} items, {formatBytes(storageInfo.sessionStorageTotalSize)} total)
+            </Text>
             {storageInfo.sessionStorageKeys.length > 0 ? (
-              storageInfo.sessionStorageKeys.map((key: string) => (
-                <Text key={key} style={styles.keyItem}>• {key}</Text>
+              storageInfo.sessionStorageKeys.map((item: {key: string, size: number, value: string}) => (
+                <Text key={item.key} style={styles.keyItem}>
+                  • {item.key} - {formatBytes(item.size)}
+                </Text>
               ))
             ) : (
               <Text style={styles.emptyMessage}>No items found</Text>
