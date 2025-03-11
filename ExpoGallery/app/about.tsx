@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Image, Linking } from 'react-native';
+import { View, StyleSheet, ScrollView,  Linking } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,12 +42,6 @@ export default function AboutScreen() {
             Adaptive tab navigation
           </ThemedText>
         </View>
-        <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={24} color="#2196F3" style={styles.featureIcon} />
-          <ThemedText type="default" style={styles.featureText}>
-            Theming support
-          </ThemedText>
-        </View>
       </View>
 
       <View style={styles.section}>
@@ -59,16 +53,6 @@ export default function AboutScreen() {
           <View style={styles.linkContent}>
             <Ionicons name="logo-github" size={24} color="#2196F3" style={styles.linkIcon} />
             <ThemedText type="default">GitHub Repository</ThemedText>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.linkButton}
-          onPress={() => Linking.openURL('mailto:support@example.com')}
-        >
-          <View style={styles.linkContent}>
-            <Ionicons name="mail" size={24} color="#2196F3" style={styles.linkIcon} />
-            <ThemedText type="default">Contact Support</ThemedText>
           </View>
         </TouchableOpacity>
       </View>
