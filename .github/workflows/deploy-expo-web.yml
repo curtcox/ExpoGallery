@@ -32,6 +32,11 @@ jobs:
           cd ExpoGallery
           npm ci
 
+      - name: Run tests
+        run: |
+          cd ExpoGallery
+          npm test
+
       - name: Set environment variables
         run: |
           cd ExpoGallery
