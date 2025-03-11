@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Button, ScrollView, Platform } from 'react-native';
 import { useCallback } from 'react';
 
 interface StorageInfo {
@@ -18,7 +18,7 @@ function useAppReset() {
     };
   }, []);
 
-  const resetAppState = useCallback(() => {
+  const clearStorageData = useCallback(() => {
     const localStorageKeys = Object.keys(localStorage);
     const sessionStorageKeys = Object.keys(sessionStorage);
 
@@ -31,6 +31,22 @@ function useAppReset() {
     };
   }, []);
 
+  const reloadPage = useCallback(() => {
+    // Reload the page to reset React state
+    if (Platform.OS === 'web') {
+      window.location.reload();
+    } else {
+      // For native platforms, you might want to use React Navigation to reset to initial screen
+      // or use a state management solution to reset app-wide state
+    }
+  }, []);
+
+  const resetAppState = useCallback(() => {
+    const clearedData = clearStorageData();
+    reloadPage();
+    return clearedData;
+  }, [clearStorageData, reloadPage]);
+
   return { resetAppState, getStorageInfo };
 }
 
@@ -39,18 +55,14 @@ export default function ResetScreen() {
   const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
 
   // Load storage information when the screen mounts
-  useEffect(() => {
-    setStorageInfo(getStorageInfo());
-  }, [getStorageInfo]);
+  useEffect(() => { setStorageInfo(getStorageInfo());}, [getStorageInfo]);
 
   const handleReset = () => {
     const info = resetAppState();
     setStorageInfo(info);
   };
 
-  const refreshStorageInfo = () => {
-    setStorageInfo(getStorageInfo());
-  };
+  const refreshStorageInfo = () => { setStorageInfo(getStorageInfo());};
 
   return (
     <View style={styles.container}>
