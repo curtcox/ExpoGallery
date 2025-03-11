@@ -23,6 +23,7 @@ jest.mock('expo-router', () => ({
 }));
 jest.mock('@/utils/logger', () => ({
   error: jest.fn(),
+  info: jest.fn(),
 }));
 
 // Mock expo-location
