@@ -46,6 +46,23 @@ jobs:
           NODE_OPTIONS: "--max_old_space_size=4096"
           EXPO_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
 
+      - name: Save latest deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: expo-web-build-latest
+          path: |
+            ExpoGallery/dist
+            ExpoGallery/public/version.json
+
+      - name: Save historical deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: expo-web-build-${{ github.sha }}
+          path: |
+            ExpoGallery/dist
+            ExpoGallery/public/version.json
+          retention-days: 90
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
