@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Linking, ActivityIndicator } from 'react-native';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { error } from '@/utils/logger';
 import appConfig from '@/app.json';
+import { Link, useNavigation } from '@react-navigation/native';
 
 // Current version of the app
 const APP_VERSION = appConfig.expo.version;
@@ -17,6 +18,7 @@ export default function AboutScreen() {
   const [isCheckingVersion, setIsCheckingVersion] = useState(false);
   const [versionCheckError, setVersionCheckError] = useState<string | null>(null);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const navigation = useNavigation();
 
   // Function to check for the latest version
   const checkForUpdates = async () => {
@@ -96,11 +98,18 @@ export default function AboutScreen() {
                   <ThemedText type="default" style={styles.updateAvailable}>
                     <Ionicons name="arrow-up-circle" size={16} color="#FFC107" /> Update available: {latestVersion}
                   </ThemedText>
-                  {latestBuildSha && APP_BUILD_SHA !== 'development' && (
-                    <ThemedText type="default" style={styles.buildInfo}>
-                      Current: {APP_BUILD_SHA} | Latest: {latestBuildSha}
-                    </ThemedText>
-                  )}
+                  <TouchableOpacity
+                    style={styles.linkButton}
+                    onPress={() => router.push('/reset')}
+                  >
+                    <ThemedText type="default" style={styles.linkText}>Reset Screen</ThemedText>
+                  </TouchableOpacity>
+                  <ThemedText type="default" style={styles.buildInfo}>
+                    Current: {APP_BUILD_SHA}
+                  </ThemedText>
+                  <ThemedText type="default" style={styles.buildInfo}>
+                    Latest: {latestBuildSha}
+                  </ThemedText>
                 </View>
               )}
               {lastChecked && (
@@ -252,19 +261,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   linkButton: {
-    padding: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(200, 200, 200, 0.2)',
-    borderRadius: 8,
+    padding: 0,
     marginTop: 12,
-    backgroundColor: 'rgba(33, 150, 243, 0.05)',
+    backgroundColor: 'transparent',
   },
   linkContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   linkIcon: {
-    marginRight: 12,
+    marginRight: 8,
+  },
+  linkText: {
+    color: '#2196F3',
+    textDecorationLine: 'underline',
+    fontSize: 14,
   },
   footer: {
     marginTop: 16,
