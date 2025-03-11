@@ -88,37 +88,56 @@ export default function AboutScreen() {
           ) : versionCheckError ? (
             <ThemedText type="default" style={styles.versionError}>{versionCheckError}</ThemedText>
           ) : latestVersion ? (
-            <View>
+            <View style={styles.versionInfoContainer}>
               {isUpToDate ? (
                 <ThemedText type="default" style={styles.upToDate}>
                   <Ionicons name="checkmark-circle" size={16} color="#4CAF50" /> Build up to date
                 </ThemedText>
               ) : (
-                <View>
-                  <ThemedText type="default" style={styles.updateAvailable}>
-                    <Ionicons name="arrow-up-circle" size={16} color="#FFC107" /> Update available: {latestVersion}
-                  </ThemedText>
-                  <TouchableOpacity
-                    style={styles.linkButton}
-                    onPress={() => router.push('/reset')}
-                  >
-                    <View style={styles.linkContent}>
-                      <ThemedText type="default" style={styles.linkText}>Reset Screen</ThemedText>
-                      <Ionicons name="arrow-forward" size={16} color="#2196F3" style={styles.linkIcon} />
-                    </View>
-                  </TouchableOpacity>
-                  <ThemedText type="default" style={styles.buildInfo}>
-                    Current: {APP_BUILD_SHA}
-                  </ThemedText>
-                  <ThemedText type="default" style={styles.buildInfo}>
-                    Latest: {latestBuildSha}
-                  </ThemedText>
-                </View>
-              )}
-              {lastChecked && (
-                <ThemedText type="default" style={styles.lastChecked}>
-                  Last checked: {lastChecked.toLocaleTimeString()}
+                <ThemedText type="default" style={styles.updateAvailable}>
+                  <Ionicons name="arrow-up-circle" size={16} color="#FFC107" /> Update available: {latestVersion}
                 </ThemedText>
+              )}
+
+              <View style={styles.infoGrid}>
+                <View style={styles.infoRow}>
+                  <ThemedText type="default" style={styles.infoLabel}>Current Version:</ThemedText>
+                  <ThemedText type="default" style={styles.infoValue}>{APP_VERSION}</ThemedText>
+                </View>
+                <View style={styles.infoRow}>
+                  <ThemedText type="default" style={styles.infoLabel}>Latest Version:</ThemedText>
+                  <ThemedText type="default" style={styles.infoValue}>{latestVersion}</ThemedText>
+                </View>
+                <View style={styles.infoRow}>
+                  <ThemedText type="default" style={styles.infoLabel}>Current Build:</ThemedText>
+                  <ThemedText type="default" style={styles.infoValue}>{APP_BUILD_SHA}</ThemedText>
+                </View>
+                <View style={styles.infoRow}>
+                  <ThemedText type="default" style={styles.infoLabel}>Latest Build:</ThemedText>
+                  <ThemedText type="default" style={styles.infoValue}>{latestBuildSha}</ThemedText>
+                </View>
+                <View style={styles.infoRow}>
+                  <ThemedText type="default" style={styles.infoLabel}>Build Date:</ThemedText>
+                  <ThemedText type="default" style={styles.infoValue}>__BUILD_DATE__</ThemedText>
+                </View>
+                {lastChecked && (
+                  <View style={styles.infoRow}>
+                    <ThemedText type="default" style={styles.infoLabel}>Last Checked:</ThemedText>
+                    <ThemedText type="default" style={styles.infoValue}>{lastChecked.toLocaleTimeString()}</ThemedText>
+                  </View>
+                )}
+              </View>
+
+              {!isUpToDate && (
+                <TouchableOpacity
+                  style={styles.linkButton}
+                  onPress={() => router.push('/reset')}
+                >
+                  <View style={styles.linkContent}>
+                    <ThemedText type="default" style={styles.linkText}>Reset Screen</ThemedText>
+                    <Ionicons name="arrow-forward" size={16} color="#2196F3" style={styles.linkIcon} />
+                  </View>
+                </TouchableOpacity>
               )}
             </View>
           ) : null}
@@ -203,10 +222,40 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   versionCheckContainer: {
-    marginTop: 8,
-    marginBottom: 8,
+    marginTop: 16,
+    marginBottom: 16,
     alignItems: 'center',
     minHeight: 40,
+    width: '100%',
+    maxWidth: 400,
+  },
+  versionInfoContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  infoGrid: {
+    width: '100%',
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(150, 150, 150, 0.2)',
+  },
+  infoLabel: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: 'monospace',
+    opacity: 0.7,
+  },
+  infoValue: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: 'monospace',
+    textAlign: 'right',
   },
   versionCheck: {
     flexDirection: 'row',
