@@ -1,11 +1,70 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView,  Linking } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Linking, ActivityIndicator } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { error } from '@/utils/logger';
+import appConfig from '@/app.json';
+
+// Current version of the app
+const APP_VERSION = appConfig.expo.version;
+const APP_BUILD_SHA: string = '__GIT_SHA__'; // This will be replaced by set-env.js
 
 export default function AboutScreen() {
+  const [latestVersion, setLatestVersion] = useState<string | null>(null);
+  const [latestBuildSha, setLatestBuildSha] = useState<string | null>(null);
+  const [isCheckingVersion, setIsCheckingVersion] = useState(false);
+  const [versionCheckError, setVersionCheckError] = useState<string | null>(null);
+  const [lastChecked, setLastChecked] = useState<Date | null>(null);
+
+  // Function to check for the latest version
+  const checkForUpdates = async () => {
+    setIsCheckingVersion(true);
+    setVersionCheckError(null);
+
+    try {
+      // Get base URL from current path
+      const baseUrl = window.location.origin;
+      const versionUrl = `${baseUrl}/version.json`;
+
+      const response = await fetch(versionUrl, {
+        headers: { 'Cache-Control': 'no-cache' },
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch version info: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setLatestVersion(data.version);
+      setLatestBuildSha(data.build);
+      setLastChecked(new Date());
+    } catch (e) {
+      error('Error checking for updates:', e);
+      setVersionCheckError('Could not check for updates');
+    } finally {
+      setIsCheckingVersion(false);
+    }
+  };
+
+  // Check for updates on component mount and periodically
+  useEffect(() => {
+    // Initial check
+    checkForUpdates();
+
+    // Check every 10 minutes
+    const intervalId = setInterval(checkForUpdates, 10 * 60 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Determine if the app is up to date - check both version and build SHA
+  const isUpToDate = latestVersion === APP_VERSION && (
+    APP_BUILD_SHA === 'development' || latestBuildSha === APP_BUILD_SHA
+  );
+
   return (
     <ScrollView style={styles.container}>
       <Stack.Screen options={{ title: 'About', headerLargeTitle: true }} />
@@ -15,8 +74,45 @@ export default function AboutScreen() {
           <Ionicons name="cube" size={60} color="#2196F3" />
         </View>
         <ThemedText type="title" style={styles.appName}>ExpoGallery</ThemedText>
-        <ThemedText type="default" style={styles.version}>Version 1.0.0</ThemedText>
-        <ThemedText type="default" style={styles.buildInfo}>Build: __GIT_SHA__</ThemedText>
+        <ThemedText type="default" style={styles.version}>Version {APP_VERSION}</ThemedText>
+
+        {/* Version check status */}
+        <View style={styles.versionCheckContainer}>
+          {isCheckingVersion ? (
+            <View style={styles.versionCheck}>
+              <ActivityIndicator size="small" color="#2196F3" />
+              <ThemedText type="default" style={styles.versionCheckText}>Checking for updates...</ThemedText>
+            </View>
+          ) : versionCheckError ? (
+            <ThemedText type="default" style={styles.versionError}>{versionCheckError}</ThemedText>
+          ) : latestVersion ? (
+            <View>
+              {isUpToDate ? (
+                <ThemedText type="default" style={styles.upToDate}>
+                  <Ionicons name="checkmark-circle" size={16} color="#4CAF50" /> Build up to date
+                </ThemedText>
+              ) : (
+                <View>
+                  <ThemedText type="default" style={styles.updateAvailable}>
+                    <Ionicons name="arrow-up-circle" size={16} color="#FFC107" /> Update available: {latestVersion}
+                  </ThemedText>
+                  {latestBuildSha && APP_BUILD_SHA !== 'development' && (
+                    <ThemedText type="default" style={styles.buildInfo}>
+                      Current: {APP_BUILD_SHA} | Latest: {latestBuildSha}
+                    </ThemedText>
+                  )}
+                </View>
+              )}
+              {lastChecked && (
+                <ThemedText type="default" style={styles.lastChecked}>
+                  Last checked: {lastChecked.toLocaleTimeString()}
+                </ThemedText>
+              )}
+            </View>
+          ) : null}
+        </View>
+
+        <ThemedText type="default" style={styles.buildInfo}>Build: {APP_BUILD_SHA}</ThemedText>
         <ThemedText type="default" style={styles.buildInfo}>Date: __BUILD_DATE__</ThemedText>
       </View>
 
@@ -93,6 +189,41 @@ const styles = StyleSheet.create({
   },
   version: {
     opacity: 0.6,
+  },
+  versionCheckContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+    minHeight: 40,
+  },
+  versionCheck: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  versionCheckText: {
+    fontSize: 12,
+    marginLeft: 8,
+  },
+  upToDate: {
+    color: '#4CAF50',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  updateAvailable: {
+    color: '#FFC107',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  versionError: {
+    color: '#F44336',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  lastChecked: {
+    fontSize: 10,
+    opacity: 0.6,
+    marginTop: 4,
+    textAlign: 'center',
   },
   buildInfo: {
     fontSize: 12,
