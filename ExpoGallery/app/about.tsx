@@ -17,6 +17,7 @@ export default function AboutScreen() {
         <ThemedText type="title" style={styles.appName}>ExpoGallery</ThemedText>
         <ThemedText type="default" style={styles.version}>Version 1.0.0</ThemedText>
         <ThemedText type="default" style={styles.buildInfo}>Build: __GIT_SHA__</ThemedText>
+        <ThemedText type="default" style={styles.buildInfo}>Date: __BUILD_DATE__</ThemedText>
       </View>
 
       <View style={styles.section}>

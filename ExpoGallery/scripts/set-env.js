@@ -15,6 +15,7 @@ fs.writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2));
 
 // Get the current date and time for build timestamp
 const buildDate = new Date().toISOString();
+const formattedDate = `${buildDate.split('T')[0]} ${buildDate.split('T')[1].substring(0, 8)}`;
 
 // Replace the Git SHA placeholder in the about.tsx file
 const gitSha = process.env.GITHUB_SHA || 'development';
@@ -22,13 +23,9 @@ const aboutFilePath = path.join(__dirname, '..', 'app', 'about.tsx');
 let aboutFileContent = fs.readFileSync(aboutFilePath, 'utf8');
 aboutFileContent = aboutFileContent.replace('__GIT_SHA__', gitSha.substring(0, 7));
 
-// Add build date to the about.tsx file
-// Look for the buildInfo line and add the date after the Git SHA
-aboutFileContent = aboutFileContent.replace(
-  '<ThemedText type="default" style={styles.buildInfo}>Build: __GIT_SHA__</ThemedText>',
-  `<ThemedText type="default" style={styles.buildInfo}>Build: ${gitSha.substring(0, 7)} (${buildDate.split('T')[0]} ${buildDate.split('T')[1].substring(0, 8)})</ThemedText>`
-);
+// Replace the build date placeholder
+aboutFileContent = aboutFileContent.replace('__BUILD_DATE__', formattedDate);
 
 fs.writeFileSync(aboutFilePath, aboutFileContent);
 
-console.log(`Environment variables set successfully. Git SHA: ${gitSha.substring(0, 7)}`);
+console.log(`Environment variables set successfully. Git SHA: ${gitSha.substring(0, 7)}, Build Date: ${formattedDate}`);
