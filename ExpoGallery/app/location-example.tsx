@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Platform, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import * as Device from 'expo-device';
 import * as Location from 'expo-location';
@@ -20,9 +20,7 @@ export default function Example() {
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android' && !Device.isDevice) {
-      setErrorMsg(
-        'Oops, this will not work on Snack in an Android Emulator. Try it on your device!'
-      );
+      setErrorMsg('Oops, this will not work on Snack in an Android Emulator. Try it on your device!');
       return false;
     }
 
