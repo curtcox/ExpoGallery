@@ -43,9 +43,16 @@ export function subscribeToLogs(callback: (logs: LogEntry[]) => void) {
   };
 }
 
+function notifySubscribersLater() {
+  // This prevents React errors when logging happens during render
+  setTimeout(() => {
+    subscribers.forEach(callback => callback([...LOG]));
+  }, 0);
+}
+
 // Notify subscribers when log changes
 function notifySubscribers() {
-  subscribers.forEach(callback => callback([...LOG]));
+  notifySubscribersLater();
 }
 
 export interface ItemProps {
