@@ -3,7 +3,8 @@
  * Includes functions for converting between latitude/longitude and geohash
  * and calculating distances between coordinates
  */
-
+import * as Location from 'expo-location';
+import { error, warn, info } from '@/utils/index';
 /**
  * Converts a latitude and longitude to a geohash string
  * @param latitude - Latitude in decimal degrees
@@ -167,4 +168,80 @@ export function calculateDistance(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
   return R * c;
+}
+
+// Cache for storing the most recent location from watchPositionAsync
+let mostRecentLocation: Location.LocationObject | null = null;
+let locationSubscription: Location.LocationSubscription | null = null;
+
+/**
+ * Initializes location watching in the background
+ * Should be called during app initialization
+ */
+export async function initLocationWatching(): Promise<void> {
+  // Clean up any existing subscription
+  if (locationSubscription) {
+    locationSubscription.remove();
+  }
+
+  try {
+    // Request permission if needed
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== 'granted') {
+      warn('Location permission not granted');
+      return;
+    }
+
+    // Start watching position
+    locationSubscription = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.Balanced,
+        timeInterval: 10000,    // Update every 10 seconds
+        distanceInterval: 100,  // Or when moved 100 meters
+      },
+      (location) => {
+        info(`Location updated: ${JSON.stringify(location.coords)}`);
+        mostRecentLocation = location;
+      }
+    );
+
+    info('Location watching initialized');
+  } catch (e) {
+    error('Error setting up location watching:', e);
+  }
+}
+
+/**
+ * Gets the most recent device location
+ * @returns Most recent LocationObject or null if no location data is available
+ */
+export async function getCurrentLocation(): Promise<Location.LocationObject | null> {
+  // If we don't have a location subscription yet, initialize it
+  if (!locationSubscription) {
+    await initLocationWatching();
+  }
+
+  // If we still don't have a location, try to get the last known position
+  if (!mostRecentLocation) {
+    try {
+      mostRecentLocation = await Location.getLastKnownPositionAsync({});
+    } catch (e) {
+      error('Error getting last known position:', e);
+    }
+  }
+
+  return mostRecentLocation;
+}
+
+/**
+ * Cleans up the location subscription
+ * Should be called when the app is closing or when location watching is no longer needed
+ */
+export function stopLocationWatching(): void {
+  if (locationSubscription) {
+    locationSubscription.remove();
+    locationSubscription = null;
+    info('Location watching stopped');
+  }
 }
