@@ -65,6 +65,16 @@ export function info(message: string) {
   notifySubscribers();
 }
 
+export function warn(message: string) {
+  console.warn(message);
+  LOG.push({
+    index: LOG.length,
+    timestamp: Date.now(),
+    message
+  });
+  notifySubscribers();
+}
+
 export function error(message: string, error: any) {
   console.error(message, error);
   LOG.push({
