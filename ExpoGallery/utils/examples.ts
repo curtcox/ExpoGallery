@@ -12,6 +12,7 @@ export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'notifications',      text: 'Notifications',          icon: 'notifications-outline',  url: 'versions/latest/sdk/notifications/' },
   { name: 'list',               text: 'List',                   icon: 'list-outline',           url: 'versions/latest/sdk/flash-list/' },
   { name: 'location',           text: 'Location',               icon: 'locate-outline',         url: 'versions/latest/sdk/location/' },
+  { name: 'location-indicator', text: 'Location Indicator',     icon: 'locate-outline',         url: 'versions/latest/sdk/location/' },
   { name: 'status-bar',         text: 'Status Bar',             icon: 'locate-outline',         url: 'versions/latest/sdk/status-bar/' },
   { name: 'image',              text: 'Image',                  icon: 'image-outline',          url: 'versions/latest/sdk/flash-list/' },
   { name: 'image-from-storage', text: 'Image from Storage',     icon: 'image-outline',          url: 'versions/latest/sdk/filesystem/' },
