@@ -1,143 +1,99 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Platform, TextStyle } from 'react-native';
+import { Platform, TextStyle, View, StyleSheet } from 'react-native';
 import GiftedChat, { IMessage, MessageTextProps, MessageText } from '@/components/Chat';
-import { generateBotResponse } from '@/services/chat';
+import {
+  createBotMessage,
+  processUserMessage,
+  BOT_USER
+} from '@/services/chat';
 import { router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 import { error, info } from '@/utils/logger';
+import { getCurrentLocation } from '@/services/location';
+import LocationIndicator from '@/components/LocationIndicator';
 
 const isServerSideRendering = () => {
-  const isSSR = Platform.OS === 'web' && typeof window === 'undefined';
-  info(`isServerSideRendering check: ${isSSR}`);
-  info(`Platform.OS: ${Platform.OS}, window defined: ${typeof window !== 'undefined'}`);
-  return isSSR;
+  return Platform.OS === 'web' && typeof window === 'undefined';
 };
-
-// Timeout duration in milliseconds (30 seconds)
-const RESPONSE_TIMEOUT = 30000;
-
-// Error messages
-const ERROR_MESSAGE = 'Sorry, I encountered an error. Please try again.';
-const TIMEOUT_MESSAGE = 'Sorry, the response took too long. Please try again.';
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [hasLocation, setHasLocation] = useState<boolean | null>(null);
 
-  info('ChatScreen rendering, environment details:');
-  info(`Platform: ${Platform.OS}, running in: ${typeof window !== 'undefined' ? 'browser' : 'server'}`);
-  if (typeof window !== 'undefined') {
-    info(`User Agent: ${window.navigator.userAgent}`);
-    info(`Is Content Script Context: ${window.location.protocol === 'chrome-extension:' ? 'Yes' : 'No'}`);
-  }
+  // Check location status periodically
+  useEffect(() => {
+    const checkLocation = async () => {
+      try {
+        const location = await getCurrentLocation();
+        setHasLocation(!!location);
+      } catch (e) {
+        error('Error checking location:', e);
+        setHasLocation(false);
+      }
+    };
+
+    // Check location immediately when component mounts
+    checkLocation();
+
+    // Set up interval to check location every second
+    const intervalId = setInterval(checkLocation, 1000);
+
+    // Clean up interval when component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
-    info('ChatScreen useEffect - Setting up message subscription');
     // Subscribe to message changes
     const unsubscribe = subscribeToMessageChanges((storedMessages) => {
-      info(`Received ${storedMessages.length} messages from storage`);
       if (storedMessages.length === 0) {
         // If no stored messages, set the initial welcome message
-        info('No stored messages found, creating welcome message');
         const welcomeMessage = {
           _id: 1,
           text: 'How can I help you?',
           createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placecats.com/140/140',
-          },
+          user: BOT_USER,
         };
         setMessages([welcomeMessage]);
-        info('Updating storage with welcome message');
         updateMessages([welcomeMessage]).catch(e =>
           error('Failed to update storage with welcome message:', e)
         );
       } else {
-        info('Setting messages from storage');
         setMessages(storedMessages as IMessage[]);
       }
     });
 
     // Cleanup subscription on unmount
     return () => {
-      info('ChatScreen cleanup - unsubscribing from messages');
       unsubscribe();
     };
   }, []);
 
   /**
-   * Add an error message to the chat
+   * Handle sending a message - this is simplified with no try/catch blocks
    */
-  const showErrorMessage = useCallback(async (errorText: string, updatedMessages: IMessage[]) => {
-    const errorMessage: IMessage = {
-      _id: Math.round(Math.random() * 1000000),
-      text: errorText,
-      createdAt: new Date(),
-      user: {
-        _id: 2,
-        name: 'React Native',
-        avatar: 'https://placecats.com/140/140',
-      },
-    };
-
-    const messagesWithError = GiftedChat.append(updatedMessages, [errorMessage]);
-    setMessages(messagesWithError);
-    await updateMessages(messagesWithError);
-  }, []);
-
   const onSend = useCallback(async (newMessages: IMessage[] = []) => {
+    if (newMessages.length === 0 || !newMessages[0].text.trim()) {
+      return; // Don't process empty messages
+    }
+
     // Update local state and storage with user message
     const updatedMessages = GiftedChat.append(messages, newMessages);
     setMessages(updatedMessages);
     await updateMessages(updatedMessages);
 
-    // Generate a response to the user's message
-    if (newMessages.length > 0 && newMessages[0].text.trim()) {
-      const userMessage = newMessages[0].text;
+    // Process user message through service layer
+    const userMessage = newMessages[0].text;
+    const result = await processUserMessage(userMessage);
 
-      try {
-        // Set up a timeout promise that rejects after the specified time
-        const timeoutPromise = new Promise<string>((_, reject) => {
-          const id = setTimeout(() => {
-            clearTimeout(id);
-            reject(new Error('Response timeout'));
-          }, RESPONSE_TIMEOUT);
-        });
+    // Update location state
+    setHasLocation(result.hasLocation);
 
-        // Race between the actual response and the timeout
-        const botResponseText = await Promise.race([
-          generateBotResponse(userMessage),
-          timeoutPromise
-        ]);
-
-        const botMessage: IMessage = {
-          _id: Math.round(Math.random() * 1000000),
-          text: botResponseText,
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placecats.com/140/140',
-          },
-        };
-
-        // Update local state and storage with bot response
-        const messagesWithBot = GiftedChat.append(updatedMessages, [botMessage]);
-        setMessages(messagesWithBot);
-        await updateMessages(messagesWithBot);
-      } catch (e) {
-        error('Failed to get bot response:', e);
-
-        // Show a specific message for timeout errors, generic message for other errors
-        const errorText = e instanceof Error && e.message === 'Response timeout'
-          ? TIMEOUT_MESSAGE
-          : ERROR_MESSAGE;
-
-        await showErrorMessage(errorText, updatedMessages);
-      }
-    }
-  }, [messages, showErrorMessage]);
+    // Create and add bot response message
+    const botMessage = createBotMessage(result.message);
+    const messagesWithResponse = GiftedChat.append(updatedMessages, [botMessage]);
+    setMessages(messagesWithResponse);
+    await updateMessages(messagesWithResponse);
+  }, [messages]);
 
   const RouteLinker = (props: MessageTextProps) => {
     const parsePatterns = useCallback((_linkStyle: TextStyle) => {
@@ -159,11 +115,20 @@ export default function ChatScreen() {
   }
 
   return (
-    <GiftedChat
-      messages={messages}
-      onSend={onSend}
-      user={{ _id: 1 }}
-      renderMessageText={props => <RouteLinker {...props} />}
-    />
+    <View style={styles.container}>
+      <LocationIndicator top={10} right={20} size={14} hasLocation={hasLocation} />
+      <GiftedChat
+        messages={messages}
+        onSend={onSend}
+        user={{ _id: 1 }}
+        renderMessageText={props => <RouteLinker {...props} />}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
