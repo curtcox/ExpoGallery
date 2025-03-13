@@ -20,6 +20,11 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [hasLocation, setHasLocation] = useState<boolean | null>(null);
 
+  // Log when chat tab is loaded
+  useEffect(() => {
+    info('Chat tab loaded');
+  }, []);
+
   // Check location status periodically
   useEffect(() => {
     const checkLocation = async () => {
