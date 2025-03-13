@@ -1,13 +1,9 @@
 /**
- * Location services for handling geospatial data
- * Includes functions for converting between latitude/longitude and geohash
- * and calculating distances between coordinates
+ * Location services for handling geospatial data on web platforms
+ * Web-specific implementation using navigator.geolocation
+ * This file maintains the same structure as location.tsx
  */
-import { error, warn, info } from '@/utils/index';
-// Import the platform-specific implementation
-// This will automatically resolve to either deviceLocation.native.ts or deviceLocation.web.ts
-import deviceLocationService from './deviceLocation.native';
-import { LocationObject } from './deviceLocation';
+import deviceLocationService from './deviceLocation.web';
 
 /**
  * Converts a latitude and longitude to a geohash string
