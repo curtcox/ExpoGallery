@@ -4,6 +4,7 @@ export interface LogEntry {
   index: number;
   timestamp: number;
   message: string;
+  level: 'info' | 'warn' | 'error';
   error?: any;
 }
 
@@ -59,6 +60,7 @@ export interface ItemProps {
   index: number;
   timestamp: number;
   message: string;
+  level: 'info' | 'warn' | 'error';
   error?: any;
 }
 
@@ -67,7 +69,8 @@ export function info(message: string) {
   LOG.push({
     index: LOG.length,
     timestamp: Date.now(),
-    message
+    message,
+    level: 'info'
   });
   notifySubscribers();
 }
@@ -77,7 +80,8 @@ export function warn(message: string) {
   LOG.push({
     index: LOG.length,
     timestamp: Date.now(),
-    message
+    message,
+    level: 'warn'
   });
   notifySubscribers();
 }
@@ -88,6 +92,7 @@ export function error(message: string, error: any) {
     index: LOG.length,
     timestamp: Date.now(),
     message,
+    level: 'error',
     error
   });
   notifySubscribers();
