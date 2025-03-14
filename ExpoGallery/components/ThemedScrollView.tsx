@@ -1,6 +1,7 @@
-import React, { ReactElement, ReactNode } from 'react';
-import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle, View } from 'react-native';
+import React, { ReactElement, ReactNode, useState, useRef } from 'react';
+import { Image, ImageSourcePropType, StyleProp, StyleSheet, ImageStyle, View, TouchableWithoutFeedback } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { router } from 'expo-router';
 
 const DEFAULT_HEADER_IMAGE = require('@/assets/images/logo.png');
 
@@ -29,7 +30,33 @@ export function ThemedScrollView({
   headerImageStyle,
   style,
 }: ThemedScrollViewProps) {
-  // Create a non-animated image element
+
+  const [tapCount, setTapCount] = useState(0);
+  const lastTapTimeRef = useRef(0);
+
+  const hiddenSettings = () => {
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapTimeRef.current;
+
+    // Reset counter if more than 1 second passed since last tap
+    if (timeSinceLastTap > 1000) {
+      setTapCount(1);
+    } else {
+      setTapCount(prevCount => prevCount + 1);
+    }
+
+    // Update last tap time
+    lastTapTimeRef.current = now;
+
+    // Navigate to settings after 3 taps
+    if (tapCount === 2) {
+      router.push('/settings');
+    }
+  };
+
+  const handleTap = hiddenSettings;
+
+  // Create a non-animated image element with a fallback empty view to ensure it's always a ReactElement
   const renderedHeaderImage = headerImage ||
     (headerImageSource ? (
       <View style={styles.imageWrapper}>
@@ -40,15 +67,22 @@ export function ThemedScrollView({
           key="header-image"
         />
       </View>
-    ) : null);
+    ) : (
+      // Fallback empty view to ensure we always have a ReactElement
+      <View style={styles.imageWrapper} />
+    ));
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={headerBackgroundColor}
-      headerGradient={headerGradient}
-      headerImage={renderedHeaderImage}>
-      {children}
-    </ParallaxScrollView>
+    <TouchableWithoutFeedback onPress={handleTap}>
+      <View style={{ flex: 1 }}>
+        <ParallaxScrollView
+          headerBackgroundColor={headerBackgroundColor}
+          headerGradient={headerGradient}
+          headerImage={renderedHeaderImage}>
+          {children}
+        </ParallaxScrollView>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
