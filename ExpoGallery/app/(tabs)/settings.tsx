@@ -4,11 +4,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { updateSettings, subscribeToSettingsChanges, settings } from '@/storage/settings';
 import { Ionicons } from '@expo/vector-icons';
 import { getCustomizableTabs, TAB_DEFINITIONS } from '@/constants/TabConfig';
+import { getDebugMode, setDebugMode } from '@/utils/logger';
 
 // Update the updateSettings function to persist changes
 export default function SettingsScreen() {
   const [uiLevel, setUiLevel] = useState(settings.UI_Level);
-  const [debug, setDebug] = useState(settings.debug);
+  const [debug, setDebug] = useState(getDebugMode());
   const [tabLevels, setTabLevels] = useState<Record<string, number>>({});
   const [tabRenames, setTabRenames] = useState<Record<string, string>>({});
   const [editingTabName, setEditingTabName] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export default function SettingsScreen() {
   const toggleDebug = () => {
     const newDebug = !debug;
     setDebug(newDebug);
-    updateSettings({ debug: newDebug });
+    setDebugMode(newDebug);
   };
 
   const handleTabLevelChange = (tabName: string, level: number) => {
@@ -48,9 +49,9 @@ export default function SettingsScreen() {
 
   // Load settings when component mounts
   useEffect(() => {
+    setDebug(getDebugMode());
     const unsubscribe = subscribeToSettingsChanges((newSettings) => {
       setUiLevel(newSettings.UI_Level);
-      setDebug(newSettings.debug);
       setTabLevels(newSettings.tabLevels || {});
       setTabRenames(newSettings.tabRenames || {});
     });

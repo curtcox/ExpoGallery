@@ -1,5 +1,8 @@
 import { Alert, Platform} from 'react-native';
 
+// Import just the types without creating a circular dependency
+import type { Settings } from '@/storage/settings';
+
 export interface LogEntry {
   index: number;
   timestamp: number;
@@ -27,8 +30,24 @@ const oneButtonAlert = (message: string) => {
   }
 };
 
-// Ideally this should be set in settings.tsx, but this way there is no import cycle
-const DEBUG = true;
+let DEBUG = false;
+
+export function getDebugMode() {
+  return DEBUG;
+}
+
+export function setDebugMode(value: boolean) {
+  DEBUG = value;
+  // Log debug mode change if we're now in debug mode
+  if (DEBUG) {
+    info(`Debug mode ${DEBUG ? 'enabled' : 'disabled'}`);
+  }
+}
+
+// Function to initialize debug mode from settings without creating an import cycle
+export function initializeDebugMode(settings: { debug: boolean }) {
+  DEBUG = settings.debug;
+}
 
 // Add subscribers mechanism
 const subscribers: Set<(logs: LogEntry[]) => void> = new Set();

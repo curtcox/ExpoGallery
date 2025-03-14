@@ -2,7 +2,6 @@ import { error, storage } from '@/utils/index';
 
 export interface Settings {
   UI_Level: number;
-  debug: boolean;
   tabLevels?: Record<string, number>;
   tabRenames?: Record<string, string>;
   focusedExamples: string[];
@@ -12,7 +11,6 @@ export interface Settings {
 // Default settings
 export const defaultSettings: Settings = {
   UI_Level: 1,
-  debug: false,
   tabLevels: {},
   tabRenames: {},
   focusedExamples: [],
