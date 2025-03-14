@@ -5,7 +5,7 @@ import {
   createBotMessage,
   processUserMessage,
   BOT_USER
-} from '@/services/chat';
+} from '@/services/chatService';
 import { router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 import { error, info } from '@/utils/logger';

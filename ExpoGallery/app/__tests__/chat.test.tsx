@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import ChatScreen from '../(tabs)/chat';
-import { generateBotResponse } from '@/services/chat';
+import { generateBotResponse } from '@/services/chatService';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 
 // Mock AsyncStorage
