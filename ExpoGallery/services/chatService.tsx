@@ -1,12 +1,12 @@
 import { error } from '@/utils/index';
 import { localBot, ChatContext } from './localBot';
+import { fetchExternal } from './externalChatService';
 import { profile } from '../storage/profile';
 import { getAllResources } from './data';
 import { LocationObject } from 'expo-location';
 import { getCurrentLocation } from '@/services/location';
 import { IMessage } from '@/components/Chat';
 
-export const CHAT_API_ENDPOINT = 'https://example.com/api/chat';
 const EXTERNAL = false;
 
 // Timeout duration in milliseconds (30 seconds)
@@ -150,31 +150,5 @@ const getResponseText = async (userMessage: string, location: LocationObject | n
     return (EXTERNAL) ? fetchExternal(userMessage, context) : localBot(userMessage, context);
   } catch (e) {
     throw new ChatServiceError('Failed to process message', 'GENERAL');
-  }
-};
-
-const fetchExternal = async (userMessage: string, context: ChatContext): Promise<string> => {
-
-  try {
-    const response = await fetch(CHAT_API_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: userMessage, context }),
-    });
-
-    if (!response.ok) {
-      throw new ChatServiceError(`API request failed with status ${response.status}`, 'API_ERROR');
-    }
-
-    const data = await response.json();
-
-    return data.response || ERROR_MESSAGES.GENERAL;
-  } catch (e) {
-    if (e instanceof ChatServiceError) {
-      throw e;
-    }
-    throw new ChatServiceError(`Failed to fetch external response: ${e instanceof Error ? e.message : 'Unknown error'}`, 'API_ERROR');
   }
 };
