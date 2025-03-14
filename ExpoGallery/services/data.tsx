@@ -1,8 +1,8 @@
 import lincolnCounty from '../assets/json/lincoln-county.json';
 import stLouisCityCounty from '../assets/json/st-louis-city-county.json';
-
+import santaClaraCounty from '../assets/json/santa-clara-county.json';
 const resourcesData = {
-  resources: [...stLouisCityCounty.resources, ...lincolnCounty.resources]
+  resources: [...stLouisCityCounty.resources, ...lincolnCounty.resources, ...santaClaraCounty.resources]
 };
 
 // Define the types based on the structure of your resources

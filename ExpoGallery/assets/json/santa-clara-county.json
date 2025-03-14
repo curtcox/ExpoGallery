@@ -1,0 +1,200 @@
+{
+    "resources": [
+      {
+        "id": "9q9k67zesn",
+        "name": "HomeFirst - Sobrato House Youth Center",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.33080337,
+          "longitude": -121.8828376,
+          "address": "496 S Third St, San Jose, CA 95112"
+        },
+        "details": "Every day, HomeFirst works to end homelessness by providing a full spectrum of services to help people find a home, improve their lives, and stay housed",
+        "contact": {
+          "phone": "14085392180",
+          "website": "http://www.homefirstscc.org/"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 40,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.2
+      },
+      {
+        "id": "9q9k6j047d",
+        "name": "LifeMoves | Montgomery Street Inn",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.33764665,
+          "longitude": -121.9040871,
+          "address": "358 N Mongomery St, San Jose, CA 95110"
+        },
+        "details": "Montgomery Street Inn (MSI) located in San Jose provides emergency and transitional housing for up to 90 single adult men per night with case management, Veteran's services, medical respite care, and other support services in San Jose",
+        "contact": {
+          "phone": "14082715160",
+          "website": "https://www.lifemoves.org/directory/montgomery-street-inn/"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 90,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9q9k6hc0vx",
+        "name": "LifeMoves | Julian Street Inn",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.33583182,
+          "longitude": -121.9026822,
+          "address": "546 W Julian St, San Jose, CA 95110"
+        },
+        "details": "Julian Street Inn located in San Jose provides emergency and interim housing for adults working to overcome homelessness and serious mental illness.",
+        "contact": {
+          "phone": "14082710820",
+          "website": "https://www.lifemoves.org/directory/julian-street-inn/"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 70,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.1
+      },
+      {
+        "id": "9q9k6q2wfc",
+        "name": "The Salvation Army",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.34506786,
+          "longitude": -121.8925008,
+          "address": "405 N 4th St, San Jose, CA 95112"
+        },
+        "details": "The Bay Area, the Emmanuel House serves an important need in our community. Here are some of the services we provide: Housing Services, Transitional Housing Program, Classes, and Spiritual Guidance",
+        "contact": {
+          "phone": "14082821175",
+          "website": "https://siliconvalley.salvationarmy.org/silicon_valley/emmanuel-house/"
+        },
+        "hours": "7:15–8 AM, 5:15–6 PM Everyday except Sun",
+        "capacity": 60,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.0
+      },
+      {
+        "id": "9q9k6s0w3d",
+        "name": "United States Mission",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.33263048,
+          "longitude": -121.8815663,
+          "address": "420 S 5th St, San Jose, CA 95112"
+        },
+        "details": "We provide our residents with a long term clean and sober home with quality meals and a self-help work program that provides each person with the opportunity of turning their lives around.",
+        "contact": {
+          "phone": "14082942853",
+          "website": "https://usmission.org/locations/san-jose-ca/"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 50,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 3.9
+      },
+      {
+        "id": "9q9k6e04yw",
+        "name": "Bill Wilson Drop-in Center",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.32682931,
+          "longitude": -121.8820384,
+          "address": "693 S Second St, San Jose, CA 95112"
+        },
+        "details": "The Drop-In Center is a safe place where young people and young parent families can begin to form bonds with caring adults and access essential resources for their overall well-being.",
+        "contact": {
+          "phone": "14089250231",
+          "website": "https://www.billwilsoncenter.org/services/all/drop.html"
+        },
+        "hours": "10 AM-5 PM Mon-Fri, 10 AM-2 PM Sat/Sun",
+        "capacity": 30,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.3
+      },
+      {
+        "id": "9q9k6m610e",
+        "name": "Front Door Communities",
+        "category": "food",
+        "location": {
+          "latitude": 37.33846532,
+          "longitude": -121.8905786,
+          "address": "81 N 2nd St, San Jose, CA 95113"
+        },
+        "details": "Front Door Communities is committed to feeding vulnerable, low-income and at-risk men, women and families in downtown San Jose regardless of their circumstances by providing nutritious meals and basic essentials for survival.",
+        "contact": {
+          "phone": "14086006654",
+          "website": "http://fdcsj.org/"
+        },
+        "hours": "9:30 AM - 1 PM Mon-Fri",
+        "capacity": 75,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.1
+      },
+      {
+        "id": "9q9k6m77zs",
+        "name": "Womens Gather Place",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.33907948,
+          "longitude": -121.8885186,
+          "address": "49 N 4th St, San Jose, CA 95112"
+        },
+        "details": "Resource organization that supports women within the community",
+        "contact": {
+          "phone": "14082977212",
+          "website": "N/A"
+        },
+        "hours": "9 AM - 5PM Mon - Friday",
+        "capacity": 35,
+        "languagesSupported": [
+          "en"
+        ],
+        "averageRating": 3.8
+      },
+      {
+        "id": "9q9kdf6q3x",
+        "name": "Family Supportive Housing",
+        "category": "shelter",
+        "location": {
+          "latitude": 37.36698692,
+          "longitude": -121.8681835,
+          "address": "692 N King Rd, San Jose, CA 95133"
+        },
+        "details": "Family Supportive Housing has been helping homeless single- and two-parent families with children stay together while addressing their needs for food, shelter, employment, and education.",
+        "contact": {
+          "phone": "14089268885",
+          "website": "http://www.familysupportivehousing.org/"
+        },
+        "hours": "Open 24 hours",
+        "capacity": 45,
+        "languagesSupported": [
+          "en",
+          "es"
+        ],
+        "averageRating": 4.4
+      }
+    ]
+  }
