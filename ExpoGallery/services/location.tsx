@@ -3,11 +3,9 @@
  * Includes functions for converting between latitude/longitude and geohash
  * and calculating distances between coordinates
  */
-import { error, warn, info } from '@/utils/index';
 // Import the platform-specific implementation
 // This will automatically resolve to either deviceLocation.native.ts or deviceLocation.web.ts
 import deviceLocationService from './deviceLocation.native';
-import { LocationObject } from './deviceLocation';
 
 /**
  * Converts a latitude and longitude to a geohash string
