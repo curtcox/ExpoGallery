@@ -1,0 +1,9 @@
+---
+description: When writing code, prefer meaningful names to comments
+globs: 
+alwaysApply: false
+---
+
+# Prefer Meaningful Names to Comments
+
+Always prefer conveying information via meaningful names over putting the same informaton in comments.
