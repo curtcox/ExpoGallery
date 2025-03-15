@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Button, Image } from 'react-native';
 import MapView, { Marker } from '@/components/MapView';
 import * as Location from 'expo-location';
-import { info, error, oneButtonAlert } from '../utils/index';
+import { info, error, oneButtonAlert } from '@/utils/index';
 
 // Embedded JSON data with resource markers
 const resourcesData = {
@@ -49,9 +49,9 @@ const resourcesData = {
 
 // Map of resource categories to specific pin images
 const categoryImages: { [key: string]: any } = {
-  shelter: require('../assets/images/react-logo.png'),
-  food: require('../assets/images/react-logo.png'),
-  other: require('../assets/images/react-logo.png'),
+  shelter: require('@/assets/images/react-logo.png'),
+  food: require('@/assets/images/react-logo.png'),
+  other: require('@/assets/images/react-logo.png'),
 };
 
 export default function Example() {

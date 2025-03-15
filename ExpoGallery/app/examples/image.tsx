@@ -6,11 +6,11 @@ export default function Example() {
     <ScrollView>
         <ThemedText>React Logos</ThemedText>
         <Image
-          source={require('../assets/images/react-logo.png')}
+          source={require('@/assets/images/react-logo.png')}
           style={{ width: 30, height: 30 }}
         />
         <Image
-          source={require('../assets/images/partial-react-logo.png')}
+          source={require('@/assets/images/partial-react-logo.png')}
           style={{ width: 30, height: 30 }}
         />
 
@@ -18,8 +18,8 @@ export default function Example() {
         <Image source={require('@/assets/images/logo.png')} />
 
         <ThemedText>Icons</ThemedText>
-        <Image source={require('../assets/images/icon.png')} />
-        <Image source={require('../assets/images/splash-icon.png')} />
+        <Image source={require('@/assets/images/icon.png')} />
+        <Image source={require('@/assets/images/splash-icon.png')} />
     </ScrollView>
   );
 }

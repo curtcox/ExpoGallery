@@ -104,7 +104,7 @@ function exampleRow(
   onToggle: () => void,
   key: number
 ) {
-  const examplePage = `/${name}-example`;
+  const examplePage = `/examples/${name}`;
   const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}`;
 
   return (

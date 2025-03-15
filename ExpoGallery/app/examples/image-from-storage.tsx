@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, View, TextInput, Button, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { save, getValueFor, getAllKeys } from '../utils/index';
+import { save, getValueFor, getAllKeys } from '@/utils/index';
 import { error } from '@/utils/logger';
 
 // Error handling utilities

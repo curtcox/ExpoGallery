@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TextInput, Button, FlatList } from 'react-native';
-import { info, save, getValueFor, getAllKeys } from '../utils/index';
+import { info, save, getValueFor, getAllKeys } from '@/utils/index';
 
 interface SaveFormProps {
   keyName: string;

@@ -6,7 +6,9 @@ import { info } from '@/utils/logger';
 import { subscribeToSettingsChanges, currentSettings } from '@/storage/settings';
 import { ALL_EXAMPLES, ExampleItem } from '@/utils/examples';
 import { ThemedScrollView } from '@/components/ThemedScrollView';
-
+import { router } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function FocusScreen() {
   const [focusedExamples, setFocusedExamples] = useState<ExampleItem[]>([]);
@@ -63,8 +65,11 @@ export default function FocusScreen() {
 }
 
 function exampleRow(name: string, text: string, icon: any, url: string, key: number) {
-  const examplePage = `/${name}-example`;
+  const examplePage = `/examples/${name}`;
   const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}`;
+
+  // Add logging to see what URL is being created
+  info(`Creating link to example page: ${examplePage} for ${name}`);
 
   return (
     <View style={styles.linkRow} key={key}>
@@ -74,7 +79,9 @@ function exampleRow(name: string, text: string, icon: any, url: string, key: num
       </View>
       <View style={styles.spacer} />
       <View style={styles.primaryLinkContainer}>
-        <Link href={examplePage as any}>{text} Example</Link>
+        <Link href={examplePage as any} onPress={() => info(`Link clicked for: ${examplePage}`)}>
+          {text} Example
+        </Link>
       </View>
     </View>
   );

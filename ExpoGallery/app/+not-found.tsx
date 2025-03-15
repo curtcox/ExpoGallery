@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { getResourceById } from '@/services/data';
+import { info } from '@/utils/logger';
 
 function isValidGeohash(str: string): boolean {
   if (str.length !== 10) return false;
@@ -25,12 +26,19 @@ export default function NotFoundScreen() {
   const path = pathname.startsWith('/') ? pathname.substring(1) : pathname;
 
   useEffect(() => {
+    info(`NotFoundScreen being called for path: ${path}`);
+
     if (isValidGeohash(path)) {
+      info(`Path is a valid geohash: ${path}`);
       if (getResourceById(path)) {
+        info(`Redirecting to resource page for ${path}`);
         router.replace(`/resource?id=${path}`);
       } else {
+        info(`Redirecting to map page for ${path}`);
         router.replace(`/map?resourceId=${path}`);
       }
+    } else {
+      info(`Not a valid geohash: ${path}`);
     }
     // If not a valid geohash, continue showing the not found screen
   }, [path, router]);

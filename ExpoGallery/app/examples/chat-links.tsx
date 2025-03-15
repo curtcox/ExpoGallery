@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import GiftedChat from '@/components/Chat';
 import { IMessage, MessageTextProps, MessageText } from '@/components/Chat';
-import { oneButtonAlert } from '../utils/alerts';
+import { oneButtonAlert } from '@/utils/alerts';
 
 export default function Example() {
   const [messages, setMessages] = useState<IMessage[]>([]);
