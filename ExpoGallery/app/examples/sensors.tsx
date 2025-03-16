@@ -10,13 +10,26 @@ import {
 } from 'expo-sensors';
 import React, { useEffect, useState } from 'react';
 import { ThemedText } from '@/components/ThemedText';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { info, error } from '@/utils/logger';
+import { router } from 'expo-router';
 
 // Define the type for our sensor availability state
 interface SensorAvailability {
   [key: string]: boolean;
 }
+
+// Mapping of sensor names to their file paths
+const sensorPaths: {[key: string]: string} = {
+  Accelerometer: 'accelerometer',
+  Barometer: 'barometer',
+  DeviceMotion: 'device-motion',
+  Gyroscope: 'gyroscope',
+  LightSensor: 'light-sensor',
+  Magnetometer: 'magnetometer',
+  MagnetometerUncalibrated: 'magnetometer', // Use the regular magnetometer example
+  Pedometer: 'pedometer'
+};
 
 export default function Example() {
   const [sensorAvailability, setSensorAvailability] = useState<SensorAvailability>({
@@ -26,7 +39,7 @@ export default function Example() {
     Gyroscope: false,
     LightSensor: false,
     Magnetometer: false,
-    MagnetometerUncalibrated: false,
+    Magnetometer_Uncalibrated: false,
     Pedometer: false
   });
 
@@ -37,14 +50,14 @@ export default function Example() {
   const checkSensorsAvailability = async () => {
     try {
       const results = {
-        Accelerometer: await Accelerometer.isAvailableAsync(),
-        Barometer: await Barometer.isAvailableAsync(),
-        DeviceMotion: await DeviceMotion.isAvailableAsync(),
-        Gyroscope: await Gyroscope.isAvailableAsync(),
-        LightSensor: await LightSensor.isAvailableAsync(),
-        Magnetometer: await Magnetometer.isAvailableAsync(),
+        Accelerometer:            await Accelerometer.isAvailableAsync(),
+        Barometer:                await Barometer.isAvailableAsync(),
+        DeviceMotion:             await DeviceMotion.isAvailableAsync(),
+        Gyroscope:                await Gyroscope.isAvailableAsync(),
+        LightSensor:              await LightSensor.isAvailableAsync(),
+        Magnetometer:             await Magnetometer.isAvailableAsync(),
         MagnetometerUncalibrated: await MagnetometerUncalibrated.isAvailableAsync(),
-        Pedometer: await Pedometer.isAvailableAsync()
+        Pedometer:                await Pedometer.isAvailableAsync()
       };
 
       setSensorAvailability(results);
@@ -55,9 +68,22 @@ export default function Example() {
   };
 
   const renderSensorStatus = (sensorName: string, isAvailable: boolean) => {
+    const sensorPath = sensorPaths[sensorName];
+
+    const navigateToSensor = () => {
+      if (sensorPath) {
+        info(`Navigating to sensor example: ${sensorPath}`);
+        router.push(`/examples/${sensorPath}` as any);
+      } else {
+        error(`No example path found for sensor:`, sensorName);
+      }
+    };
+
     return (
       <View style={styles.sensorRow} key={sensorName}>
-        <ThemedText style={styles.sensorName}>{sensorName}:</ThemedText>
+        <TouchableOpacity onPress={navigateToSensor} style={styles.sensorNameContainer}>
+          <ThemedText style={[styles.sensorName, styles.linkText]}>{sensorName}</ThemedText>
+        </TouchableOpacity>
         <ThemedText
           style={[
             styles.statusText,
@@ -98,9 +124,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#cccccc30',
   },
+  sensorNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   sensorName: {
     fontSize: 16,
     fontWeight: '500',
+  },
+  linkText: {
+    color: '#2196F3',
+    textDecorationLine: 'underline',
   },
   statusText: {
     fontSize: 16,
