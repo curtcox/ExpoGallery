@@ -12,6 +12,7 @@ export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'device-motion',      text: 'Device Motion',          icon: 'pulse-outline',          url: 'versions/latest/sdk/devicemotion/' },
   { name: 'gyroscope',          text: 'Gyroscope',              icon: 'pulse-outline',          url: 'versions/latest/sdk/gyroscope/' },
   { name: 'magnetometer',       text: 'Magnetometer',           icon: 'pulse-outline',          url: 'versions/latest/sdk/magnetometer/' },
+  { name: 'pedometer',          text: 'Pedometer',              icon: 'pulse-outline',          url: 'versions/latest/sdk/pedometer/' },
   { name: 'light-sensor',       text: 'Light Sensor',           icon: 'pulse-outline',          url: 'versions/latest/sdk/light-sensor/' },
   { name: 'alert',              text: 'Alert',                  icon: 'alert-outline',          url: 'https://reactnative.dev/docs/alert' },
   { name: 'asset',              text: 'Asset',                  icon: 'alert-outline',          url: 'versions/latest/sdk/asset/' },
