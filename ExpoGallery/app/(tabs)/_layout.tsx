@@ -12,8 +12,6 @@ import { TAB_DEFINITIONS, getTabProperties } from '@/constants/TabConfig';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [settings, setSettings] = useState(currentSettings());
-  // const segments = useSegments();
-  // const router = useRouter();
   const [isLayoutMounted, setIsLayoutMounted] = useState(false);
 
   // Set layout as mounted after first render
