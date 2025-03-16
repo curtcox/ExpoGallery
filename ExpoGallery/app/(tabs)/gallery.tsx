@@ -30,15 +30,8 @@ export default function GalleryScreen() {
       .map(([icon]) => icon);
   }, []);
 
-  // Initialize with all top icons selected
+  // Initialize with no icons selected by default
   const [selectedIcons, setSelectedIcons] = useState<Set<string>>(new Set());
-
-  // Set all top icons as selected on initial render
-  useEffect(() => {
-    if (topIconTypes.length > 0) {
-      setSelectedIcons(new Set(topIconTypes));
-    }
-  }, [topIconTypes]);
 
   useEffect(() => {
     info('Viewing Gallery');
