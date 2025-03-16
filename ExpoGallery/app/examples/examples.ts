@@ -40,6 +40,7 @@ export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'fetch',              text: 'Fetch',                  icon: 'cloud-download-outline', url: 'versions/latest/sdk/expo/#api' },
   { name: 'local-storage',      text: 'Local Storage',          icon: 'folder-outline',         url: 'versions/latest/sdk/filesystem/' },
   { name: 'secure-storage',     text: 'Secure Storage',         icon: 'lock-closed',            url: 'versions/latest/sdk/securestore/' },
+  { name: 'svg',                text: 'SVG',                    icon: 'SVG',                    url: 'versions/latest/sdk/svg/' },
   { name: 'json',               text: 'JSON',                   icon: 'code-outline',           url: 'json-example' },
   { name: 'external-app',       text: 'External App',           icon: 'open-outline',           url: 'linking/into-other-apps/' },
   { name: 'query-param',        text: 'Query Param',            icon: 'open-outline',           url: 'router/reference/url-parameters/' },
