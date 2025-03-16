@@ -8,6 +8,7 @@ export type ExampleItem = {
 
 export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'accelerometer',      text: 'Accelerometer',          icon: 'pulse-outline',          url: 'versions/latest/sdk/accelerometer/' },
+  { name: 'barometer',          text: 'barometer',              icon: 'pulse-outline',          url: 'versions/latest/sdk/barometer/' },
   { name: 'alert',              text: 'Alert',                  icon: 'alert-outline',          url: 'https://reactnative.dev/docs/alert' },
   { name: 'asset',              text: 'Asset',                  icon: 'alert-outline',          url: 'versions/latest/sdk/asset/' },
   { name: 'notifications',      text: 'Notifications',          icon: 'notifications-outline',  url: 'versions/latest/sdk/notifications/' },
