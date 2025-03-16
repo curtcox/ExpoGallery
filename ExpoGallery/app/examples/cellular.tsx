@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import * as Cellular from 'expo-cellular';
-import { info, error } from '@/utils/logger';
+import { info } from '@/utils/logger';
 
 export default function Example() {
   const [carrierName, setCarrierName] = useState<string | null>(null);
