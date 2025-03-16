@@ -69,7 +69,8 @@
     "react-native-svg": "15.8.0",
     "expo-clipboard": "~7.0.1",
     "expo-cellular": "~7.0.2",
-    "expo-battery": "~9.0.2"
+    "expo-battery": "~9.0.2",
+    "expo-auth-session": "~6.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

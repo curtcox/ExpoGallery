@@ -8,6 +8,7 @@ export type ExampleItem = {
 
 export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'sensors',            text: 'Sensors',                icon: 'pulse-outline',          url: 'versions/latest/sdk/sensors/' },
+  { name: 'auth-session',       text: 'Auth Session',           icon: 'auth-session',          url: 'versions/latest/sdk/auth-session/' },
   { name: 'accelerometer',      text: 'Accelerometer',          icon: 'pulse-outline',          url: 'versions/latest/sdk/accelerometer/' },
   { name: 'barometer',          text: 'Barometer',              icon: 'pulse-outline',          url: 'versions/latest/sdk/barometer/' },
   { name: 'battery',            text: 'Battery',                icon: 'battery',                url: 'versions/latest/sdk/battery/' },
