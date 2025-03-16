@@ -1,51 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, ScrollView, Platform } from 'react-native';
 import { useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface StorageInfo {
-  localStorageKeys: Array<{key: string, size: number, value: string}>;
-  sessionStorageKeys: Array<{key: string, size: number, value: string}>;
-  localStorageTotalSize: number;
-  sessionStorageTotalSize: number;
+  asyncStorageKeys: Array<{key: string, size: number, value: string}>;
+  asyncStorageTotalSize: number;
 }
 
 function useAppReset() {
-  const getStorageInfo = useCallback((): StorageInfo => {
-    // Calculate size for localStorage
-    const localStorageItems = Object.keys(localStorage).map(key => {
-      const value = localStorage.getItem(key) || '';
-      const size = new Blob([value]).size;
-      return { key, size, value };
-    });
+  const getStorageInfo = useCallback(async (): Promise<StorageInfo> => {
+    try {
+      // Get all keys
+      const keys = await AsyncStorage.getAllKeys();
 
-    // Calculate size for sessionStorage
-    const sessionStorageItems = Object.keys(sessionStorage).map(key => {
-      const value = sessionStorage.getItem(key) || '';
-      const size = new Blob([value]).size;
-      return { key, size, value };
-    });
+      // Get values for all keys
+      const asyncStorageItems = await Promise.all(
+        keys.map(async (key) => {
+          const value = await AsyncStorage.getItem(key) || '';
+          const size = new Blob([value]).size;
+          return { key, size, value };
+        })
+      );
 
-    // Calculate total sizes
-    const localStorageTotalSize = localStorageItems.reduce((total, item) => total + item.size, 0);
-    const sessionStorageTotalSize = sessionStorageItems.reduce((total, item) => total + item.size, 0);
+      // Calculate total size
+      const asyncStorageTotalSize = asyncStorageItems.reduce((total, item) => total + item.size, 0);
 
-    return {
-      localStorageKeys: localStorageItems,
-      sessionStorageKeys: sessionStorageItems,
-      localStorageTotalSize,
-      sessionStorageTotalSize
-    };
+      return {
+        asyncStorageKeys: asyncStorageItems,
+        asyncStorageTotalSize
+      };
+    } catch (error) {
+      console.error('Error getting storage info:', error);
+      return {
+        asyncStorageKeys: [],
+        asyncStorageTotalSize: 0
+      };
+    }
   }, []);
 
-  const clearStorageData = useCallback(() => {
-    // Get storage info before clearing
-    const storageInfo = getStorageInfo();
+  const clearStorageData = useCallback(async () => {
+    try {
+      // Get storage info before clearing
+      const storageInfo = await getStorageInfo();
 
-    // Clear storage
-    storageInfo.localStorageKeys.forEach(item => localStorage.removeItem(item.key));
-    storageInfo.sessionStorageKeys.forEach(item => sessionStorage.removeItem(item.key));
+      // Clear all keys
+      await AsyncStorage.clear();
 
-    return storageInfo;
+      return storageInfo;
+    } catch (error) {
+      console.error('Error clearing storage:', error);
+      return {
+        asyncStorageKeys: [],
+        asyncStorageTotalSize: 0
+      };
+    }
   }, [getStorageInfo]);
 
   const reloadPage = useCallback(() => {
@@ -58,8 +67,8 @@ function useAppReset() {
     }
   }, []);
 
-  const resetAppState = useCallback(() => {
-    const clearedData = clearStorageData();
+  const resetAppState = useCallback(async () => {
+    const clearedData = await clearStorageData();
     reloadPage();
     return clearedData;
   }, [clearStorageData, reloadPage]);
@@ -81,16 +90,36 @@ function useAppReset() {
 export default function ResetScreen() {
   const { resetAppState, getStorageInfo, formatBytes } = useAppReset();
   const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load storage information when the screen mounts
-  useEffect(() => { setStorageInfo(getStorageInfo());}, [getStorageInfo]);
+  useEffect(() => {
+    refreshStorageInfo();
+  }, []);
 
-  const handleReset = () => {
-    const info = resetAppState();
-    setStorageInfo(info);
+  const handleReset = async () => {
+    setIsLoading(true);
+    try {
+      const info = await resetAppState();
+      setStorageInfo(info);
+    } catch (error) {
+      console.error('Error resetting app state:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const refreshStorageInfo = () => { setStorageInfo(getStorageInfo());};
+  const refreshStorageInfo = async () => {
+    setIsLoading(true);
+    try {
+      const info = await getStorageInfo();
+      setStorageInfo(info);
+    } catch (error) {
+      console.error('Error refreshing storage info:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -98,9 +127,9 @@ export default function ResetScreen() {
       <Text style={styles.text}>View and reset your app's stored data.</Text>
 
       <View style={styles.buttonContainer}>
-        <Button title="Refresh Storage Info" onPress={refreshStorageInfo} />
+        <Button title={isLoading ? "Loading..." : "Refresh Storage Info"} onPress={refreshStorageInfo} disabled={isLoading} />
         <View style={styles.buttonSpacer} />
-        <Button title="Reset App State" onPress={handleReset} color="#ff6347" />
+        <Button title={isLoading ? "Loading..." : "Reset App State"} onPress={handleReset} color="#ff6347" disabled={isLoading} />
       </View>
 
       {storageInfo && (
@@ -109,25 +138,10 @@ export default function ResetScreen() {
 
           <View style={styles.storageSection}>
             <Text style={styles.storageTitle}>
-              LocalStorage ({storageInfo.localStorageKeys.length} items, {formatBytes(storageInfo.localStorageTotalSize)} total)
+              AsyncStorage ({storageInfo.asyncStorageKeys.length} items, {formatBytes(storageInfo.asyncStorageTotalSize)} total)
             </Text>
-            {storageInfo.localStorageKeys.length > 0 ? (
-              storageInfo.localStorageKeys.map((item: {key: string, size: number, value: string}) => (
-                <Text key={item.key} style={styles.keyItem}>
-                  • {item.key} - {formatBytes(item.size)}
-                </Text>
-              ))
-            ) : (
-              <Text style={styles.emptyMessage}>No items found</Text>
-            )}
-          </View>
-
-          <View style={styles.storageSection}>
-            <Text style={styles.storageTitle}>
-              SessionStorage ({storageInfo.sessionStorageKeys.length} items, {formatBytes(storageInfo.sessionStorageTotalSize)} total)
-            </Text>
-            {storageInfo.sessionStorageKeys.length > 0 ? (
-              storageInfo.sessionStorageKeys.map((item: {key: string, size: number, value: string}) => (
+            {storageInfo.asyncStorageKeys.length > 0 ? (
+              storageInfo.asyncStorageKeys.map((item: {key: string, size: number, value: string}) => (
                 <Text key={item.key} style={styles.keyItem}>
                   • {item.key} - {formatBytes(item.size)}
                 </Text>
