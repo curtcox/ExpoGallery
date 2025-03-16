@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'expo-router';
 import { info } from '@/utils/logger';
 import { subscribeToSettingsChanges, currentSettings } from '@/storage/settings';
-import { ALL_EXAMPLES, ExampleItem } from '@/utils/examples';
+import { ALL_EXAMPLES, ExampleItem } from '@/app/examples/examples';
 import { ThemedScrollView } from '@/components/ThemedScrollView';
 import { router } from 'expo-router';
 import { TouchableOpacity } from 'react-native';

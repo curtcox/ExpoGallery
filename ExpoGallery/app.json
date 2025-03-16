@@ -35,6 +35,12 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow $(PRODUCT_NAME) to access your device motion"
+        }
+      ],
       "expo-asset",
       "expo-font",
       "expo-secure-store"

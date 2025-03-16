@@ -1,14 +1,12 @@
 import { Alert, Platform} from 'react-native';
 
-// Import just the types without creating a circular dependency
-import type { Settings } from '@/storage/settings';
-
 export interface LogEntry {
   index: number;
   timestamp: number;
   message: string;
   level: 'info' | 'warn' | 'error';
   error?: any;
+  object?: any;
 }
 
 export const LOG: LogEntry[] = [];
@@ -81,15 +79,17 @@ export interface ItemProps {
   message: string;
   level: 'info' | 'warn' | 'error';
   error?: any;
+  object?: any;
 }
 
-export function info(message: string) {
+export function info(message: string, object?: any) {
   console.log(message);
   LOG.push({
     index: LOG.length,
     timestamp: Date.now(),
     message,
-    level: 'info'
+    level: 'info',
+    object
   });
   notifySubscribers();
 }

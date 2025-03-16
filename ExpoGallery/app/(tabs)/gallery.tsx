@@ -4,13 +4,11 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'expo-router';
 import { info } from '../../utils/logger';
 import { Checkbox } from 'react-native-paper';
-import { ALL_EXAMPLES, ExampleItem } from '@/utils/examples';
+import { ALL_EXAMPLES, ExampleItem } from '@/app/examples/examples';
 import { subscribeToSettingsChanges, updateSettings, currentSettings } from '@/storage/settings';
 import { FlashList } from '@shopify/flash-list';
-import { useColorScheme } from 'react-native';
 
 export default function GalleryScreen() {
-  const colorScheme = useColorScheme();
   const [examples, setExamples] = useState<ExampleItem[]>(
     ALL_EXAMPLES.map(example => ({ ...example, selected: false }))
   );
@@ -123,7 +121,7 @@ export default function GalleryScreen() {
     // Filter by selected icons
     if (selectedIcons.size > 0) {
       filtered = filtered.filter(example =>
-        selectedIcons.has(example.icon)
+        !selectedIcons.has(example.icon)
       );
     }
 
