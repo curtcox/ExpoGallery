@@ -31,7 +31,7 @@ export default function ResourcesScreen() {
 
     return Object.entries(categoryCountMap)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
+      .slice(0, 3)
       .map(([category]) => category);
   }
 
