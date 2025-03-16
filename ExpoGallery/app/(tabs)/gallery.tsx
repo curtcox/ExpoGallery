@@ -61,9 +61,12 @@ export default function GalleryScreen() {
     return () => unsubscribe();
   }, []);
 
-  const toggleExample = (index: number) => {
-    const updatedExamples = [...examples];
-    updatedExamples[index].selected = !updatedExamples[index].selected;
+  const toggleExample = (exampleName: string) => {
+    const updatedExamples = examples.map(example =>
+      example.name === exampleName
+        ? { ...example, selected: !example.selected }
+        : example
+    );
     setExamples(updatedExamples);
 
     // Save to settings
@@ -87,15 +90,15 @@ export default function GalleryScreen() {
     });
   };
 
-  const renderItem = ({ item, index }: { item: ExampleItem; index: number }) => {
+  const renderItem = ({ item }: { item: ExampleItem; index: number }) => {
     return exampleRow(
       item.name,
       item.text,
       item.icon as any,
       item.url,
       item.selected ?? false,
-      () => toggleExample(index),
-      index
+      () => toggleExample(item.name),
+      item.name
     );
   };
 
@@ -184,7 +187,7 @@ function exampleRow(
   url: string,
   selected: boolean,
   onToggle: () => void,
-  key: number
+  key: string
 ) {
   const examplePage = `/examples/${name}`;
   const docUrl = url.startsWith('https') ? url : `https://docs.expo.dev/${url}`;
