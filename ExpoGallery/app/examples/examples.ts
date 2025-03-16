@@ -45,4 +45,5 @@ export const ALL_EXAMPLES: ExampleItem[] = [
   { name: 'query-param',        text: 'Query Param',            icon: 'open-outline',           url: 'router/reference/url-parameters/' },
   { name: 'text-to-speech',     text: 'Text to Speech',         icon: 'volume-high-outline',    url: 'versions/latest/sdk/speech/' },
   { name: 'speech-to-text',     text: 'Speech to Text',         icon: 'mic-outline',            url: 'https://github.com/trestrantham/react-native-speech-recognition' },
+  { name: 'webbrowser',         text: 'Web browser',            icon: 'webbrowser',             url: 'versions/latest/sdk/webbrowser/' },
 ];
