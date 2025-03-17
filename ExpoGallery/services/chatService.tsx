@@ -7,10 +7,10 @@ import { LocationObject } from 'expo-location';
 import { getCurrentLocation } from '@/services/location';
 import { IMessage } from '@/components/Chat';
 
-const EXTERNAL = false;
+const EXTERNAL = true;
 
 // Timeout duration in milliseconds (30 seconds)
-const RESPONSE_TIMEOUT = 30000;
+const DEFAULT_RESPONSE_TIMEOUT = 30000;
 
 // Error messages
 export const ERROR_MESSAGES = {
@@ -43,9 +43,10 @@ export interface ChatResult {
  * Process a user message and generate a response
  * This function handles all error cases and location fetching internally
  * @param userMessage The message from the user
+ * @param timeoutDuration Optional timeout duration in milliseconds (defaults to DEFAULT_RESPONSE_TIMEOUT)
  * @returns A promise that resolves to an object with the message and location status
  */
-export const processUserMessage = async (userMessage: string): Promise<ChatResult> => {
+export const processUserMessage = async (userMessage: string, timeoutDuration?: number): Promise<ChatResult> => {
   let location: LocationObject | null = null;
   let hasLocation = false;
 
@@ -59,7 +60,7 @@ export const processUserMessage = async (userMessage: string): Promise<ChatResul
 
   try {
     // Generate bot response with or without location
-    const botResponseText = await generateBotResponse(userMessage, location);
+    const botResponseText = await generateBotResponse(userMessage, location, timeoutDuration);
     return {
       message: botResponseText,
       hasLocation
@@ -101,29 +102,52 @@ export const createBotMessage = (text: string): IMessage => {
  * Generate a bot response with built-in timeout and error handling
  * @param userMessage The message from the user
  * @param location The user's current location (if available)
+ * @param timeoutDuration Optional timeout duration in milliseconds (defaults to DEFAULT_RESPONSE_TIMEOUT)
  * @returns A promise that resolves to the bot's response
  * @throws ChatServiceError with errorType property indicating the type of error
  */
-export const generateBotResponse = async (userMessage: string, location: LocationObject | null): Promise<string> => {
+export const generateBotResponse = async (
+  userMessage: string,
+  location: LocationObject | null,
+  timeoutDuration: number = DEFAULT_RESPONSE_TIMEOUT
+): Promise<string> => {
   try {
-    // Set up a timeout promise that rejects after the specified time
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      const id = setTimeout(() => {
-        clearTimeout(id);
-        reject(new ChatServiceError('Response timeout', 'TIMEOUT'));
-      }, RESPONSE_TIMEOUT);
-    });
+    // Prepare context for both external and local bots
+    const context: ChatContext = {
+      timestamp: new Date(),
+      location: location ? {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      } : undefined,
+      userProfile: profile,
+      resources: await getAllResources(),
+    };
 
-    // Race between the actual response and the timeout
-    const startTime = Date.now();
+    if (EXTERNAL) {
+      try {
+        // Set up a timeout promise that rejects after the specified time
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          const id = setTimeout(() => {
+            clearTimeout(id);
+            reject(new ChatServiceError('Response timeout', 'TIMEOUT'));
+          }, timeoutDuration);
+        });
 
-    const response = await Promise.race([
-      getResponseText(userMessage, location),
-      timeoutPromise
-    ]);
+        // Try external service with timeout
+        const externalResponse = await Promise.race([
+          fetchExternal(userMessage, context),
+          timeoutPromise
+        ]);
 
-    const endTime = Date.now();
-    return response;
+        return externalResponse;
+      } catch (e) {
+        error('External service failed or timed out, falling back to local bot:', e);
+        // Fall back to local bot on timeout or other errors
+        return localBot(userMessage, context);
+      }
+    } else {
+      return localBot(userMessage, context);
+    }
   } catch (e) {
     error('Error generating bot response:', e);
 
@@ -136,6 +160,13 @@ export const generateBotResponse = async (userMessage: string, location: Locatio
   }
 };
 
+/**
+ * Get response text from either external service or local bot
+ * @param userMessage The message from the user
+ * @param location The user's current location (if available)
+ * @returns A promise that resolves to the bot's response
+ * @throws ChatServiceError if both external and local bot fail
+ */
 const getResponseText = async (userMessage: string, location: LocationObject | null): Promise<string> => {
   try {
     const context: ChatContext = {
@@ -147,7 +178,12 @@ const getResponseText = async (userMessage: string, location: LocationObject | n
       userProfile: profile,
       resources: await getAllResources(),
     };
-    return (EXTERNAL) ? fetchExternal(userMessage, context) : localBot(userMessage, context);
+
+    if (EXTERNAL) {
+      return fetchExternal(userMessage, context);
+    } else {
+      return localBot(userMessage, context);
+    }
   } catch (e) {
     throw new ChatServiceError('Failed to process message', 'GENERAL');
   }

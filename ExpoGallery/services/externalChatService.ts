@@ -3,6 +3,9 @@ import { ERROR_MESSAGES, ChatServiceError } from './chatService';
 import { latLongToGeohash } from './location';
 import { CHAT_API_ENDPOINT, DEFAULT_CHAT_LOCATION } from '../constants/Env';
 
+// Re-export the API endpoint for tests
+export { CHAT_API_ENDPOINT };
+
 /**
  * Fetches a response from an external API
  * @param userMessage The message from the user

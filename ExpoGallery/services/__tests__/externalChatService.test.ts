@@ -1,7 +1,7 @@
 import { fetchExternal, CHAT_API_ENDPOINT } from '../externalChatService';
 import { ChatContext } from '../localBot';
 import { defaultProfile } from '../../storage/profile';
-import { ChatServiceError, ERROR_MESSAGES } from '../chatService';
+import { ERROR_MESSAGES } from '../chatService';
 
 // Mock global fetch
 global.fetch = jest.fn();
