@@ -49,7 +49,7 @@ describe('externalChatService', () => {
       },
       body: JSON.stringify({
         message: 'Food?',
-        location: '38.627,-90.1994',
+        location: '9yzgeryf9d',
       }),
     });
   });

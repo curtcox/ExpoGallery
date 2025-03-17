@@ -1,8 +1,11 @@
 /**
+ * @jest-environment jsdom
+ * @jest-skip
+ *
  * Example file showing how to use the externalChatService with the API endpoint
  *
  * This is not a test file, but can be run directly to demonstrate the API interaction
- * Run using: npx ts-node services/__tests__/externalChatExample.ts
+ * Run using: npx ts-node services/examples/externalChatExample.ts
  */
 
 import { fetchExternal } from '../externalChatService';
