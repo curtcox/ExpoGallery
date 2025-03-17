@@ -22,10 +22,10 @@ export default function AboutScreen() {
   const checkForUpdates = async () => {
     setIsCheckingVersion(true);
     setVersionCheckError(null);
+    let versionUrl = '';
 
     try {
       // Determine the correct path to version.json based on platform
-      let versionUrl = '';
 
       if (Platform.OS === 'web') {
         // For web, use a relative path that works with the base URL
@@ -56,8 +56,8 @@ export default function AboutScreen() {
       setLatestBuildSha(data.build);
       setLastChecked(new Date());
     } catch (e) {
-      error('Error checking for updates:', e);
-      setVersionCheckError('Could not check for updates');
+      error(`Error checking for ${versionUrl}, updates:`, e);
+      setVersionCheckError(`Could not check for updates at ${versionUrl}`);
     } finally {
       setIsCheckingVersion(false);
     }
