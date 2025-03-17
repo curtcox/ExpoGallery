@@ -232,6 +232,23 @@ export default function SettingsScreen() {
         <TouchableOpacity
           style={styles.overridesLink}
           onPress={() => {
+            // Navigate to services screen
+            const { router } = require('expo-router');
+            router.navigate('/services');
+          }}
+        >
+          <View style={styles.linkContent}>
+            <ThemedText type="default">Services Configuration</ThemedText>
+            <Ionicons name="chevron-forward" size={20} color="#2196F3" />
+          </View>
+          <ThemedText type="default" style={styles.linkDescription}>
+            Configure chat and other service settings
+          </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.overridesLink}
+          onPress={() => {
             // Navigate to overrides screen
             const { router } = require('expo-router');
             router.navigate('/overrides');
