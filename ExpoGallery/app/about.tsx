@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Linking, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Linking, ActivityIndicator, Platform } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { error } from '@/utils/logger';
 import appConfig from '@/app.json';
-import { Link, useNavigation } from '@react-navigation/native';
 
 // Current version of the app
 const APP_VERSION = appConfig.expo.version;
@@ -18,7 +17,6 @@ export default function AboutScreen() {
   const [isCheckingVersion, setIsCheckingVersion] = useState(false);
   const [versionCheckError, setVersionCheckError] = useState<string | null>(null);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
-  const navigation = useNavigation();
 
   // Function to check for the latest version
   const checkForUpdates = async () => {
@@ -26,9 +24,23 @@ export default function AboutScreen() {
     setVersionCheckError(null);
 
     try {
-      // Get base URL from current path
-      const baseUrl = window.location.origin;
-      const versionUrl = `${baseUrl}/version.json`;
+      // Determine the correct path to version.json based on platform
+      let versionUrl = '';
+
+      if (Platform.OS === 'web') {
+        // For web, use a relative path that works with the base URL
+        const baseUrl = window.location.origin;
+        const basePath = appConfig.expo.experiments?.baseUrl || '';
+        versionUrl = `${baseUrl}${basePath}/version.json`;
+      } else {
+        // For native, we'll use a mock response to show current values
+        // In a real app, you might want to fetch from a remote API endpoint
+        setLatestVersion(APP_VERSION);
+        setLatestBuildSha(APP_BUILD_SHA);
+        setLastChecked(new Date());
+        setIsCheckingVersion(false);
+        return;
+      }
 
       const response = await fetch(versionUrl, {
         headers: { 'Cache-Control': 'no-cache' },

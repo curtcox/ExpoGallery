@@ -26,7 +26,7 @@ let aboutFileContent = fs.readFileSync(aboutFilePath, 'utf8');
 aboutFileContent = aboutFileContent.replace('__GIT_SHA__', gitSha);
 
 // Replace the build date placeholder
-aboutFileContent = aboutFileContent.replace('__BUILD_DATE__', formattedDate);
+aboutFileContent = aboutFileContent.replace(/__BUILD_DATE__/g, formattedDate);
 
 fs.writeFileSync(aboutFilePath, aboutFileContent);
 
