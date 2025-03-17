@@ -1,13 +1,18 @@
 import React from 'react';
 import {StyleSheet, Button, Alert, Platform} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-import { info } from '../utils/logger';
+import { info } from '@/utils/logger';
 import { useEffect } from 'react';
-import { handlePress, oneButtonAlert } from '../utils/alerts';
+import { handlePress, oneButtonAlert } from '@/utils/alerts';
 export default function Example() {
 
   useEffect(() => {
-    info('Viewing Alert Example');
+    info('Viewing Alert Example'); // <--- This appears in console log as if this page was navigated to
+
+    // Add return cleanup function to see if component unmounts
+    return () => {
+      info('Alert Example unmounting');
+    };
   }, []);
 
   const createTwoButtonAlert = () => {

@@ -17,15 +17,30 @@ fs.writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2));
 const buildDate = new Date().toISOString();
 const formattedDate = `${buildDate.split('T')[0]} ${buildDate.split('T')[1].substring(0, 8)}`;
 
-// Replace the Git SHA placeholder in the about.tsx file
+// Get the Git SHA
 const gitSha = process.env.GITHUB_SHA || 'development';
+
+// Replace the Git SHA placeholder in the about.tsx file
 const aboutFilePath = path.join(__dirname, '..', 'app', 'about.tsx');
 let aboutFileContent = fs.readFileSync(aboutFilePath, 'utf8');
-aboutFileContent = aboutFileContent.replace('__GIT_SHA__', gitSha.substring(0, 7));
+aboutFileContent = aboutFileContent.replace('__GIT_SHA__', gitSha);
 
 // Replace the build date placeholder
 aboutFileContent = aboutFileContent.replace('__BUILD_DATE__', formattedDate);
 
 fs.writeFileSync(aboutFilePath, aboutFileContent);
 
-console.log(`Environment variables set successfully. Git SHA: ${gitSha.substring(0, 7)}, Build Date: ${formattedDate}`);
+// Update the version.json file
+const versionJsonPath = path.join(__dirname, '..', 'public', 'version.json');
+const appVersion = appJson.expo.version || '0.0.1';
+const versionData = {
+  version: appVersion,
+  buildDate: formattedDate,
+  build: gitSha
+};
+
+fs.writeFileSync(versionJsonPath, JSON.stringify(versionData, null, 2));
+
+console.log(`Environment variables set successfully.`);
+console.log(`App Version: ${appVersion}, Git SHA: ${gitSha}, Build Date: ${formattedDate}`);
+console.log(`Version.json updated.`);

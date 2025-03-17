@@ -1,4 +1,4 @@
-import { Tabs, useSegments, useRouter } from 'expo-router';
+import { Tabs } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
@@ -12,8 +12,6 @@ import { TAB_DEFINITIONS, getTabProperties } from '@/constants/TabConfig';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [settings, setSettings] = useState(currentSettings());
-  const segments = useSegments();
-  const router = useRouter();
   const [isLayoutMounted, setIsLayoutMounted] = useState(false);
 
   // Set layout as mounted after first render
@@ -29,34 +27,6 @@ export default function TabLayout() {
 
     return () => unsubscribe();
   }, []);
-
-  // Filter tabs based on UI level and custom tab levels
-  const visibleTabs = TAB_DEFINITIONS.filter(tab => {
-    // Always visible tabs
-    if (tab.alwaysVisible) {
-      return true;
-    }
-
-    // For other tabs, check custom tab level settings
-    const tabLevel = settings.tabLevels?.[tab.name] ?? tab.uiLevel;
-    return tabLevel <= settings.UI_Level;
-  });
-
-  // Check if current tab is accessible at current UI level
-  useEffect(() => {
-    // Only run navigation logic after the layout is mounted
-    if (!isLayoutMounted) return;
-
-    if (segments.length > 1) {
-      const currentTab = segments[1] as string;
-      const isTabVisible = visibleTabs.some(tab => tab.name === currentTab);
-
-      // If current tab is not visible at this UI level, redirect to home
-      if (!isTabVisible && currentTab !== 'index') {
-        router.replace('/');
-      }
-    }
-  }, [segments, settings.UI_Level, visibleTabs, isLayoutMounted]);
 
   return (
     <Tabs

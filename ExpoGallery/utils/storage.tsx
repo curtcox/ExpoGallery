@@ -57,13 +57,6 @@ export const storage = Platform.select({
         return await AsyncStorage.getItem(key);
       } catch (e) {
         error('Storage access error details:', e);
-        if (e instanceof Error &&
-            (e.message.includes('Access to storage is not allowed') ||
-             e.message.includes('from this context'))) {
-          info('Storage access is restricted in this context, using memory fallback');
-          return memoryStorageFallback.getItem(key);
-        }
-        error('Error reading from storage:', e);
         return null;
       }
     },
@@ -77,14 +70,6 @@ export const storage = Platform.select({
         await AsyncStorage.setItem(key, value);
       } catch (e) {
         error('Storage access error details:', e);
-        if (e instanceof Error &&
-            (e.message.includes('Access to storage is not allowed') ||
-             e.message.includes('from this context'))) {
-          info('Storage access is restricted in this context, using memory fallback');
-          memoryStorageFallback.setItem(key, value);
-          return;
-        }
-        error('Error writing to storage:', e);
       }
     },
     removeItem: async (key: string) => {
@@ -97,14 +82,6 @@ export const storage = Platform.select({
         await AsyncStorage.removeItem(key);
       } catch (e) {
         error('Storage access error details:', e);
-        if (e instanceof Error &&
-            (e.message.includes('Access to storage is not allowed') ||
-             e.message.includes('from this context'))) {
-          info('Storage access is restricted in this context, using memory fallback');
-          memoryStorageFallback.removeItem(key);
-          return;
-        }
-        error('Error removing from storage:', e);
       }
     },
     multiGet: async (keys: string[]) => {
@@ -117,32 +94,9 @@ export const storage = Platform.select({
         return await AsyncStorage.multiGet(keys);
       } catch (e) {
         error('Storage access error details:', e);
-        if (e instanceof Error &&
-            (e.message.includes('Access to storage is not allowed') ||
-             e.message.includes('from this context'))) {
-          info('Storage access is restricted in this context, using memory fallback');
-          return keys.map(key => [key, memoryStorageFallback.getItem(key)]);
-        }
-        error('Error reading multiple items from storage:', e);
         return [];
       }
     }
   },
   default: AsyncStorage,
 });
-
-const memoryStorageFallback = {
-  _storage: new Map<string, string>(),
-  getItem: (key: string): string | null => {
-    return memoryStorageFallback._storage.get(key) || null;
-  },
-  setItem: (key: string, value: string): void => {
-    memoryStorageFallback._storage.set(key, value);
-  },
-  removeItem: (key: string): void => {
-    memoryStorageFallback._storage.delete(key);
-  },
-  clear: (): void => {
-    memoryStorageFallback._storage.clear();
-  }
-};

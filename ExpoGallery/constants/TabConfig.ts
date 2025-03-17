@@ -39,13 +39,7 @@ export const TAB_DEFINITIONS: TabDefinition[] = [
   { name: 'chat',      title: 'Chat',      icon: 'chatbubble-outline',    uiLevel: 1 },
   { name: 'profile',   title: 'Profile',   icon: 'person-outline',        uiLevel: 1 },
   { name: 'log',       title: 'Log',       icon: 'document-text-outline', uiLevel: 3 },
-  {
-    name: 'settings',
-    title: 'Settings',
-    icon: 'settings-outline',
-    uiLevel: 1,
-    alwaysVisible: true
-  },
+  { name: 'settings',  title: 'Settings',  icon: 'settings-outline',      uiLevel: 2 },
 ];
 
 // Helper function to get customizable tabs (excludes alwaysVisible tabs)

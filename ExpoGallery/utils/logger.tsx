@@ -4,7 +4,9 @@ export interface LogEntry {
   index: number;
   timestamp: number;
   message: string;
+  level: 'info' | 'warn' | 'error';
   error?: any;
+  object?: any;
 }
 
 export const LOG: LogEntry[] = [];
@@ -26,8 +28,24 @@ const oneButtonAlert = (message: string) => {
   }
 };
 
-// Ideally this should be set in settings.tsx, but this way there is no import cycle
-const DEBUG = true;
+let DEBUG = false;
+
+export function getDebugMode() {
+  return DEBUG;
+}
+
+export function setDebugMode(value: boolean) {
+  DEBUG = value;
+  // Log debug mode change if we're now in debug mode
+  if (DEBUG) {
+    info(`Debug mode ${DEBUG ? 'enabled' : 'disabled'}`);
+  }
+}
+
+// Function to initialize debug mode from settings without creating an import cycle
+export function initializeDebugMode(settings: { debug: boolean }) {
+  DEBUG = settings.debug;
+}
 
 // Add subscribers mechanism
 const subscribers: Set<(logs: LogEntry[]) => void> = new Set();
@@ -43,24 +61,46 @@ export function subscribeToLogs(callback: (logs: LogEntry[]) => void) {
   };
 }
 
+function notifySubscribersLater() {
+  // This prevents React errors when logging happens during render
+  setTimeout(() => {
+    subscribers.forEach(callback => callback([...LOG]));
+  }, 0);
+}
+
 // Notify subscribers when log changes
 function notifySubscribers() {
-  subscribers.forEach(callback => callback([...LOG]));
+  notifySubscribersLater();
 }
 
 export interface ItemProps {
   index: number;
   timestamp: number;
   message: string;
+  level: 'info' | 'warn' | 'error';
   error?: any;
+  object?: any;
 }
 
-export function info(message: string) {
+export function info(message: string, object?: any) {
   console.log(message);
   LOG.push({
     index: LOG.length,
     timestamp: Date.now(),
-    message
+    message,
+    level: 'info',
+    object
+  });
+  notifySubscribers();
+}
+
+export function warn(message: string) {
+  console.warn(message);
+  LOG.push({
+    index: LOG.length,
+    timestamp: Date.now(),
+    message,
+    level: 'warn'
   });
   notifySubscribers();
 }
@@ -71,6 +111,7 @@ export function error(message: string, error: any) {
     index: LOG.length,
     timestamp: Date.now(),
     message,
+    level: 'error',
     error
   });
   notifySubscribers();

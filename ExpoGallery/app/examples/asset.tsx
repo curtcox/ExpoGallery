@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ThemedText } from '@/components/ThemedText';
-import { info, error } from '../utils/logger';
+import { info, error } from '@/utils/logger';
 
 export default function Example() {
   const [contents, setContents] = useState('');
@@ -9,7 +9,7 @@ export default function Example() {
     const loadContent = async () => {
       try {
         info('Loading asset example file contents');
-        const source = await require('../assets/json/stuff.json');
+        const source = await require('@/assets/json/stuff.json');
         const contents = JSON.stringify(source);
         info(`Required ${contents}`);
         info('Downloading');

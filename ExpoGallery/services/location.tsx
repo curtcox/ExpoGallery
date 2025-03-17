@@ -3,6 +3,9 @@
  * Includes functions for converting between latitude/longitude and geohash
  * and calculating distances between coordinates
  */
+// Import the platform-specific implementation
+// This will automatically resolve to either deviceLocation.native.ts or deviceLocation.web.ts
+import deviceLocationService from './deviceLocation.native';
 
 /**
  * Converts a latitude and longitude to a geohash string
@@ -168,3 +171,9 @@ export function calculateDistance(
 
   return R * c;
 }
+
+// Bind the methods to maintain their 'this' context
+export const requestForegroundPermissionsAsync = deviceLocationService.requestForegroundPermissionsAsync.bind(deviceLocationService);
+export const initLocationWatching = deviceLocationService.initLocationWatching.bind(deviceLocationService);
+export const getCurrentLocation = deviceLocationService.getCurrentLocation.bind(deviceLocationService);
+export const stopLocationWatching = deviceLocationService.stopLocationWatching.bind(deviceLocationService);

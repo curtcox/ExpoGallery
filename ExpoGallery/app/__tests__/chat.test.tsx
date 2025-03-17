@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import ChatScreen from '../(tabs)/chat';
-import { generateBotResponse } from '@/services/chat';
+import { generateBotResponse } from '@/services/chatService';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 
 // Mock AsyncStorage
@@ -23,6 +23,7 @@ jest.mock('expo-router', () => ({
 }));
 jest.mock('@/utils/logger', () => ({
   error: jest.fn(),
+  info: jest.fn(),
 }));
 
 // Mock expo-location
