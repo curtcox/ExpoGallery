@@ -10,6 +10,14 @@ const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
 const googleMapsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 appJson.expo.extra.googleMapsApiKey = googleMapsApiKey;
 
+// Replace the placeholder with the actual Chat API endpoint
+const chatApiEndpoint = process.env.EXPO_PUBLIC_CHAT_API_ENDPOINT || 'http://54.147.61.224:5000/chat';
+appJson.expo.extra.chatApiEndpoint = chatApiEndpoint;
+
+// Replace the placeholder with the default chat location (geohash)
+const defaultChatLocation = process.env.EXPO_PUBLIC_DEFAULT_CHAT_LOCATION || '9yzey5mxsb';
+appJson.expo.extra.defaultChatLocation = defaultChatLocation;
+
 // Write the updated app.json file
 fs.writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2));
 
@@ -43,4 +51,7 @@ fs.writeFileSync(versionJsonPath, JSON.stringify(versionData, null, 2));
 
 console.log(`Environment variables set successfully.`);
 console.log(`App Version: ${appVersion}, Git SHA: ${gitSha}, Build Date: ${formattedDate}`);
+console.log(`Google Maps API Key: ${googleMapsApiKey ? '********' + googleMapsApiKey.slice(-4) : 'Not set'}`);
+console.log(`Chat API Endpoint: ${chatApiEndpoint}`);
+console.log(`Default Chat Location: ${defaultChatLocation}`);
 console.log(`Version.json updated.`);
