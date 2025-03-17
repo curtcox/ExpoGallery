@@ -2,45 +2,64 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: '.env.local' });
 
-// Read the app.json file
+// File paths
 const appJsonPath = path.join(__dirname, '..', 'app.json');
+const aboutFilePath = path.join(__dirname, '..', 'app', 'about.tsx');
+const versionJsonPath = path.join(__dirname, '..', 'public', 'version.json');
+
+// Read app.json
 const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
 
-// Replace the placeholder with the actual API key
-const googleMapsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
-appJson.expo.extra.googleMapsApiKey = googleMapsApiKey;
+// Helper functions
+function updateAppConfig(key, envKey, defaultValue = '') {
+  const value = process.env[envKey] || defaultValue;
+  appJson.expo.extra[key] = value;
+  return value;
+}
 
-// Write the updated app.json file
-fs.writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2));
+function replaceInFile(filePath, replacements) {
+  let content = fs.readFileSync(filePath, 'utf8');
+  for (const [placeholder, value] of Object.entries(replacements)) {
+    content = content.replace(new RegExp(placeholder, 'g'), value);
+  }
+  fs.writeFileSync(filePath, content);
+}
 
-// Get the current date and time for build timestamp
+function writeJsonFile(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+// Update app.json configuration
+const googleMapsApiKey = updateAppConfig('googleMapsApiKey', 'EXPO_PUBLIC_GOOGLE_MAPS_API_KEY');
+const chatApiEndpoint = updateAppConfig('chatApiEndpoint', 'EXPO_PUBLIC_CHAT_API_ENDPOINT', 'http://54.147.61.224:5000/chat');
+const defaultChatLocation = updateAppConfig('defaultChatLocation', 'EXPO_PUBLIC_DEFAULT_CHAT_LOCATION', '9yzey5mxsb');
+
+// Write updated app.json
+writeJsonFile(appJsonPath, appJson);
+
+// Get build metadata
 const buildDate = new Date().toISOString();
 const formattedDate = `${buildDate.split('T')[0]} ${buildDate.split('T')[1].substring(0, 8)}`;
-
-// Get the Git SHA
 const gitSha = process.env.GITHUB_SHA || 'development';
 
-// Replace the Git SHA placeholder in the about.tsx file
-const aboutFilePath = path.join(__dirname, '..', 'app', 'about.tsx');
-let aboutFileContent = fs.readFileSync(aboutFilePath, 'utf8');
-aboutFileContent = aboutFileContent.replace('__GIT_SHA__', gitSha);
+// Update about.tsx with build info
+replaceInFile(aboutFilePath, {
+  '__GIT_SHA__': gitSha,
+  '__BUILD_DATE__': formattedDate
+});
 
-// Replace the build date placeholder
-aboutFileContent = aboutFileContent.replace(/__BUILD_DATE__/g, formattedDate);
-
-fs.writeFileSync(aboutFilePath, aboutFileContent);
-
-// Update the version.json file
-const versionJsonPath = path.join(__dirname, '..', 'public', 'version.json');
+// Update version.json
 const appVersion = appJson.expo.version || '0.0.1';
-const versionData = {
+writeJsonFile(versionJsonPath, {
   version: appVersion,
   buildDate: formattedDate,
   build: gitSha
-};
+});
 
-fs.writeFileSync(versionJsonPath, JSON.stringify(versionData, null, 2));
-
+// Log results
 console.log(`Environment variables set successfully.`);
 console.log(`App Version: ${appVersion}, Git SHA: ${gitSha}, Build Date: ${formattedDate}`);
+console.log(`Google Maps API Key: ${googleMapsApiKey ? '********' + googleMapsApiKey.slice(-4) : 'Not set'}`);
+console.log(`Chat API Endpoint: ${chatApiEndpoint}`);
+console.log(`Default Chat Location: ${defaultChatLocation}`);
 console.log(`Version.json updated.`);

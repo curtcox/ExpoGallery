@@ -6,6 +6,12 @@ export interface Settings {
   tabRenames?: Record<string, string>;
   focusedExamples: string[];
   overrides?: string; // JSON string containing custom overrides
+  services?: {
+    chat?: {
+      external?: boolean;
+      timeout?: number;
+    }
+  }
 }
 
 // Default settings
@@ -15,6 +21,12 @@ export const defaultSettings: Settings = {
   tabRenames: {},
   focusedExamples: [],
   overrides: '',
+  services: {
+    chat: {
+      external: true,
+      timeout: 30000
+    }
+  }
 };
 
 // Current settings (in memory)
@@ -59,6 +71,29 @@ export async function updateSettings(newSettings: Partial<Settings>) {
   subscribers.forEach(callback => callback(settings));
 
   return settings;
+}
+
+/**
+ * Update chat service settings specifically
+ * @param external Whether to use external chat service
+ * @param timeout Timeout duration for chat responses in milliseconds
+ * @returns The updated settings object
+ */
+export async function updateChatSettings(external?: boolean, timeout?: number) {
+  // Create new settings object, preserving any existing values not being updated
+  const newSettings: Settings = {
+    ...settings,
+    services: {
+      ...settings.services,
+      chat: {
+        ...settings.services?.chat,
+        ...(external !== undefined ? { external } : {}),
+        ...(timeout !== undefined ? { timeout } : {})
+      }
+    }
+  };
+
+  return updateSettings(newSettings);
 }
 
 export function subscribeToSettingsChanges(callback: (settings: Settings) => void) {

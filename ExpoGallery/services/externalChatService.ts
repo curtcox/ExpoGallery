@@ -1,8 +1,11 @@
 import { ChatContext } from './localBot';
 import { ERROR_MESSAGES, ChatServiceError } from './chatService';
 import { latLongToGeohash } from './location';
+import { CHAT_API_ENDPOINT, DEFAULT_CHAT_LOCATION } from '../constants/Env';
 
-export const CHAT_API_ENDPOINT = 'http://54.147.61.224:5000/chat';
+// Re-export the API endpoint for tests
+export { CHAT_API_ENDPOINT };
+
 /**
  * Fetches a response from an external API
  * @param userMessage The message from the user
@@ -12,10 +15,10 @@ export const CHAT_API_ENDPOINT = 'http://54.147.61.224:5000/chat';
  */
 export const fetchExternal = async (userMessage: string, context: ChatContext): Promise<string> => {
   try {
-    // Convert location to geohash if available, or use a default geohash
+    // Convert location to geohash if available, or use the default geohash from environment
     const locationId = context.location ?
       latLongToGeohash(context.location.latitude, context.location.longitude) :
-      '9yzey5mxsb'; // Default location ID
+      DEFAULT_CHAT_LOCATION;
 
     const response = await fetch(CHAT_API_ENDPOINT, {
       method: 'POST',

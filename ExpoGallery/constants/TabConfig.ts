@@ -40,6 +40,7 @@ export const TAB_DEFINITIONS: TabDefinition[] = [
   { name: 'profile',   title: 'Profile',   icon: 'person-outline',        uiLevel: 1 },
   { name: 'log',       title: 'Log',       icon: 'document-text-outline', uiLevel: 3 },
   { name: 'settings',  title: 'Settings',  icon: 'settings-outline',      uiLevel: 2 },
+  { name: 'services',  title: 'Services',  icon: 'construct-outline',     uiLevel: 3 },
 ];
 
 // Helper function to get customizable tabs (excludes alwaysVisible tabs)
