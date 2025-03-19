@@ -12,6 +12,11 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+  CHAT_API_ENDPOINT: ${{ vars.CHAT_API_ENDPOINT }}
+  DEFAULT_CHAT_LOCATION: ${{ vars.DEFAULT_CHAT_LOCATION }}
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -23,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Use the Node.js version compatible with your Expo version
+          node-version: '18' # Use the Node.js version compatible with our Expo version
           cache: 'npm'
           cache-dependency-path: 'ExpoGallery/package-lock.json'
 
@@ -37,11 +42,6 @@ jobs:
           cd ExpoGallery
           npm test
 
-      - name: Set environment variables
-        run: |
-          cd ExpoGallery
-          node ./scripts/set-env.js
-
       - name: Build Expo web
         run: |
           cd ExpoGallery
@@ -49,9 +49,6 @@ jobs:
           touch dist/.nojekyll
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-          CHAT_API_ENDPOINT: ${{ vars.CHAT_API_ENDPOINT }}
-          DEFAULT_CHAT_LOCATION: ${{ vars.DEFAULT_CHAT_LOCATION }}
 
       - name: Save latest deployment artifact
         uses: actions/upload-artifact@v4
