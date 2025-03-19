@@ -8,17 +8,74 @@ import { getAllResources, Resource } from '@/services/data';
 import deviceLocationService from '@/services/deviceLocation.native';
 import { calculateDistance } from '@/services/location';
 import { FontAwesome } from '@expo/vector-icons';
+import { subscribeToProfileChanges, Profile } from '@/storage/profile';
+import { error, warn } from '@/utils/index';
+
+/**
+ * Convert a distance from meters to the user's preferred unit (kilometers or miles)
+ * @param distanceInMeters The distance in meters
+ * @param usesMetric Whether to use metric (km) or imperial (mi) units
+ * @returns The converted distance in the preferred unit
+ */
+function convertDistance(distanceInMeters: number, usesMetric: boolean): number {
+  return usesMetric
+    ? distanceInMeters / 1000        // Convert to kilometers for metric
+    : distanceInMeters / 1609.344;   // Convert to miles for imperial
+}
+
+/**
+ * Sort resources by distance from user's location in their preferred unit
+ * @param resources The resources to sort
+ * @param userLocation The user's current location
+ * @param usesMetric Whether to use metric (km) or imperial (mi) units
+ * @returns Resources sorted by distance with added distance property
+ */
+function sortedByPreferredDistance(
+  resources: Resource[],
+  userLocation: { coords: { latitude: number, longitude: number } },
+  usesMetric: boolean
+): (Resource & { distance: number })[] {
+  return resources.map(resource => {
+    // Calculate distance in meters
+    const distanceInMeters = calculateDistance(
+      { latitude: userLocation.coords.latitude, longitude: userLocation.coords.longitude },
+      { latitude: resource.location.latitude, longitude: resource.location.longitude }
+    );
+
+    // Convert to user's preferred unit
+    const distanceInPreferredUnit = convertDistance(
+      distanceInMeters,
+      usesMetric
+    );
+
+    return {
+      ...resource,
+      distance: distanceInPreferredUnit
+    };
+  })
+  .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+}
 
 export default function ResourcesScreen() {
   const colorScheme = useColorScheme();
   const resources = getAllResources();
   const [userLocation, setUserLocation] = useState(deviceLocationService.getLastKnownLocation());
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
 
   const topCategories = useMemo(() => getTopCategoriesByFrequency(resources), [resources]);
 
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(() =>
     new Set(topCategories)
   );
+
+  // Subscribe to profile changes
+  useEffect(() => {
+    const unsubscribe = subscribeToProfileChanges((profile) => {
+      setUserProfile(profile);
+    });
+
+    return unsubscribe;
+  }, []);
 
   // Calculate distances and sort resources
   const filteredResources = useMemo(() => {
@@ -27,22 +84,21 @@ export default function ResourcesScreen() {
     // Add distance from user if location is available
     if (userLocation) {
       try {
-        return resourcesWithCategories.map(resource => ({
-          ...resource,
-          distance: calculateDistance(
-            { latitude: userLocation.coords.latitude, longitude: userLocation.coords.longitude },
-            { latitude: resource.location.latitude, longitude: resource.location.longitude }
-          ) / 1000 // Convert from meters to kilometers
-        }))
-        .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+        return sortedByPreferredDistance(
+          resourcesWithCategories,
+          userLocation,
+          Boolean(userProfile?.usesMetric)
+        );
       } catch (e) {
-        console.error('Error calculating distances:', e);
+        error('Error calculating distances:', e);
         return resourcesWithCategories;
       }
+    } else {
+      warn('No location available');
     }
 
     return resourcesWithCategories;
-  }, [resources, selectedCategories, userLocation]);
+  }, [resources, selectedCategories, userLocation, userProfile?.usesMetric]);
 
   // Initialize location services and set up listener
   useEffect(() => {
@@ -113,6 +169,8 @@ export default function ResourcesScreen() {
 
   function renderResourceItem({ item }: { item: Resource & { distance?: number } }) {
     const tintColor = Colors[colorScheme ?? 'light'].tint;
+    const distanceUnit = userProfile?.usesMetric ? 'km' : 'mi';
+
     return (
       <TouchableOpacity
         style={styles.resourceCard}
@@ -141,7 +199,7 @@ export default function ResourcesScreen() {
               <View style={[styles.distanceContainer, { borderColor: tintColor }]}>
                 <FontAwesome name="location-arrow" size={14} color={tintColor} style={styles.distanceIcon} />
                 <ThemedText style={[styles.distanceText, { color: tintColor }]}>
-                  {item.distance.toFixed(1)} km away
+                  {item.distance.toFixed(1)} {distanceUnit} away
                 </ThemedText>
               </View>
             )}
