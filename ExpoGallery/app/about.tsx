@@ -5,12 +5,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { error } from '@/utils/logger';
-import appConfig from '@/app.json';
+import appConfig from '../app.config.js';
 
 // Current version of the app
 const APP_VERSION = appConfig.expo.version;
-const APP_BUILD_SHA: string = '__GIT_SHA__'; // This will be replaced by set-env.js
-
+const APP_BUILD_SHA: string = appConfig.expo.extra.gitSha;
+const APP_BUILD_DATE: string = appConfig.expo.extra.buildDate;
 export default function AboutScreen() {
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [latestBuildSha, setLatestBuildSha] = useState<string | null>(null);
@@ -130,7 +130,7 @@ export default function AboutScreen() {
                 </View>
                 <View style={styles.infoRow}>
                   <ThemedText type="default" style={styles.infoLabel}>Build Date:</ThemedText>
-                  <ThemedText type="default" style={styles.infoValue}>__BUILD_DATE__</ThemedText>
+                  <ThemedText type="default" style={styles.infoValue}>{APP_BUILD_DATE}</ThemedText>
                 </View>
                 {lastChecked && (
                   <View style={styles.infoRow}>
@@ -156,7 +156,7 @@ export default function AboutScreen() {
         </View>
 
         <ThemedText type="default" style={styles.buildInfo}>Build: {APP_BUILD_SHA}</ThemedText>
-        <ThemedText type="default" style={styles.buildInfo}>Date: __BUILD_DATE__</ThemedText>
+        <ThemedText type="default" style={styles.buildInfo}>Date: {APP_BUILD_DATE}</ThemedText>
       </View>
 
       <View style={styles.section}>

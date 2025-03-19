@@ -1,50 +1,77 @@
 import Constants from 'expo-constants';
+import { isDevelopment } from '@/utils/env';
+
+// Define the keys we expect to have in our environment
+type EnvKey = 'googleMapsApiKey' | 'chatApiEndpoint' | 'defaultChatLocation' | 'buildDate' | 'gitSha';
 
 /**
- * Get environment variable from Constants.expoConfig or process.env with fallback
+ * For debugging: Dump values from Constants.expoConfig.extra to help diagnose issues
  */
-const getEnvVariable = (
-  key: string,
-  placeholder: string,
-  fallback: string = '',
-  envPrefix: string = 'EXPO_PUBLIC_'
-): string => {
+function dumpConfigValues() {
+  console.log('Constants.expoConfig:', Constants.expoConfig);
+  console.log('Constants.expoConfig?.extra:', Constants.expoConfig?.extra);
+
+  if (Constants.expoConfig?.extra) {
+    const { extra } = Constants.expoConfig;
+    Object.keys(extra).forEach(key => {
+      const value = extra[key];
+      const displayValue = typeof value === 'string' && key.includes('Key')
+        ? `${value.substring(0, 4)}...`
+        : value;
+      console.log(`- ${key}: ${displayValue}`);
+    });
+  } else {
+    console.log('No extra config values found!');
+  }
+}
+
+/**
+ * Get environment variable from Constants.expoConfig - fails fast if value is missing
+ */
+const getEnvVariable = (key: EnvKey): string => {
+  // Check if we have a config error
+  if (Constants.expoConfig?.extra?.envError) {
+    const errorMsg = `Environment error: ${Constants.expoConfig.extra.error}`;
+    console.error(errorMsg);
+
+    // Debug info
+    dumpConfigValues();
+
+    throw new Error(errorMsg);
+  }
+
   // Try Constants.expoConfig?.extra
   const configValue = Constants.expoConfig?.extra?.[key];
-  if (configValue && configValue !== placeholder) {
+
+  // Log all values in development to help debug
+  if (isDevelopment && !configValue) {
+    console.error(`\n\x1b[43m\x1b[30m ENV DEBUG \x1b[0m Missing value for key: ${key}`);
+    dumpConfigValues();
+  }
+
+  // Check if the value exists and is valid
+  if (configValue &&
+      typeof configValue === 'string' &&
+      !configValue.includes('_PLACEHOLDER') &&
+      configValue !== key.toUpperCase()) {
     return configValue;
   }
 
-  // Try process.env
-  const envKey = `${envPrefix}${key}`;
-  if (process.env[envKey]) {
-    return process.env[envKey] as string;
-  }
-
-  // Fallback with warning
-  console.warn(`${key} not found in environment variables or app.json`);
-  return fallback;
+  // Throw a clear error - no fallbacks
+  const errorMessage = `Environment variable "${key}" is missing or invalid!`;
+  console.error(
+    `\n\x1b[41m\x1b[37m ENVIRONMENT ERROR \x1b[0m\n` +
+    `\x1b[31m${errorMessage}\x1b[0m\n` +
+    `Make sure all required environment variables are defined in .env.local`
+  );
+  throw new Error(errorMessage);
 };
 
-// Retrieve environment variables (ensures build-time injection for web)
-export const GOOGLE_MAPS_API_KEY = getEnvVariable(
-  'googleMapsApiKey',
-  'GOOGLE_MAPS_API_KEY_PLACEHOLDER',
-  ''
-);
+// Retrieve remaining environment variables - will throw if missing
+export const CHAT_API_ENDPOINT = getEnvVariable('chatApiEndpoint');
+export const DEFAULT_CHAT_LOCATION = getEnvVariable('defaultChatLocation');
+export const GOOGLE_MAPS_API_KEY = getEnvVariable('googleMapsApiKey');
 
-// Chat API endpoint from environment
-export const CHAT_API_ENDPOINT = getEnvVariable(
-  'chatApiEndpoint',
-  'CHAT_API_ENDPOINT_PLACEHOLDER',
-  'http://54.147.61.224:5000/chat'
-);
-
-// Default geohash location for chat service
-export const DEFAULT_CHAT_LOCATION = getEnvVariable(
-  'defaultChatLocation',
-  'DEFAULT_CHAT_LOCATION_PLACEHOLDER',
-  '9yzey5mxsb'
-);
-
-// Add other environment variables as needed
+// Build metadata - these will also throw if missing
+export const BUILD_DATE = getEnvVariable('buildDate');
+export const GIT_SHA = getEnvVariable('gitSha');
