@@ -9,6 +9,17 @@ let mostRecentLocation: LocationObject | null = null;
 let watchId: number | null = null;
 
 /**
+ * Geolocation API options for position watching and retrieval
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
+ */
+const GEOLOCATION_OPTIONS: PositionOptions = {
+  enableHighAccuracy: true,
+  maximumAge: 60 * 60 * 1000, // 1 hour
+  timeout: 60 * 1000 // 1 minute
+};
+
+/**
  * Check if geolocation is available in this browser
  * @returns boolean indicating if geolocation is supported
  */
@@ -88,17 +99,13 @@ const deviceLocationService: DeviceLocationService = {
             (err) => {
               error('Error watching position:', err);
             },
-            {
-              enableHighAccuracy: false, // equivalent to lower accuracy
-              maximumAge: 10000, // 10 seconds
-              timeout: 30000 // 30 seconds
-            }
+            GEOLOCATION_OPTIONS
           );
 
           info('Location watching initialized');
         },
         (err) => {
-          warn(`Geolocation permission denied or error: ${err.message}`);
+          warn(`Geolocation permission denied or error: ${err.message}`, err);
         }
       );
     } catch (e) {
@@ -138,11 +145,7 @@ const deviceLocationService: DeviceLocationService = {
           error('Error getting current position:', err);
           resolve(null);
         },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 60 * 60 * 1000, // 1 hour
-          timeout: 60 * 1000 // 1 minute
-        }
+        GEOLOCATION_OPTIONS
       );
     });
   },

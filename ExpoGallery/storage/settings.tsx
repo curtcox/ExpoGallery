@@ -24,7 +24,7 @@ export const defaultSettings: Settings = {
   services: {
     chat: {
       external: true,
-      timeout: 30000
+      timeout: 20000
     }
   }
 };

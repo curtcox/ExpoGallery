@@ -10,6 +10,7 @@ export interface LogEntry {
 }
 
 export const LOG: LogEntry[] = [];
+const MAX_LOG_SIZE = 1000;
 
 // Just like in alerts.tsx, but this way there is no import cycle
 const handlePress = (buttonType: string) => {
@@ -82,39 +83,44 @@ export interface ItemProps {
   object?: any;
 }
 
-export function info(message: string, object?: any) {
-  console.log(message);
+function addLogEntry(entry: Omit<LogEntry, 'index' | 'timestamp'>) {
   LOG.push({
     index: LOG.length,
     timestamp: Date.now(),
+    ...entry
+  });
+  // Keep only the last MAX_LOG_SIZE entries
+  if (LOG.length > MAX_LOG_SIZE) {
+    LOG.splice(0, LOG.length - MAX_LOG_SIZE);
+  }
+  notifySubscribers();
+}
+
+export function info(message: string, object?: any) {
+  console.log(message);
+  addLogEntry({
     message,
     level: 'info',
     object
   });
-  notifySubscribers();
 }
 
-export function warn(message: string) {
+export function warn(message: string, error?: any) {
   console.warn(message);
-  LOG.push({
-    index: LOG.length,
-    timestamp: Date.now(),
+  addLogEntry({
     message,
-    level: 'warn'
+    level: 'warn',
+    error
   });
-  notifySubscribers();
 }
 
 export function error(message: string, error: any) {
   console.error(message, error);
-  LOG.push({
-    index: LOG.length,
-    timestamp: Date.now(),
+  addLogEntry({
     message,
     level: 'error',
     error
   });
-  notifySubscribers();
   if (DEBUG) {
     oneButtonAlert(message);
   }

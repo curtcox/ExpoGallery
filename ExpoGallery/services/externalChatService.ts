@@ -2,7 +2,7 @@ import { ChatContext } from './localBot';
 import { ERROR_MESSAGES, ChatServiceError } from './chatService';
 import { latLongToGeohash } from './location';
 import { CHAT_API_ENDPOINT, DEFAULT_CHAT_LOCATION } from '../constants/Env';
-
+import { error, warn } from '@/utils/index';
 // Re-export the API endpoint for tests
 export { CHAT_API_ENDPOINT };
 
@@ -32,6 +32,7 @@ export const fetchExternal = async (userMessage: string, context: ChatContext): 
     });
 
     if (!response.ok) {
+      warn(`API request failed with status ${response.status} accessing [${CHAT_API_ENDPOINT}]`);
       throw new ChatServiceError(`API request failed with status ${response.status}`, 'API_ERROR');
     }
 
@@ -40,6 +41,7 @@ export const fetchExternal = async (userMessage: string, context: ChatContext): 
     // The API returns a 'message' field in the response
     return data.message || ERROR_MESSAGES.GENERAL;
   } catch (e) {
+    error(`Error fetching from [${CHAT_API_ENDPOINT}]`,e);
     if (e instanceof ChatServiceError) {
       throw e;
     }
