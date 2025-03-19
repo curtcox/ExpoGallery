@@ -162,32 +162,3 @@ export const generateBotResponse = async (
     }
   }
 };
-
-/**
- * Get response text from either external service or local bot
- * @param userMessage The message from the user
- * @param location The user's current location (if available)
- * @returns A promise that resolves to the bot's response
- * @throws ChatServiceError if both external and local bot fail
- */
-const getResponseText = async (userMessage: string, location: LocationObject | null): Promise<string> => {
-  try {
-    const context: ChatContext = {
-      timestamp: new Date(),
-      location: location ? {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      } : undefined,
-      userProfile: profile,
-      resources: await getAllResources(),
-    };
-
-    if (getExternal()) {
-      return fetchExternal(userMessage, context);
-    } else {
-      return localBot(userMessage, context);
-    }
-  } catch (e) {
-    throw new ChatServiceError('Failed to process message', 'GENERAL');
-  }
-};
