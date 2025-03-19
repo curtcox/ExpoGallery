@@ -4,6 +4,7 @@ import { fetchExternal } from '../externalChatService';
 import { localBot } from '../localBot';
 import { getCurrentLocation } from '../location';
 import { getAllResources } from '../data';
+import { LocationObject } from 'expo-location';
 
 // Mock all dependencies
 jest.mock('../externalChatService');
@@ -23,23 +24,24 @@ describe('Chat Service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Default mock implementations
-    (getCurrentLocation as jest.Mock).mockResolvedValue({
+    // Type assertion to any to bypass TS errors in tests
+    // While not ideal, this allows the tests to run
+    (getCurrentLocation as any).mockResolvedValue({
       coords: {
         latitude: 37.7749,
         longitude: -122.4194,
       },
     });
 
-    (fetchExternal as jest.Mock).mockResolvedValue('External bot response');
-    (localBot as jest.Mock).mockReturnValue('Local bot response');
-    (getAllResources as jest.Mock).mockResolvedValue([]);
+    (fetchExternal as any).mockResolvedValue('External bot response');
+    (localBot as any).mockReturnValue('Local bot response');
+    (getAllResources as any).mockResolvedValue([]);
   });
 
   describe('processUserMessage', () => {
     it('should use a configurable timeout for testing', async () => {
       // Setup: External service will take a long time to respond
-      (fetchExternal as jest.Mock).mockImplementation(() => new Promise(resolve => {
+      (fetchExternal as any).mockImplementation(() => new Promise(resolve => {
         setTimeout(() => resolve('External response'), 500);
       }));
 
@@ -62,7 +64,7 @@ describe('Chat Service', () => {
 
     it('should fall back to local bot if external service fails', async () => {
       // Setup: External service will throw an error
-      (fetchExternal as jest.Mock).mockRejectedValue(new Error('External service error'));
+      (fetchExternal as any).mockRejectedValue(new Error('External service error'));
 
       const result = await processUserMessage('Hello');
 
@@ -73,7 +75,7 @@ describe('Chat Service', () => {
 
     it('should fall back to local bot if external service times out', async () => {
       // Setup: External service will take too long to respond
-      (fetchExternal as jest.Mock).mockImplementation(() => new Promise(resolve => {
+      (fetchExternal as any).mockImplementation(() => new Promise(resolve => {
         setTimeout(() => resolve('External response'), 100);
       }));
 
@@ -85,9 +87,9 @@ describe('Chat Service', () => {
 
     it('should return an error message if both external and local bot fail', async () => {
       // Setup: Both services will fail
-      (fetchExternal as jest.Mock).mockRejectedValue(new Error('External service error'));
+      (fetchExternal as any).mockRejectedValue(new Error('External service error'));
 
-      (localBot as jest.Mock).mockImplementation(() => {
+      (localBot as any).mockImplementation(() => {
         throw new Error('Local bot error');
       });
 
@@ -100,7 +102,7 @@ describe('Chat Service', () => {
 
     it('should handle location errors gracefully', async () => {
       // Setup: Location service will fail
-      (getCurrentLocation as jest.Mock).mockRejectedValue(
+      (getCurrentLocation as any).mockRejectedValue(
         new Error('Location error')
       );
 
@@ -115,12 +117,12 @@ describe('Chat Service', () => {
   describe('generateBotResponse', () => {
     it('should timeout with custom duration and fall back to local bot', async () => {
       // External service will take too long
-      (fetchExternal as jest.Mock).mockImplementation(() =>
+      (fetchExternal as any).mockImplementation(() =>
         new Promise(resolve => setTimeout(() => resolve('too late'), 100))
       );
 
       // Local bot returns a response
-      (localBot as jest.Mock).mockReturnValue('Local bot response');
+      (localBot as any).mockReturnValue('Local bot response');
 
       // Use a very short timeout for testing (should fall back to local bot)
       const response = await generateBotResponse('Hello', null, 10);
@@ -129,12 +131,12 @@ describe('Chat Service', () => {
 
     it('should throw a timeout error if both external and local bot fail', async () => {
       // External service will take too long
-      (fetchExternal as jest.Mock).mockImplementation(() =>
+      (fetchExternal as any).mockImplementation(() =>
         new Promise(resolve => setTimeout(() => resolve('too late'), 100))
       );
 
       // Local bot also fails
-      (localBot as jest.Mock).mockImplementation(() => {
+      (localBot as any).mockImplementation(() => {
         throw new Error('Local bot error');
       });
 
@@ -156,12 +158,12 @@ describe('Chat Service', () => {
 
     it('should rethrow ChatServiceError with correct type', async () => {
       // Setup an API error
-      (fetchExternal as jest.Mock).mockRejectedValue(
+      (fetchExternal as any).mockRejectedValue(
         new ChatServiceError('API error', 'API_ERROR')
       );
 
       // Local bot also fails
-      (localBot as jest.Mock).mockImplementation(() => {
+      (localBot as any).mockImplementation(() => {
         throw new Error('Local bot error');
       });
 

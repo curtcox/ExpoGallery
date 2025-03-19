@@ -6,6 +6,12 @@ import { ERROR_MESSAGES } from '../chatService';
 // Mock global fetch
 global.fetch = jest.fn();
 
+// Mock the logger functions
+jest.mock('@/utils/index', () => ({
+  error: jest.fn(),
+  warn: jest.fn(),
+}));
+
 describe('externalChatService', () => {
   // Reset mocks between tests
   beforeEach(() => {
