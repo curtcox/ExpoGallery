@@ -10,7 +10,7 @@ import { settings } from '@/storage/settings';
 
 // Get values from settings with fallbacks
 const getExternal = () => settings.services?.chat?.external ?? true;
-const getResponseTimeout = () => settings.services?.chat?.timeout ?? 30000;
+const getResponseTimeout = () => settings.services?.chat?.timeout ?? 20000;
 
 // Error messages
 export const ERROR_MESSAGES = {
