@@ -45,6 +45,7 @@ jobs:
       - name: Build Expo web
         run: |
           cd ExpoGallery
+          npm run predeploy
           npx expo export --platform web
           touch dist/.nojekyll
         env:
