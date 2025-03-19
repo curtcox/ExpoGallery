@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { StyleSheet, FlatList, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, FlatList, View, TouchableOpacity, ScrollView, Text } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { router } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { getAllResources, Resource } from '@/services/data';
+import deviceLocationService from '@/services/deviceLocation.native';
+import { calculateDistance } from '@/services/location';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function ResourcesScreen() {
   const colorScheme = useColorScheme();
   const resources = getAllResources();
+  const [userLocation, setUserLocation] = useState(deviceLocationService.getLastKnownLocation());
 
   const topCategories = useMemo(() => getTopCategoriesByFrequency(resources), [resources]);
 
@@ -16,10 +20,56 @@ export default function ResourcesScreen() {
     new Set(topCategories)
   );
 
-  const filteredResources = useMemo(() =>
-    filterResourcesByCategories(resources, selectedCategories),
-    [resources, selectedCategories]
-  );
+  // Calculate distances and sort resources
+  const filteredResources = useMemo(() => {
+    const resourcesWithCategories = filterResourcesByCategories(resources, selectedCategories);
+
+    // Add distance from user if location is available
+    if (userLocation) {
+      try {
+        return resourcesWithCategories.map(resource => ({
+          ...resource,
+          distance: calculateDistance(
+            { latitude: userLocation.coords.latitude, longitude: userLocation.coords.longitude },
+            { latitude: resource.location.latitude, longitude: resource.location.longitude }
+          ) / 1000 // Convert from meters to kilometers
+        }))
+        .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+      } catch (e) {
+        console.error('Error calculating distances:', e);
+        return resourcesWithCategories;
+      }
+    }
+
+    return resourcesWithCategories;
+  }, [resources, selectedCategories, userLocation]);
+
+  // Initialize location services and set up listener
+  useEffect(() => {
+    let mounted = true;
+
+    // Initialize location watching in the background
+    const initializeLocation = async () => {
+      try {
+        await deviceLocationService.initLocationWatching();
+
+        // Get the current location (which may update the cached location)
+        const location = await deviceLocationService.getCurrentLocation();
+        if (location && mounted) {
+          setUserLocation(location);
+        }
+      } catch (e) {
+        console.error('Error initializing location:', e);
+      }
+    };
+
+    initializeLocation();
+
+    return () => {
+      mounted = false;
+      deviceLocationService.stopLocationWatching();
+    };
+  }, []);
 
   function getTopCategoriesByFrequency(resources: Resource[]): string[] {
     const categoryCountMap: Record<string, number> = {};
@@ -61,7 +111,8 @@ export default function ResourcesScreen() {
     router.push(`/resource?id=${id}`);
   }
 
-  function renderResourceItem({ item }: { item: Resource }) {
+  function renderResourceItem({ item }: { item: Resource & { distance?: number } }) {
+    const tintColor = Colors[colorScheme ?? 'light'].tint;
     return (
       <TouchableOpacity
         style={styles.resourceCard}
@@ -72,15 +123,29 @@ export default function ResourcesScreen() {
             <ThemedText type="subtitle" style={styles.resourceName}>{item.name}</ThemedText>
             <View style={[
               styles.categoryBadge,
-              { backgroundColor: Colors[colorScheme ?? 'light'].tint }
+              { backgroundColor: tintColor }
             ]}>
               <ThemedText style={styles.categoryText}>{item.category}</ThemedText>
             </View>
           </View>
 
           <View style={styles.cardDetails}>
-            <ThemedText style={styles.detailText}>{item.location.address}</ThemedText>
+            <View style={styles.locationRow}>
+              <FontAwesome name="map-marker" size={16} color={tintColor} style={styles.locationIcon} />
+              <ThemedText style={styles.detailText}>{item.location.address}</ThemedText>
+            </View>
+
             <ThemedText style={styles.detailText}>{item.hours}</ThemedText>
+
+            {item.distance !== undefined && (
+              <View style={[styles.distanceContainer, { borderColor: tintColor }]}>
+                <FontAwesome name="location-arrow" size={14} color={tintColor} style={styles.distanceIcon} />
+                <ThemedText style={[styles.distanceText, { color: tintColor }]}>
+                  {item.distance.toFixed(1)} km away
+                </ThemedText>
+              </View>
+            )}
+
             <ThemedText style={styles.detailText} numberOfLines={2}>
               {item.details}
             </ThemedText>
@@ -128,7 +193,15 @@ export default function ResourcesScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="title" style={styles.screenTitle}>Resources</ThemedText>
+      <View style={styles.screenHeader}>
+        <ThemedText type="title" style={styles.screenTitle}>Resources</ThemedText>
+        {userLocation ? (
+          <View style={styles.locationBadge}>
+            <FontAwesome name="location-arrow" size={12} color="#fff" style={styles.locationBadgeIcon} />
+            <Text style={styles.locationBadgeText}>Sorted by distance</Text>
+          </View>
+        ) : null}
+      </View>
 
       <View style={styles.filterSection}>
         <ThemedText style={styles.filterTitle}>Filter by category:</ThemedText>
@@ -156,8 +229,30 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  screenTitle: {
+  screenHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
+  },
+  screenTitle: {
+    marginBottom: 0,
+  },
+  locationBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
+  },
+  locationBadgeIcon: {
+    marginRight: 4,
+  },
+  locationBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   filterSection: {
     marginBottom: 16,
@@ -227,8 +322,33 @@ const styles = StyleSheet.create({
   cardDetails: {
     marginBottom: 10,
   },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  locationIcon: {
+    marginRight: 6,
+  },
   detailText: {
     marginBottom: 4,
+  },
+  distanceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    alignSelf: 'flex-start',
+    marginVertical: 6,
+  },
+  distanceIcon: {
+    marginRight: 4,
+  },
+  distanceText: {
+    fontWeight: '600',
+    fontSize: 13,
   },
   cardFooter: {
     marginTop: 8,

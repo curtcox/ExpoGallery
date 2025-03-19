@@ -48,6 +48,12 @@ export interface DeviceLocationService {
   getCurrentLocation(): Promise<LocationObject | null>;
 
   /**
+   * Get the last known location immediately without blocking
+   * This is useful for UI operations that need location data right away
+   */
+  getLastKnownLocation(): LocationObject | null;
+
+  /**
    * Stop watching for location updates
    */
   stopLocationWatching(): void;

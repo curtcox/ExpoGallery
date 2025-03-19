@@ -151,6 +151,14 @@ const deviceLocationService: DeviceLocationService = {
   },
 
   /**
+   * Gets the last known location without blocking or initializing watching
+   * @returns The most recent LocationObject or null if no location has been cached
+   */
+  getLastKnownLocation(): LocationObject | null {
+    return mostRecentLocation;
+  },
+
+  /**
    * Cleans up the location subscription
    * Should be called when the app is closing or when location watching is no longer needed
    */
