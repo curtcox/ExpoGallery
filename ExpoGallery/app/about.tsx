@@ -11,6 +11,7 @@ import appConfig from '../app.config.js';
 const APP_VERSION = appConfig.expo.version;
 const APP_BUILD_SHA: string = appConfig.expo.extra.gitSha;
 const APP_BUILD_DATE: string = appConfig.expo.extra.buildDate;
+
 export default function AboutScreen() {
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [latestBuildSha, setLatestBuildSha] = useState<string | null>(null);
@@ -79,129 +80,137 @@ export default function AboutScreen() {
     APP_BUILD_SHA === 'development' || latestBuildSha === APP_BUILD_SHA
   );
 
+  const renderAppHeader = () => (
+    <View style={styles.header}>
+      <View style={styles.logoContainer}>
+        <Ionicons name="cube" size={60} color="#2196F3" />
+      </View>
+      <ThemedText type="title" style={styles.appName}>ExpoGallery</ThemedText>
+      <ThemedText type="default" style={styles.version}>Version {APP_VERSION}</ThemedText>
+
+      {renderVersionCheck()}
+
+      <ThemedText type="default" style={styles.buildInfo}>Build: {APP_BUILD_SHA}</ThemedText>
+      <ThemedText type="default" style={styles.buildInfo}>Date: {APP_BUILD_DATE}</ThemedText>
+    </View>
+  );
+
+  const renderVersionCheck = () => (
+    <View style={styles.versionCheckContainer}>
+      {isCheckingVersion ? (
+        <View style={styles.versionCheck}>
+          <ActivityIndicator size="small" color="#2196F3" />
+          <ThemedText type="default" style={styles.versionCheckText}>Checking for updates...</ThemedText>
+        </View>
+      ) : versionCheckError ? (
+        <ThemedText type="default" style={styles.versionError}>{versionCheckError}</ThemedText>
+      ) : latestVersion ? (
+        renderVersionInfo()
+      ) : null}
+    </View>
+  );
+
+  const renderVersionInfo = () => (
+    <View style={styles.versionInfoContainer}>
+      {isUpToDate ? (
+        <ThemedText type="default" style={styles.upToDate}>
+          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" /> Build up to date
+        </ThemedText>
+      ) : (
+        <ThemedText type="default" style={styles.updateAvailable}>
+          <Ionicons name="arrow-up-circle" size={16} color="#FFC107" /> Update available: {latestVersion}
+        </ThemedText>
+      )}
+
+      <View style={styles.infoGrid}>
+        {renderVersionInfoRow('Current Version:', APP_VERSION)}
+        {renderVersionInfoRow('Latest Version:', latestVersion)}
+        {renderVersionInfoRow('Current Build:', APP_BUILD_SHA)}
+        {renderVersionInfoRow('Latest Build:', latestBuildSha)}
+        {renderVersionInfoRow('Build Date:', APP_BUILD_DATE)}
+        {lastChecked && renderVersionInfoRow('Last Checked:', lastChecked.toLocaleTimeString())}
+      </View>
+
+      {!isUpToDate && (
+        <TouchableOpacity
+          style={styles.linkButton}
+          onPress={() => router.push('/reset')}
+        >
+          <View style={styles.linkContent}>
+            <ThemedText type="default" style={styles.linkText}>Reset Screen</ThemedText>
+            <Ionicons name="arrow-forward" size={16} color="#2196F3" style={styles.linkIcon} />
+          </View>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  const renderVersionInfoRow = (label: string, value: string | null) => (
+    <View style={styles.infoRow}>
+      <ThemedText type="default" style={styles.infoLabel}>{label}</ThemedText>
+      <ThemedText type="default" style={styles.infoValue}>{value}</ThemedText>
+    </View>
+  );
+
+  const renderAboutSection = () => (
+    <View style={styles.section}>
+      <ThemedText type="subtitle">About ExpoGallery</ThemedText>
+      <ThemedText type="default" style={styles.description}>
+        ExpoGallery is a showcase of React Native and Expo features, demonstrating
+        options for mobile app development. This app serves as both
+        a reference and a playground for developers.
+      </ThemedText>
+    </View>
+  );
+
+  const renderFeaturesSection = () => (
+    <View style={styles.section}>
+      <ThemedText type="subtitle">Features</ThemedText>
+      {renderFeatureItem('Customizable UI levels')}
+      {renderFeatureItem('Adaptive tab navigation')}
+    </View>
+  );
+
+  const renderFeatureItem = (text: string) => (
+    <View style={styles.featureItem}>
+      <Ionicons name="checkmark-circle" size={24} color="#2196F3" style={styles.featureIcon} />
+      <ThemedText type="default" style={styles.featureText}>
+        {text}
+      </ThemedText>
+    </View>
+  );
+
+  const renderContactSection = () => (
+    <View style={styles.section}>
+      <ThemedText type="subtitle">Contact & Support</ThemedText>
+      <TouchableOpacity
+        style={styles.linkButton}
+        onPress={() => Linking.openURL('https://github.com/curtcox/ExpoGallery')}
+      >
+        <View style={styles.linkContent}>
+          <Ionicons name="logo-github" size={24} color="#2196F3" style={styles.linkIcon} />
+          <ThemedText type="default">GitHub Repository</ThemedText>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderFooter = () => (
+    <View style={styles.footer}>
+      <ThemedText type="default" style={styles.copyright}>
+        © {new Date().getFullYear()} ExpoGallery. All rights reserved.
+      </ThemedText>
+    </View>
+  );
+
   return (
     <ScrollView style={styles.container}>
       <Stack.Screen options={{ title: 'About', headerLargeTitle: true }} />
-
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Ionicons name="cube" size={60} color="#2196F3" />
-        </View>
-        <ThemedText type="title" style={styles.appName}>ExpoGallery</ThemedText>
-        <ThemedText type="default" style={styles.version}>Version {APP_VERSION}</ThemedText>
-
-        {/* Version check status */}
-        <View style={styles.versionCheckContainer}>
-          {isCheckingVersion ? (
-            <View style={styles.versionCheck}>
-              <ActivityIndicator size="small" color="#2196F3" />
-              <ThemedText type="default" style={styles.versionCheckText}>Checking for updates...</ThemedText>
-            </View>
-          ) : versionCheckError ? (
-            <ThemedText type="default" style={styles.versionError}>{versionCheckError}</ThemedText>
-          ) : latestVersion ? (
-            <View style={styles.versionInfoContainer}>
-              {isUpToDate ? (
-                <ThemedText type="default" style={styles.upToDate}>
-                  <Ionicons name="checkmark-circle" size={16} color="#4CAF50" /> Build up to date
-                </ThemedText>
-              ) : (
-                <ThemedText type="default" style={styles.updateAvailable}>
-                  <Ionicons name="arrow-up-circle" size={16} color="#FFC107" /> Update available: {latestVersion}
-                </ThemedText>
-              )}
-
-              <View style={styles.infoGrid}>
-                <View style={styles.infoRow}>
-                  <ThemedText type="default" style={styles.infoLabel}>Current Version:</ThemedText>
-                  <ThemedText type="default" style={styles.infoValue}>{APP_VERSION}</ThemedText>
-                </View>
-                <View style={styles.infoRow}>
-                  <ThemedText type="default" style={styles.infoLabel}>Latest Version:</ThemedText>
-                  <ThemedText type="default" style={styles.infoValue}>{latestVersion}</ThemedText>
-                </View>
-                <View style={styles.infoRow}>
-                  <ThemedText type="default" style={styles.infoLabel}>Current Build:</ThemedText>
-                  <ThemedText type="default" style={styles.infoValue}>{APP_BUILD_SHA}</ThemedText>
-                </View>
-                <View style={styles.infoRow}>
-                  <ThemedText type="default" style={styles.infoLabel}>Latest Build:</ThemedText>
-                  <ThemedText type="default" style={styles.infoValue}>{latestBuildSha}</ThemedText>
-                </View>
-                <View style={styles.infoRow}>
-                  <ThemedText type="default" style={styles.infoLabel}>Build Date:</ThemedText>
-                  <ThemedText type="default" style={styles.infoValue}>{APP_BUILD_DATE}</ThemedText>
-                </View>
-                {lastChecked && (
-                  <View style={styles.infoRow}>
-                    <ThemedText type="default" style={styles.infoLabel}>Last Checked:</ThemedText>
-                    <ThemedText type="default" style={styles.infoValue}>{lastChecked.toLocaleTimeString()}</ThemedText>
-                  </View>
-                )}
-              </View>
-
-              {!isUpToDate && (
-                <TouchableOpacity
-                  style={styles.linkButton}
-                  onPress={() => router.push('/reset')}
-                >
-                  <View style={styles.linkContent}>
-                    <ThemedText type="default" style={styles.linkText}>Reset Screen</ThemedText>
-                    <Ionicons name="arrow-forward" size={16} color="#2196F3" style={styles.linkIcon} />
-                  </View>
-                </TouchableOpacity>
-              )}
-            </View>
-          ) : null}
-        </View>
-
-        <ThemedText type="default" style={styles.buildInfo}>Build: {APP_BUILD_SHA}</ThemedText>
-        <ThemedText type="default" style={styles.buildInfo}>Date: {APP_BUILD_DATE}</ThemedText>
-      </View>
-
-      <View style={styles.section}>
-        <ThemedText type="subtitle">About ExpoGallery</ThemedText>
-        <ThemedText type="default" style={styles.description}>
-          ExpoGallery is a showcase of React Native and Expo features, demonstrating
-          options for mobile app development. This app serves as both
-          a reference and a playground for developers.
-        </ThemedText>
-      </View>
-
-      <View style={styles.section}>
-        <ThemedText type="subtitle">Features</ThemedText>
-        <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={24} color="#2196F3" style={styles.featureIcon} />
-          <ThemedText type="default" style={styles.featureText}>
-            Customizable UI levels
-          </ThemedText>
-        </View>
-        <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={24} color="#2196F3" style={styles.featureIcon} />
-          <ThemedText type="default" style={styles.featureText}>
-            Adaptive tab navigation
-          </ThemedText>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <ThemedText type="subtitle">Contact & Support</ThemedText>
-        <TouchableOpacity
-          style={styles.linkButton}
-          onPress={() => Linking.openURL('https://github.com/curtcox/ExpoGallery')}
-        >
-          <View style={styles.linkContent}>
-            <Ionicons name="logo-github" size={24} color="#2196F3" style={styles.linkIcon} />
-            <ThemedText type="default">GitHub Repository</ThemedText>
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.footer}>
-        <ThemedText type="default" style={styles.copyright}>
-          © {new Date().getFullYear()} ExpoGallery. All rights reserved.
-        </ThemedText>
-      </View>
+      {renderAppHeader()}
+      {renderAboutSection()}
+      {renderFeaturesSection()}
+      {renderContactSection()}
+      {renderFooter()}
     </ScrollView>
   );
 }
