@@ -10,7 +10,7 @@ const copy = `# h1 Heading 8-)
 This is normal text
 `;
 
-const App: () => React$Node = () => {
+const App: () => React.ReactNode = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
