@@ -10,6 +10,7 @@ export interface Profile {
   age: number;
   gender: string;
   privateFields: string[];
+  usesMetric: boolean;
 }
 
 export const defaultProfile: Profile = {
@@ -22,6 +23,7 @@ export const defaultProfile: Profile = {
   age: 0,
   gender: '',
   privateFields: [],
+  usesMetric: false,
 };
 
 // Current profile state

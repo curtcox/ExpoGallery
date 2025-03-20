@@ -18,7 +18,7 @@ export default function ProfileScreen() {
     return unsubscribe;
   }, []);
 
-  const handleChange = (field: keyof Profile, value: string | number) => {
+  const handleChange = (field: keyof Profile, value: string | number | boolean) => {
     setProfileData(prev => ({
       ...prev,
       [field]: value
@@ -63,7 +63,7 @@ export default function ProfileScreen() {
     </TouchableOpacity>
   );
 
-  const renderField = (label: string, field: keyof Profile, type: 'text' | 'number' | 'gender' = 'text') => {
+  const renderField = (label: string, field: keyof Profile, type: 'text' | 'number' | 'gender' | 'measurement' = 'text') => {
     const isPrivate = profileData.privateFields.includes(field);
 
     const privacyToggle = (
@@ -82,6 +82,19 @@ export default function ProfileScreen() {
 
     // For view mode
     if (!isEditing) {
+      if (type === 'measurement') {
+        return (
+          <View style={styles.fieldContainer}>
+            <ThemedText type="subtitle" style={styles.label}>{label}</ThemedText>
+            <View style={styles.valueContainer}>
+              <ThemedText type="default" style={styles.value}>
+                {profileData.usesMetric ? 'Metric' : 'Imperial'}
+              </ThemedText>
+            </View>
+          </View>
+        );
+      }
+
       return (
         <View style={styles.fieldContainer}>
           <ThemedText type="subtitle" style={styles.label}>{label}</ThemedText>
@@ -119,6 +132,25 @@ export default function ProfileScreen() {
               </Picker>
             </View>
             {privacyToggle}
+          </View>
+        </View>
+      );
+    }
+
+    if (type === 'measurement') {
+      return (
+        <View style={styles.fieldContainer}>
+          <ThemedText type="subtitle" style={styles.label}>{label}</ThemedText>
+          <View style={styles.valueContainer}>
+            <View style={styles.inputContainer}>
+              <Switch
+                value={profileData.usesMetric}
+                onValueChange={(value) => handleChange('usesMetric', value)}
+              />
+            </View>
+            <ThemedText type="default" style={{marginLeft: 8}}>
+              {profileData.usesMetric ? 'Metric (km, kg, °C)' : 'Imperial (mi, lb, °F)'}
+            </ThemedText>
           </View>
         </View>
       );
@@ -172,6 +204,7 @@ export default function ProfileScreen() {
           {renderField('State', 'state')}
           {renderField('Age', 'age', 'number')}
           {renderField('Gender', 'gender', 'gender')}
+          {renderField('Measurement System', 'usesMetric', 'measurement')}
         </View>
 
         <View style={styles.buttonContainer}>
