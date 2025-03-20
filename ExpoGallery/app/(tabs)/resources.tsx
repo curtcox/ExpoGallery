@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, FlatList, View, TouchableOpacity, ScrollView, Text } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { router } from 'expo-router';
@@ -10,6 +10,7 @@ import { calculateDistance } from '@/services/location';
 import { FontAwesome } from '@expo/vector-icons';
 import { subscribeToProfileChanges, Profile } from '@/storage/profile';
 import { error, warn } from '@/utils/index';
+import { useFocusEffect } from '@react-navigation/native';
 
 /**
  * Convert a distance from meters to the user's preferred unit (kilometers or miles)
@@ -56,6 +57,21 @@ function sortedByPreferredDistance(
   .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
 }
 
+/**
+ * Refreshes the user's location using the device location service
+ * @param setLocationFn Function to update the location state
+ */
+async function refreshUserLocation(setLocationFn: (location: any) => void) {
+  try {
+    const currentLocation = await deviceLocationService.getCurrentLocation();
+    if (currentLocation) {
+      setLocationFn(currentLocation);
+    }
+  } catch (e) {
+    error('Error getting current location on focus:', e);
+  }
+}
+
 export default function ResourcesScreen() {
   const colorScheme = useColorScheme();
   const resources = getAllResources();
@@ -76,6 +92,12 @@ export default function ResourcesScreen() {
 
     return unsubscribe;
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshUserLocation(setUserLocation);
+    }, [])
+  );
 
   // Calculate distances and sort resources
   const filteredResources = useMemo(() => {
