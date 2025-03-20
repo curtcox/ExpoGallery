@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Linking, ActivityIndicator, Platform } fr
 import { router, Stack } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 import { error } from '@/utils/logger';
 import appConfig from '../app.config.js';
 
@@ -204,14 +204,16 @@ export default function AboutScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: 'About', headerLargeTitle: true }} />
-      {renderAppHeader()}
-      {renderAboutSection()}
-      {renderFeaturesSection()}
-      {renderContactSection()}
-      {renderFooter()}
-    </ScrollView>
+    <GestureHandlerRootView>
+      <ScrollView style={styles.container}>
+        <Stack.Screen options={{ title: 'About', headerLargeTitle: true }} />
+        {renderAppHeader()}
+        {renderAboutSection()}
+        {renderFeaturesSection()}
+        {renderContactSection()}
+        {renderFooter()}
+      </ScrollView>
+    </GestureHandlerRootView>
   );
 }
 
