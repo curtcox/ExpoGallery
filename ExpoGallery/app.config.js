@@ -59,7 +59,7 @@ module.exports = {
       buildDate: new Date().toISOString(),
       gitSha: process.env.GITHUB_SHA || 'development',
       "eas": {
-        "projectId": process.env.EAS_PROJECT_ID
+        "projectId": "3e5b317d-5f00-4af1-8c9a-b50a6f6fe2c2"
       }
     }
   }
