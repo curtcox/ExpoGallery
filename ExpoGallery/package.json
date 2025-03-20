@@ -32,6 +32,7 @@
     "@shopify/flash-list": "1.7.3",
     "@teovilla/react-native-web-maps": "0.9.5",
     "dayjs": "^1.11.10",
+    "eas-cli": "^16.0.0",
     "eventemitter3": "^5.0.1",
     "expo": "~52.0.38",
     "expo-asset": "~11.0.4",
@@ -78,7 +79,8 @@
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "recyclerlistview": "^4.2.0"
+    "recyclerlistview": "^4.2.0",
+    "expo-dev-client": "~5.0.14"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
