@@ -7,6 +7,7 @@ export type ExampleItem = {
 };
 
 export const ALL_EXAMPLES: ExampleItem[] = [
+  { name: 'markdown-renderer',  text: 'Markdown Renderer',      icon: 'ntfy',                   url: 'https://github.com/iamacup/react-native-markdown-display' },
   { name: 'ntfy',               text: 'ntfy',                   icon: 'ntfy',                   url: 'https://docs.ntfy.sh/publish/' },
   { name: 'sensors',            text: 'Sensors',                icon: 'pulse-outline',          url: 'versions/latest/sdk/sensors/' },
   { name: 'auth-session',       text: 'Auth Session',           icon: 'auth-session',           url: 'versions/latest/sdk/auth-session/' },
