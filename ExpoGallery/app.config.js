@@ -10,7 +10,10 @@ module.exports = {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.curtcox.ExpoGallery"
+      bundleIdentifier: "com.curtcox.ExpoGallery",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     android: {
       adaptiveIcon: {
@@ -54,7 +57,10 @@ module.exports = {
       chatApiEndpoint: process.env.CHAT_API_ENDPOINT || "CHAT_API_ENDPOINT",
       defaultChatLocation: process.env.DEFAULT_CHAT_LOCATION || "DEFAULT_CHAT_LOCATION",
       buildDate: new Date().toISOString(),
-      gitSha: process.env.GITHUB_SHA || 'development'
+      gitSha: process.env.GITHUB_SHA || 'development',
+      "eas": {
+        "projectId": process.env.EAS_PROJECT_ID
+      }
     }
   }
 };
