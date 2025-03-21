@@ -12,7 +12,8 @@ module.exports = {
       supportsTablet: true,
       bundleIdentifier: "com.curtcox.ExpoGallery",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "This app uses the microphone to record audio."
       }
     },
     android: {
