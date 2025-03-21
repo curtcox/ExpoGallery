@@ -7,6 +7,7 @@ export type ExampleItem = {
 };
 
 export const ALL_EXAMPLES: ExampleItem[] = [
+  { name: 'dom',                text: 'DOM',                    icon: 'dom',                    url: 'https://docs.expo.dev/guides/dom-components/' },
   { name: 'lucide',             text: 'lucide',                 icon: 'lucide',                 url: 'https://lucide.dev/guide/packages/lucide-react-native' },
   { name: 'elevenlabs',         text: 'Eleven Labs',            icon: 'voice',                  url: 'https://elevenlabs.io/docs/conversational-ai/guides/integrations/expo-react-native' },
   { name: 'webview',            text: 'Web View',               icon: 'web-view',               url: 'versions/latest/sdk/webview/' },
