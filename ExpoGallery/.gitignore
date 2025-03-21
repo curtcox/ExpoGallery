@@ -44,4 +44,4 @@ app.json
 .temp-env-values.json
 
 # Build info
-public/version.json
+public/
