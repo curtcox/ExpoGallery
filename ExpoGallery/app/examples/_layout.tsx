@@ -30,6 +30,8 @@ export default function ExampleLayout() {
     ? currentExample.url
     : `https://docs.expo.dev/${currentExample.url}`;
 
+  const srcUrl = `sources//app/examples/${currentExample.name}.tsx`;
+
   return (
     <>
       <View style={styles.header}>
@@ -38,7 +40,10 @@ export default function ExampleLayout() {
       </View>
       <Slot />
       <View style={styles.footer}>
-        <Link href={docUrl as any} style={styles.link}>View Documentation</Link>
+        <View style={styles.footerContent}>
+          <Link href={docUrl as any} style={styles.link}>Documentation</Link>
+          <Link href={srcUrl as any} style={styles.link}>Source</Link>
+        </View>
       </View>
     </>
   );
@@ -61,9 +66,14 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 16,
-    alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
+  },
+  footerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 16,
   },
   link: {
     color: '#3498db',
