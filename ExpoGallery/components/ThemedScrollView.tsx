@@ -38,8 +38,8 @@ export function ThemedScrollView({
     const now = Date.now();
     const timeSinceLastTap = now - lastTapTimeRef.current;
 
-    // Reset counter if more than 1 second passed since last tap
-    if (timeSinceLastTap > 1000) {
+    // Reset counter if more than 1/4 second passed since last tap
+    if (timeSinceLastTap > 250) {
       setTapCount(1);
     } else {
       setTapCount(prevCount => prevCount + 1);
@@ -48,8 +48,8 @@ export function ThemedScrollView({
     // Update last tap time
     lastTapTimeRef.current = now;
 
-    // Navigate to settings after 3 taps
-    if (tapCount === 2) {
+    // Navigate to settings after 6 taps
+    if (tapCount === 6) {
       router.push('/settings');
     }
   };
