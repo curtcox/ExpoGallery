@@ -6,15 +6,6 @@ require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 const appConfigPath = path.join(__dirname, '..', 'app.config.js');
 const versionJsonPath = path.join(__dirname, '..', 'public', 'version.json');
 
-// Get required environment variable
-const getRequiredEnv = (key) => {
-  const value = process.env[key];
-  if (!value || value === 'undefined') {
-    throw new Error(`Required environment variable ${key} is missing!`);
-  }
-  return value;
-};
-
 try {
   // Get app config (this loads the environment variables automatically)
   const appConfig = require(appConfigPath);
