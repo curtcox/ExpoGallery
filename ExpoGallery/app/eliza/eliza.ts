@@ -13,8 +13,6 @@ interface KeywordData {
     rules: Rule[];
 }
 
-type KeywordTuple = [string, number, [string, string[]][]][];
-
 export interface ResponseDetails {
     sanitizedInput: string;
     matchedKeywords: KeywordData[];
