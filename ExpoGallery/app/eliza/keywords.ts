@@ -1,5 +1,5 @@
 export const elizaKeywords: [string, number, [string, string[]][]][] = [
-	["sorry", 0, [
+	["sorry|apologize", 0, [
 		["*", [
 			"Please don't apologize.",
 			"Apologies are not necessary.",
@@ -9,17 +9,7 @@ export const elizaKeywords: [string, number, [string, string[]][]][] = [
 			"There is nothing to worry about"
 		]]
 	]],
-	["apologize", 0, [
-		["*", [
-			"Please don't apologize.",
-			"Apologies are not necessary.",
-			"I've told you that apologies are not required.",
-			"It did not bother me.  Please continue.",
-			"I have no feelings. Do continue.",
-			"There is nothing to worry about"
-		]]
-	]],
-	["remember", 5, [
+	["remember|recall", 5, [
 		["* i remember *", [
 			"Do you often think of (2) ?",
 			"Does thinking of (2) bring anything else to mind ?",
@@ -88,7 +78,7 @@ export const elizaKeywords: [string, number, [string, string[]][]][] = [
 			"Do you believe that dreams have something to do with your problem ?"
 		]]
 	]],
-	["perhaps", 0, [
+	["perhaps|maybe", 0, [
 		["*", [
 			"You don't seem quite certain.",
 			"Why the uncertain tone ?",
@@ -348,7 +338,7 @@ export const elizaKeywords: [string, number, [string, string[]][]][] = [
 			"What are your feelings now ?"
 		]]
 	]],
-	["yes", 0, [
+	["yes|yeah|yup|yep", 0, [
 		["*", [
 			"You seem to be quite positive.",
 			"You are sure.",
@@ -356,7 +346,7 @@ export const elizaKeywords: [string, number, [string, string[]][]][] = [
 			"I understand."
 		]]
 	]],
-	["no", 0, [
+	["no|nope|nah", 0, [
 		["* no one *", [
 			"Are you sure, no one (2) ?",
 			"Surely someone (2) .",

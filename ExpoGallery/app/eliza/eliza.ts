@@ -138,9 +138,15 @@ export class Eliza {
         return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
     }
 
+    private matchesKeyword(input: string, keyword: string): boolean {
+        // Split keyword by | to handle multiple variations
+        const variations = keyword.split('|');
+        return variations.some(variation => input.includes(variation));
+    }
+
     private getDecompositionRules(input: string): KeywordData[] {
         return this.keywords
-            .filter(k => input.includes(k.word))
+            .filter(k => this.matchesKeyword(input, k.word))
             .sort((a, b) => b.priority - a.priority);
     }
 
