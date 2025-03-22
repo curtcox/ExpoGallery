@@ -17,6 +17,57 @@ const isServerSideRendering = () => {
   return Platform.OS === 'web' && typeof window === 'undefined';
 };
 
+const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<{ word: string; priority: number }> }) => {
+  // Sort keywords by length (descending) to handle overlapping matches correctly
+  const sortedKeywords = [...keywords].sort((a, b) => b.word.length - a.word.length);
+
+  // Create segments with highlighting information
+  let segments: Array<{ text: string; priority?: number }> = [{ text }];
+
+  sortedKeywords.forEach(({ word, priority }) => {
+    segments = segments.flatMap(segment => {
+      if (segment.priority !== undefined) return [segment]; // Skip already highlighted segments
+
+      // Use word boundaries (\b) to match whole words only
+      const parts = segment.text.split(new RegExp(`\\b(${word})\\b`, 'gi'));
+      return parts.map(part =>
+        part.toLowerCase() === word.toLowerCase()
+          ? { text: part, priority }
+          : { text: part }
+      );
+    });
+  });
+
+  return (
+    <Text>
+      {segments.map((segment, index) => (
+        <Text
+          key={index}
+          style={segment.priority !== undefined ? {
+            backgroundColor: getPriorityColor(segment.priority),
+            borderRadius: 2,
+            paddingHorizontal: 2,
+          } : undefined}
+        >
+          {segment.text}
+        </Text>
+      ))}
+    </Text>
+  );
+};
+
+const getPriorityColor = (priority: number): string => {
+  // Color scale from high priority (warm colors) to low priority (cool colors)
+  const colors = [
+    '#ffcdd2', // Priority 0 (lowest) - Light red
+    '#fff9c4', // Priority 1 - Light yellow
+    '#c8e6c9', // Priority 2 - Light green
+    '#bbdefb', // Priority 3 - Light blue
+    '#e1bee7', // Priority 4 - Light purple
+  ];
+  return colors[Math.min(priority, colors.length - 1)] || colors[0];
+};
+
 export default function ChatScreen() {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [hasLocation, setHasLocation] = useState<boolean | null>(null);
@@ -146,7 +197,12 @@ export default function ChatScreen() {
       <ScrollView style={styles.detailsPanel}>
         <Text style={styles.detailsTitle}>Response Details</Text>
         <Text style={styles.detailsLabel}>Sanitized Input:</Text>
-        <Text style={styles.detailsText}>{responseDetails.sanitizedInput}</Text>
+        <View style={styles.sanitizedInputContainer}>
+          <HighlightedText
+            text={responseDetails.sanitizedInput}
+            keywords={responseDetails.matchedKeywords}
+          />
+        </View>
 
         <Text style={styles.detailsLabel}>Matched Keywords:</Text>
         <Text style={styles.detailsText}>
@@ -283,5 +339,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#555',
     marginBottom: 4,
+  },
+  sanitizedInputContainer: {
+    marginVertical: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    backgroundColor: 'white',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
 });
