@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Platform, TextStyle, View, StyleSheet } from 'react-native';
+import { Platform, TextStyle, View, StyleSheet, Text, ScrollView } from 'react-native';
 import GiftedChat, { IMessage, MessageTextProps, MessageText } from '@/components/Chat';
 import {
   createBotMessage,
@@ -11,6 +11,7 @@ import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 import { error, info } from '@/utils/logger';
 import { getCurrentLocation } from '@/services/location';
 import LocationIndicator from '@/components/LocationIndicator';
+import { ResponseDetails } from './eliza';
 
 const isServerSideRendering = () => {
   return Platform.OS === 'web' && typeof window === 'undefined';
@@ -19,6 +20,7 @@ const isServerSideRendering = () => {
 export default function ChatScreen() {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [hasLocation, setHasLocation] = useState<boolean | null>(null);
+  const [responseDetails, setResponseDetails] = useState<ResponseDetails | null>(null);
 
   // Log when chat tab is loaded
   useEffect(() => {
@@ -78,22 +80,19 @@ export default function ChatScreen() {
    */
   const onSend = useCallback(async (newMessages: IMessage[] = []) => {
     if (newMessages.length === 0 || !newMessages[0].text.trim()) {
-      return; // Don't process empty messages
+      return;
     }
 
-    // Update local state and storage with user message
     const updatedMessages = GiftedChat.append(messages, newMessages);
     setMessages(updatedMessages);
     await updateMessages(updatedMessages);
 
-    // Process user message through service layer
     const userMessage = newMessages[0].text;
     const result = await processUserMessage(userMessage);
 
-    // Update location state
     setHasLocation(result.hasLocation);
+    setResponseDetails(result.details);
 
-    // Create and add bot response message
     const botMessage = createBotMessage(result.message);
     const messagesWithResponse = GiftedChat.append(updatedMessages, [botMessage]);
     setMessages(messagesWithResponse);
@@ -119,15 +118,47 @@ export default function ChatScreen() {
     return null;
   }
 
+  const renderResponseDetails = () => {
+    if (!responseDetails) return null;
+
+    return (
+      <ScrollView style={styles.detailsPanel}>
+        <Text style={styles.detailsTitle}>Response Details</Text>
+        <Text style={styles.detailsLabel}>Sanitized Input:</Text>
+        <Text style={styles.detailsText}>{responseDetails.sanitizedInput}</Text>
+
+        <Text style={styles.detailsLabel}>Matched Keywords:</Text>
+        <Text style={styles.detailsText}>
+          {responseDetails.matchedKeywords.map(k => `${k.word} (priority: ${k.priority})`).join('\n')}
+        </Text>
+
+        {responseDetails.isGenericResponse ? (
+          <Text style={styles.detailsText}>Using generic response</Text>
+        ) : responseDetails.usedRule ? (
+          <>
+            <Text style={styles.detailsLabel}>Used Rule:</Text>
+            <Text style={styles.detailsText}>Pattern: {responseDetails.usedRule.pattern}</Text>
+            <Text style={styles.detailsText}>Response template: {responseDetails.usedRule.response}</Text>
+          </>
+        ) : (
+          <Text style={styles.detailsText}>Using keyword response without decomposition rule</Text>
+        )}
+      </ScrollView>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <LocationIndicator top={10} right={20} size={14} hasLocation={hasLocation} />
-      <GiftedChat
-        messages={messages}
-        onSend={onSend}
-        user={{ _id: 1 }}
-        renderMessageText={props => <RouteLinker {...props} />}
-      />
+      <View style={styles.chatContainer}>
+        <GiftedChat
+          messages={messages}
+          onSend={onSend}
+          user={{ _id: 1 }}
+          renderMessageText={props => <RouteLinker {...props} />}
+        />
+      </View>
+      {renderResponseDetails()}
     </View>
   );
 }
@@ -135,5 +166,31 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  chatContainer: {
+    flex: 2,
+  },
+  detailsPanel: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+  },
+  detailsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  detailsLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 8,
+    color: '#666',
+  },
+  detailsText: {
+    fontSize: 14,
+    marginTop: 4,
+    marginBottom: 8,
   },
 });

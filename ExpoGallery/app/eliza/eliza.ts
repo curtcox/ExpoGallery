@@ -15,6 +15,16 @@ interface KeywordData {
 
 type KeywordTuple = [string, number, [string, string[]][]][];
 
+export interface ResponseDetails {
+    sanitizedInput: string;
+    matchedKeywords: KeywordData[];
+    usedRule?: {
+        pattern: string;
+        response: string;
+    };
+    isGenericResponse: boolean;
+}
+
 export class Eliza {
     private keywords: KeywordData[];
 
@@ -31,13 +41,21 @@ export class Eliza {
         }));
     }
 
-    public getResponse(input: string): string {
+    public getResponse(input: string): { response: string; details: ResponseDetails } {
         const sanitizedInput = this.sanatize(input);
         const matchedKeywords = this.getDecompositionRules(sanitizedInput);
 
         if (!matchedKeywords || matchedKeywords.length === 0) {
             const genericResponses = this.keywords.find(k => k.word === '*')?.responses || [];
-            return genericResponses[Math.floor(Math.random() * genericResponses.length)];
+            const response = genericResponses[Math.floor(Math.random() * genericResponses.length)];
+            return {
+                response,
+                details: {
+                    sanitizedInput,
+                    matchedKeywords: [],
+                    isGenericResponse: true
+                }
+            };
         }
 
         // Try each keyword in order of priority
@@ -45,12 +63,32 @@ export class Eliza {
             const decompositionRule = this.getDecompositionRule(sanitizedInput, keyword.rules);
             if (decompositionRule) {
                 const reassemblyRule = this.getReassemblyRule(decompositionRule);
-                return this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.pattern);
+                const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.pattern);
+                return {
+                    response,
+                    details: {
+                        sanitizedInput,
+                        matchedKeywords,
+                        usedRule: {
+                            pattern: decompositionRule.pattern,
+                            response: reassemblyRule
+                        },
+                        isGenericResponse: false
+                    }
+                };
             }
         }
 
         // If no decomposition rules match, use the first keyword's response
-        return matchedKeywords[0].responses[Math.floor(Math.random() * matchedKeywords[0].responses.length)];
+        const response = matchedKeywords[0].responses[Math.floor(Math.random() * matchedKeywords[0].responses.length)];
+        return {
+            response,
+            details: {
+                sanitizedInput,
+                matchedKeywords,
+                isGenericResponse: false
+            }
+        };
     }
 
     private sanatize(input: string): string {

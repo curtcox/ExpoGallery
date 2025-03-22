@@ -1,10 +1,11 @@
 import { error } from '@/utils/index';
-import { localBot, ChatContext } from './elizaBot';
+import { localBot, ChatContext, BotResponse } from './elizaBot';
 import { profile } from '@/storage/profile';
 import { getAllResources } from '@/services/data';
 import { LocationObject } from 'expo-location';
 import { getCurrentLocation } from '@/services/location';
 import { IMessage } from '@/components/Chat';
+import { ResponseDetails } from './eliza';
 
 // Error messages
 export const ERROR_MESSAGES = {
@@ -31,6 +32,7 @@ export class ChatServiceError extends Error {
 export interface ChatResult {
   message: string;
   hasLocation: boolean;
+  details: ResponseDetails;
 }
 
 /**
@@ -54,10 +56,11 @@ export const processUserMessage = async (userMessage: string, timeoutDuration?: 
 
   try {
     // Generate bot response with or without location
-    const botResponseText = await generateBotResponse(userMessage, location, timeoutDuration);
+    const response = await generateBotResponse(userMessage, location, timeoutDuration);
     return {
-      message: botResponseText,
-      hasLocation
+      message: response.message,
+      hasLocation,
+      details: response.details
     };
   } catch (e) {
     error('Error in processUserMessage:', e);
@@ -66,14 +69,24 @@ export const processUserMessage = async (userMessage: string, timeoutDuration?: 
     if (e instanceof ChatServiceError) {
       return {
         message: ERROR_MESSAGES[e.errorType],
-        hasLocation
+        hasLocation,
+        details: {
+          sanitizedInput: userMessage,
+          matchedKeywords: [],
+          isGenericResponse: true
+        }
       };
     }
 
     // Default error message for unexpected errors
     return {
       message: ERROR_MESSAGES.GENERAL,
-      hasLocation
+      hasLocation,
+      details: {
+        sanitizedInput: userMessage,
+        matchedKeywords: [],
+        isGenericResponse: true
+      }
     };
   }
 };
@@ -104,8 +117,7 @@ export const generateBotResponse = async (
   userMessage: string,
   location: LocationObject | null,
   timeoutDuration?: number
-): Promise<string> => {
-
+): Promise<BotResponse> => {
   try {
     const context: ChatContext = {
       timestamp: new Date(),
