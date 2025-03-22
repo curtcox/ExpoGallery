@@ -27,8 +27,9 @@ export interface ResponseDetails {
 
 export class Eliza {
     private keywords: KeywordData[];
+    private rng: () => number;
 
-    constructor() {
+    constructor(seed?: number) {
         this.keywords = elizaKeywords.map(([word, priority, rules]: [string, number, [string, string[]][]]): KeywordData => ({
             word,
             priority,
@@ -39,6 +40,17 @@ export class Eliza {
                 reassembRules: responses
             }))
         }));
+
+        if (seed !== undefined) {
+            // Simple seeded random number generator
+            let currentSeed = seed;
+            this.rng = () => {
+                currentSeed = (1597 * currentSeed + 51749) % 244944;
+                return currentSeed / 244944;
+            };
+        } else {
+            this.rng = Math.random;
+        }
     }
 
     public getResponse(input: string): { response: string; details: ResponseDetails } {
@@ -47,7 +59,7 @@ export class Eliza {
 
         if (!matchedKeywords || matchedKeywords.length === 0) {
             const genericResponses = this.keywords.find(k => k.word === '*')?.responses || [];
-            const response = genericResponses[Math.floor(Math.random() * genericResponses.length)];
+            const response = genericResponses[Math.floor(this.rng() * genericResponses.length)];
             return {
                 response,
                 details: {
@@ -80,7 +92,7 @@ export class Eliza {
         }
 
         // If no decomposition rules match, use the first keyword's response
-        const response = matchedKeywords[0].responses[Math.floor(Math.random() * matchedKeywords[0].responses.length)];
+        const response = matchedKeywords[0].responses[Math.floor(this.rng() * matchedKeywords[0].responses.length)];
         return {
             response,
             details: {
@@ -112,7 +124,7 @@ export class Eliza {
     }
 
     private getReassemblyRule(rule: Rule): string {
-        return rule.reassembRules[Math.floor(Math.random() * rule.reassembRules.length)];
+        return rule.reassembRules[Math.floor(this.rng() * rule.reassembRules.length)];
     }
 
     private getRegExp(pattern: string): RegExp {

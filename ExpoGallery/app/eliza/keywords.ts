@@ -1,12 +1,13 @@
 export const elizaKeywords: [string, number, [string, string[]][]][] = [
-	['hello', 1, [
-		['*', ['Hi there!', 'Hello!', 'Hey!']]
+	['hello', 10, [
+		['*', ['Hello!', 'Hi there!', 'Hey!']]
 	]],
-	['i am', 2, [
-		['* i am feeling *', ['Why do you say you are feeling (2)?', 'How long have you been feeling (2)?']],
-		['* i am *', ['Why do you say you are (2)?', 'How long have you been (2)?']]
+	['i am', 5, [
+		['i am *', ['Why do you say you are (1)?', 'How long have you been (1)?']],
+		['i am feeling *', ['Why do you say you are feeling (1)?', 'How long have you been feeling (1)?']]
 	]],
-	['because', 2, [
+	['because', 5, [
+		['because *', ['And why do you think (1)?', 'Is that the real reason?']],
 		['* because *', ['And why do you think (2)?', 'Is that the real reason?']]
 	]],
 	['*', 0, [
@@ -15,9 +16,7 @@ export const elizaKeywords: [string, number, [string, string[]][]][] = [
 ];
 
 export const genericResponses = [
-	"I see.",
-	"Please go on.",
-	"Tell me more about that.",
-	"That's interesting.",
-	"I understand."
+	"Let's explore that further.",
+	"Very interesting.",
+	"Tell me more about that."
 ];
