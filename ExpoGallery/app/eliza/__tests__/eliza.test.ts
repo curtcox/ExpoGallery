@@ -1,4 +1,5 @@
 import { Eliza } from '../eliza';
+import { genericResponses } from '../keywords';
 
 describe('Eliza', () => {
     let eliza: Eliza;
@@ -33,6 +34,22 @@ describe('Eliza', () => {
         test('should return deterministic generic response when no keyword matches', () => {
             const response = eliza.getResponse('xyz').response;
             expect(response).toBe("Let's explore that further.");
+        });
+
+        test('should use generic responses for unmatched input', () => {
+            // Get multiple responses to verify we're getting different ones from the generic pool
+            const responses = new Set<string>();
+            for (let i = 0; i < 10; i++) {
+                const response = eliza.getResponse('xyzabc123').response;
+                responses.add(response);
+            }
+            // Should get multiple different responses
+            expect(responses.size).toBeGreaterThan(1);
+            // All responses should be from the generic responses list
+            const genericResponseSet = new Set(genericResponses);
+            for (const response of responses) {
+                expect(genericResponseSet.has(response)).toBe(true);
+            }
         });
     });
 

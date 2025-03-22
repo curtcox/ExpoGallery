@@ -64,7 +64,6 @@ export class Eliza {
         const matchedKeywords = this.getDecompositionRules(sanitizedInput);
 
         if (!matchedKeywords || matchedKeywords.length === 0) {
-            const genericResponses = this.keywords.find(k => k.word === '*')?.responses || [];
             const response = genericResponses[Math.floor(this.rng() * genericResponses.length)];
             return {
                 response,
