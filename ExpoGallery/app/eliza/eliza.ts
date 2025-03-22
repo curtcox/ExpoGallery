@@ -23,6 +23,12 @@ export interface ResponseDetails {
         response: string;
     };
     isGenericResponse: boolean;
+    alternativeResponses?: {
+        keyword: string;
+        priority: number;
+        pattern?: string;
+        possibleResponses: string[];
+    }[];
 }
 
 export class Eliza {
@@ -76,6 +82,22 @@ export class Eliza {
             if (decompositionRule) {
                 const reassemblyRule = this.getReassemblyRule(decompositionRule);
                 const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.pattern);
+
+                // Collect alternative responses from lower priority matches
+                const alternativeResponses = matchedKeywords
+                    .filter(k => k !== keyword) // Exclude the current keyword
+                    .map(k => {
+                        const altDecompRule = this.getDecompositionRule(sanitizedInput, k.rules);
+                        return {
+                            keyword: k.word,
+                            priority: k.priority,
+                            pattern: altDecompRule?.pattern,
+                            possibleResponses: altDecompRule
+                                ? altDecompRule.responses
+                                : k.responses
+                        };
+                    });
+
                 return {
                     response,
                     details: {
@@ -85,7 +107,8 @@ export class Eliza {
                             pattern: decompositionRule.pattern,
                             response: reassemblyRule
                         },
-                        isGenericResponse: false
+                        isGenericResponse: false,
+                        alternativeResponses
                     }
                 };
             }
@@ -93,12 +116,23 @@ export class Eliza {
 
         // If no decomposition rules match, use the first keyword's response
         const response = matchedKeywords[0].responses[Math.floor(this.rng() * matchedKeywords[0].responses.length)];
+
+        // Collect alternative responses from other matches
+        const alternativeResponses = matchedKeywords
+            .slice(1) // Exclude the first keyword which was used
+            .map(k => ({
+                keyword: k.word,
+                priority: k.priority,
+                possibleResponses: k.responses
+            }));
+
         return {
             response,
             details: {
                 sanitizedInput,
                 matchedKeywords,
-                isGenericResponse: false
+                isGenericResponse: false,
+                alternativeResponses
             }
         };
     }

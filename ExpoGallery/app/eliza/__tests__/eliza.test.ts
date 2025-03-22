@@ -115,4 +115,82 @@ describe('Eliza', () => {
             expect(response1).toBe(response3); // Same seed should give same results
         });
     });
+
+    describe('Alternative Responses', () => {
+        test('should include alternative responses in details', () => {
+            const { details } = eliza.getResponse('i am sad because i am lonely');
+
+            // Verify we have alternative responses
+            expect(details.alternativeResponses).toBeDefined();
+            expect(details.alternativeResponses!.length).toBeGreaterThan(0);
+
+            // Get all matched keywords (primary and alternatives)
+            const primaryKeyword = details.matchedKeywords[0].word;
+            const alternativeKeywords = details.alternativeResponses!.map(alt => alt.keyword);
+            const allKeywords = [primaryKeyword, ...alternativeKeywords];
+
+            // Verify that either:
+            // 1. Both "because" and "i am" are in alternatives (if neither is primary), or
+            // 2. At least one is in alternatives and the other is the primary response
+            expect(
+                // Case 1: Both in alternatives
+                (alternativeKeywords.includes('because') && alternativeKeywords.includes('i am')) ||
+                // Case 2a: One primary, one alternative
+                (primaryKeyword === 'i am' && alternativeKeywords.includes('because')) ||
+                // Case 2b: Other primary, other alternative
+                (primaryKeyword === 'because' && alternativeKeywords.includes('i am'))
+            ).toBe(true);
+
+            // Verify that both keywords are matched somewhere (either primary or alternative)
+            expect(allKeywords).toContain('because');
+            expect(allKeywords).toContain('i am');
+
+            // Verify structure of alternative responses
+            details.alternativeResponses!.forEach(alt => {
+                expect(alt).toHaveProperty('keyword');
+                expect(alt).toHaveProperty('priority');
+                expect(alt).toHaveProperty('possibleResponses');
+                expect(Array.isArray(alt.possibleResponses)).toBe(true);
+                expect(alt.possibleResponses.length).toBeGreaterThan(0);
+            });
+        });
+
+        test('should order alternative responses by priority', () => {
+            const { details } = eliza.getResponse('i am sad because i am lonely');
+
+            // Verify priorities are in descending order
+            const priorities = details.alternativeResponses!.map(alt => alt.priority);
+            const sortedPriorities = [...priorities].sort((a, b) => b - a);
+            expect(priorities).toEqual(sortedPriorities);
+        });
+
+        test('should include pattern information when available', () => {
+            const { details } = eliza.getResponse('i am feeling very sad');
+
+            // Find the "i am" alternative (if it wasn't the main response)
+            const iAmAlt = details.alternativeResponses?.find(alt => alt.keyword === 'i am');
+
+            if (iAmAlt) {
+                expect(iAmAlt.pattern).toBeDefined();
+                expect(iAmAlt.pattern).toContain('*'); // Should contain wildcard
+            }
+        });
+
+        test('should exclude the primary matched keyword from alternatives', () => {
+            const { details } = eliza.getResponse('i am sad');
+
+            // The keyword that was used for the main response should not appear in alternatives
+            const mainKeyword = details.matchedKeywords[0].word;
+            const alternativeKeywords = details.alternativeResponses!.map(alt => alt.keyword);
+
+            expect(alternativeKeywords).not.toContain(mainKeyword);
+        });
+
+        test('should handle generic responses with no alternatives', () => {
+            const { details } = eliza.getResponse('xyzabc');
+
+            expect(details.isGenericResponse).toBe(true);
+            expect(details.alternativeResponses).toBeUndefined();
+        });
+    });
 });
