@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ThemedText } from '@/components/ThemedText';
-import { info, error } from '@/utils/logger';
+import { info } from '@/utils/logger';
 
 export default function Example() {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
