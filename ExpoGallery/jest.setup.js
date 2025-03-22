@@ -154,3 +154,14 @@ console.error = (...args) => {
   }
   originalConsoleError(...args);
 };
+
+// Add any global test setup here
+import '@testing-library/jest-dom';
+
+// Mock any global objects that might be needed for tests
+global.fetch = jest.fn();
+
+// Reset all mocks before each test
+beforeEach(() => {
+  jest.clearAllMocks();
+});

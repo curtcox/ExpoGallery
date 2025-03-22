@@ -104,7 +104,7 @@ describe('ChatScreen with Storage Integration', () => {
     ];
 
     // Setup callback function to test
-    let capturedCallback: ((messages: Message[]) => void) | null = null;
+    let capturedCallback: MessageCallback = () => {};
 
     // Mock the subscription callback
     mockSubscribeImpl.mockImplementation((callback: MessageCallback) => {
@@ -139,7 +139,7 @@ describe('ChatScreen with Storage Integration', () => {
     );
 
     // Setup callback function to test
-    let capturedCallback: ((messages: Message[]) => void) | null = null;
+    let capturedCallback: MessageCallback = () => {};
 
     // Mock the subscription callback
     mockSubscribeImpl.mockImplementation((callback: MessageCallback) => {
@@ -173,7 +173,7 @@ describe('ChatScreen with Storage Integration', () => {
     mockGetItemImpl.mockRejectedValue(new Error('Generic storage error'));
 
     // Setup callback function to test
-    let capturedCallback: ((messages: Message[]) => void) | null = null;
+    let capturedCallback: MessageCallback = () => {};
 
     // Mock the subscription callback
     mockSubscribeImpl.mockImplementation((callback: MessageCallback) => {

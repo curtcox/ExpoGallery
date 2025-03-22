@@ -2,6 +2,8 @@
 ![Deploy Expo Web to GitHub Pages](https://github.com/coxcu/ExpoGallery/actions/workflows/deploy-expo-web.yml/badge.svg) via
 [deploy-expo-web.yml](https://github.com/coxcu/ExpoGallery/actions/workflows/deploy-expo-web.yml)
 
+![Dev](https://github.com/coxcu/ExpoGallery/actions/workflows/run-tests.yml/badge.svg?branch=dev)
+
 A comprehensive gallery showcasing Expo and React Native features, components, and API capabilities. This project serves as both a reference and demonstration of what's possible with Expo.
 
 ## Features

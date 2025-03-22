@@ -30,7 +30,7 @@ export default function ExampleLayout() {
     ? currentExample.url
     : `https://docs.expo.dev/${currentExample.url}`;
 
-  const srcUrl = `sources//app/examples/${currentExample.name}.tsx`;
+  const srcUrl = `https://github.com/curtcox/ExpoGallery/blob/main/ExpoGallery/app/examples/${currentExample.name}.tsx`;
 
   return (
     <>

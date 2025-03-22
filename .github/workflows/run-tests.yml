@@ -1,0 +1,46 @@
+name: Run the tests. Check if this be deployed.
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch: # Allow manual triggering of the workflow
+
+env:
+  GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+  CHAT_API_ENDPOINT: ${{ vars.CHAT_API_ENDPOINT }}
+  DEFAULT_CHAT_LOCATION: ${{ vars.DEFAULT_CHAT_LOCATION }}
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Use the Node.js version compatible with our Expo version
+          cache: 'npm'
+          cache-dependency-path: 'ExpoGallery/package-lock.json'
+
+      - name: Install dependencies
+        run: |
+          cd ExpoGallery
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd ExpoGallery
+          npm test
+
+      - name: Build Expo web
+        run: |
+          cd ExpoGallery
+          npm run predeploy
+          npx expo export --platform web
+          touch dist/.nojekyll
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
