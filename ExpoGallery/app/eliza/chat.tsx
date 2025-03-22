@@ -17,7 +17,19 @@ const isServerSideRendering = () => {
   return Platform.OS === 'web' && typeof window === 'undefined';
 };
 
-const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<{ word: string; priority: number }> }) => {
+export const getPriorityColor = (priority: number): string => {
+  // Color scale from high priority (warm colors) to low priority (cool colors)
+  const colors = [
+    '#ffcdd2', // Priority 0 (lowest) - Light red
+    '#fff9c4', // Priority 1 - Light yellow
+    '#c8e6c9', // Priority 2 - Light green
+    '#bbdefb', // Priority 3 - Light blue
+    '#e1bee7', // Priority 4 - Light purple
+  ];
+  return colors[Math.min(priority, colors.length - 1)] || colors[0];
+};
+
+export const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<{ word: string; priority: number }> }) => {
   // Sort keywords by length (descending) to handle overlapping matches correctly
   const sortedKeywords = [...keywords].sort((a, b) => b.word.length - a.word.length);
 
@@ -28,13 +40,17 @@ const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<{ w
     segments = segments.flatMap(segment => {
       if (segment.priority !== undefined) return [segment]; // Skip already highlighted segments
 
-      // Use word boundaries (\b) to match whole words only
-      const parts = segment.text.split(new RegExp(`\\b(${word})\\b`, 'gi'));
-      return parts.map(part =>
-        part.toLowerCase() === word.toLowerCase()
-          ? { text: part, priority }
-          : { text: part }
-      );
+      // Find word variations: exact match, plural/singular forms, and stemmed versions
+      const wordPattern = word.endsWith('s') ?
+        `\\b(${word}|${word.slice(0, -1)})\\b` : // If keyword ends in 's', match with and without it
+        `\\b(${word}|${word}s)\\b`; // Otherwise match with and without 's'
+
+      const parts = segment.text.split(new RegExp(wordPattern, 'gi'));
+      return parts.map(part => {
+        // Check if this part matches any variation of the word
+        const isMatch = new RegExp(wordPattern, 'i').test(part);
+        return isMatch ? { text: part, priority } : { text: part };
+      });
     });
   });
 
@@ -54,18 +70,6 @@ const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<{ w
       ))}
     </Text>
   );
-};
-
-const getPriorityColor = (priority: number): string => {
-  // Color scale from high priority (warm colors) to low priority (cool colors)
-  const colors = [
-    '#ffcdd2', // Priority 0 (lowest) - Light red
-    '#fff9c4', // Priority 1 - Light yellow
-    '#c8e6c9', // Priority 2 - Light green
-    '#bbdefb', // Priority 3 - Light blue
-    '#e1bee7', // Priority 4 - Light purple
-  ];
-  return colors[Math.min(priority, colors.length - 1)] || colors[0];
 };
 
 export default function ChatScreen() {
