@@ -209,9 +209,32 @@ export default function ChatScreen() {
         </View>
 
         <Text style={styles.detailsLabel}>Matched Keywords:</Text>
-        <Text style={styles.detailsText}>
-          {responseDetails.matchedKeywords.map(k => `${k.word} (priority: ${k.priority})`).join('\n')}
-        </Text>
+        <View style={styles.keywordsContainer}>
+          {[...responseDetails.matchedKeywords, ...(responseDetails.alternativeResponses || [])].sort((a, b) => b.priority - a.priority).map((k, index) => {
+            const isKeywordData = 'word' in k;
+            const keyword = isKeywordData ? k.word : k.keyword;
+            const pattern = isKeywordData ? (k.rules?.[0]?.pattern) : k.pattern;
+            const responses = isKeywordData ? k.responses : k.possibleResponses;
+
+            return (
+              <View key={index} style={styles.keywordItem}>
+                <Text style={styles.detailsText}>
+                  {keyword} (priority: {k.priority})
+                  {k === responseDetails.matchedKeywords[0] && " - Primary Response"}
+                </Text>
+                {pattern && (
+                  <Text style={styles.patternText}>Pattern: {pattern}</Text>
+                )}
+                {responses && (
+                  <Text style={styles.responsesText}>
+                    Possible responses:{'\n'}
+                    {responses.map((resp: string, i: number) => `${i + 1}. ${resp}`).join('\n')}
+                  </Text>
+                )}
+              </View>
+            );
+          })}
+        </View>
 
         {responseDetails.isGenericResponse ? (
           <Text style={styles.detailsText}>Using generic response</Text>
@@ -352,5 +375,25 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  keywordsContainer: {
+    marginTop: 8,
+  },
+  keywordItem: {
+    marginBottom: 12,
+    paddingLeft: 8,
+    borderLeftWidth: 2,
+    borderLeftColor: '#ddd',
+  },
+  patternText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  responsesText: {
+    fontSize: 14,
+    color: '#444',
+    marginTop: 4,
+    marginLeft: 8,
   },
 });
