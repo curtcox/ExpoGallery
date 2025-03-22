@@ -1,4 +1,4 @@
-name: Run the tests. Check if this be deployed.
+name: Run the tests. Check if this can be deployed.
 
 on:
   push:
