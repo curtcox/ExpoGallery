@@ -6,11 +6,10 @@ import {
   processUserMessage,
   BOT_USER
 } from './elizaService';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 import { error, info } from '@/utils/logger';
 import { getCurrentLocation } from '@/services/location';
-import LocationIndicator from '@/components/LocationIndicator';
 import { ResponseDetails } from './eliza';
 
 const isServerSideRendering = () => {
@@ -195,7 +194,14 @@ export default function ChatScreen() {
   }
 
   const renderResponseDetails = () => {
-    if (!responseDetails) return null;
+    if (!responseDetails) return (
+      <View style={styles.detailsPanel}>
+          <Text style={styles.detailsText}>Very simple Eliza chatbot adapted from </Text>
+          <Link href="https://github.com/Adventvr/Eliza" style={styles.link}>Adventvr/Eliza</Link>
+          <Text style={styles.detailsText}>A more complex version is available </Text>
+          <Link href="https://curtcox.github.io/elizabot-js/" style={styles.link}>here.</Link>
+      </View>
+    );
 
     return (
       <ScrollView style={styles.detailsPanel}>
@@ -273,7 +279,6 @@ export default function ChatScreen() {
 
   return (
     <View style={styles.container}>
-      <LocationIndicator top={10} right={20} size={14} hasLocation={hasLocation} />
       <View
         style={styles.splitContainer}
         onLayout={(e) => containerWidth.setValue(e.nativeEvent.layout.width)}
@@ -346,7 +351,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   detailsText: {
-    fontSize: 14,
+    fontSize: 16,
     marginTop: 4,
     marginBottom: 8,
   },
@@ -395,5 +400,11 @@ const styles = StyleSheet.create({
     color: '#444',
     marginTop: 4,
     marginLeft: 8,
+  },
+  link: {
+    fontSize: 16,
+    color: '#2196F3',
+    textDecorationLine: 'underline',
+    marginVertical: 4,
   },
 });
