@@ -48,12 +48,16 @@ export class Eliza {
         this.rng = Math.random;
     }
 
+    private pick<T>(array: T[]): T {
+        return array[Math.floor(this.rng() * array.length)];
+    }
+
     public getResponse(input: string): { response: string; details: ResponseDetails } {
         const sanitizedInput = this.sanatize(input);
         const matchedKeywords = this.getDecompositionRules(sanitizedInput);
 
         if (!matchedKeywords || matchedKeywords.length === 0) {
-            const response = genericResponses[Math.floor(this.rng() * genericResponses.length)];
+            const response = this.pick(genericResponses);
             return {
                 response,
                 details: {
@@ -103,7 +107,7 @@ export class Eliza {
         }
 
         // If no decomposition rules match, use the first keyword's response
-        const response = matchedKeywords[0].responses[Math.floor(this.rng() * matchedKeywords[0].responses.length)];
+        const response = this.pick(matchedKeywords[0].responses);
 
         // Collect alternative responses from other matches
         const alternativeResponses = matchedKeywords
@@ -152,7 +156,7 @@ export class Eliza {
     }
 
     private getReassemblyRule(rule: Rule): string {
-        return rule.reassembRules[Math.floor(this.rng() * rule.reassembRules.length)];
+        return this.pick(rule.reassembRules);
     }
 
     private getRegExp(pattern: string): RegExp {
