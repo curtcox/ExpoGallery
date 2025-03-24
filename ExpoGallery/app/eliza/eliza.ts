@@ -33,7 +33,7 @@ export class Eliza {
     private keywords: KeywordData[];
     private rng: () => number;
 
-    constructor(seed?: number) {
+    constructor() {
         this.keywords = elizaKeywords.map(([word, priority, rules]: [string, number, [string, string[]][]]): KeywordData => ({
             word,
             priority,
@@ -45,16 +45,7 @@ export class Eliza {
             }))
         }));
 
-        if (seed !== undefined) {
-            // Simple seeded random number generator
-            let currentSeed = seed;
-            this.rng = () => {
-                currentSeed = (1597 * currentSeed + 51749) % 244944;
-                return currentSeed / 244944;
-            };
-        } else {
-            this.rng = Math.random;
-        }
+        this.rng = Math.random;
     }
 
     public getResponse(input: string): { response: string; details: ResponseDetails } {
