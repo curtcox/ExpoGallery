@@ -1,33 +1,5 @@
+import { KeywordData, Rule, ResponseDetails } from './ibot';
 import { elizaKeywords, genericResponses } from './keywords';
-
-interface Rule {
-    pattern: string;
-    responses: string[];
-    reassembRules: string[];
-}
-
-interface KeywordData {
-    word: string;
-    priority: number;
-    responses: string[];
-    rules: Rule[];
-}
-
-export interface ResponseDetails {
-    sanitizedInput: string;
-    matchedKeywords: KeywordData[];
-    usedRule?: {
-        pattern: string;
-        response: string;
-    };
-    isGenericResponse: boolean;
-    alternativeResponses?: {
-        keyword: string;
-        priority: number;
-        pattern?: string;
-        possibleResponses: string[];
-    }[];
-}
 
 export class Eliza {
     private keywords: KeywordData[];
@@ -37,7 +9,6 @@ export class Eliza {
         this.keywords = elizaKeywords.map(([word, priority, rules]: [string, number, [string, string[]][]]): KeywordData => ({
             word,
             priority,
-            responses: rules.map(([_, responses]: [string, string[]]) => responses[0]),
             rules: rules.map(([pattern, responses]: [string, string[]]) => ({
                 pattern,
                 responses,
@@ -63,7 +34,6 @@ export class Eliza {
                 details: {
                     sanitizedInput,
                     matchedKeywords: [],
-                    isGenericResponse: true
                 }
             };
         }
@@ -75,21 +45,6 @@ export class Eliza {
                 const reassemblyRule = this.getReassemblyRule(decompositionRule);
                 const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.pattern);
 
-                // Collect alternative responses from lower priority matches
-                const alternativeResponses = matchedKeywords
-                    .filter(k => k !== keyword) // Exclude the current keyword
-                    .map(k => {
-                        const altDecompRule = this.getDecompositionRule(sanitizedInput, k.rules);
-                        return {
-                            keyword: k.word,
-                            priority: k.priority,
-                            pattern: altDecompRule?.pattern,
-                            possibleResponses: altDecompRule
-                                ? altDecompRule.responses
-                                : k.responses
-                        };
-                    });
-
                 return {
                     response,
                     details: {
@@ -99,32 +54,19 @@ export class Eliza {
                             pattern: decompositionRule.pattern,
                             response: reassemblyRule
                         },
-                        isGenericResponse: false,
-                        alternativeResponses
                     }
                 };
             }
         }
 
         // If no decomposition rules match, use the first keyword's response
-        const response = this.pick(matchedKeywords[0].responses);
-
-        // Collect alternative responses from other matches
-        const alternativeResponses = matchedKeywords
-            .slice(1) // Exclude the first keyword which was used
-            .map(k => ({
-                keyword: k.word,
-                priority: k.priority,
-                possibleResponses: k.responses
-            }));
+        const response = this.pick(matchedKeywords[0].rules[0].responses);
 
         return {
             response,
             details: {
                 sanitizedInput,
                 matchedKeywords,
-                isGenericResponse: false,
-                alternativeResponses
             }
         };
     }

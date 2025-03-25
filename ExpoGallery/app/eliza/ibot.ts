@@ -17,13 +17,6 @@ export interface ResponseDetails {
         pattern: string;
         response: string;
     };
-    isGenericResponse: boolean;
-    alternativeResponses?: {
-        keyword: string;
-        priority: number;
-        pattern?: string;
-        possibleResponses: string[];
-    }[];
 }
 
 export interface IBot {
