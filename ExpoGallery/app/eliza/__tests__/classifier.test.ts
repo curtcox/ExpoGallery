@@ -1,7 +1,7 @@
-import { classify, ResourceRulesMap } from '../classifier';
+import { classify, classificationMap } from '../classifier';
 
 describe('resource matcher with default rules', () => {
-    const rules: ResourceRulesMap = {
+    const rules: classificationMap = {
         computer: {
             pattern: /\b(computer|cpu|ram|disk|memory|processor|storage|hardware)\b/,
             classification: 'computer'
@@ -97,7 +97,7 @@ describe('resource matcher with default rules', () => {
 });
 
 describe('weather matcher with custom rules', () => {
-    const customRules: ResourceRulesMap = {
+    const customRules: classificationMap = {
         food: {
             pattern: /\b(hungry|food|eat|meal|snack|dinner|lunch|breakfast)\b/,
             classification: 'nutrition'
@@ -125,7 +125,7 @@ describe('weather matcher with custom rules', () => {
 });
 
 describe('assistance resource matcher with custom rules', () => {
-    const assistanceRules: ResourceRulesMap = {
+    const assistanceRules: classificationMap = {
         food: {
             pattern: /\b(food|hungry|meal|eat|soup kitchen|meals|snack)\b/,
             classification: 'food'
@@ -139,8 +139,9 @@ describe('assistance resource matcher with custom rules', () => {
             classification: 'medicine'
         },
         legal: {
-            pattern: /\b(ID|legal|rights|forms|application|crime|report)\b/,
-            classification: 'legal'
+            pattern: /\b(ID|legal|rights|forms|application|crime|report|lawyer|law|attorney|judge|court|jail|prison)\b/i,
+            classification: 'legal',
+            priority: 2
         },
         employment: {
             pattern: /\b(job|work|employment|training|placement)\b/,
@@ -156,7 +157,8 @@ describe('assistance resource matcher with custom rules', () => {
         },
         mental: {
             pattern: /\b(mental|counseling|down|support)\b/,
-            classification: 'mental'
+            classification: 'mental',
+            priority: 1
         },
         transportation: {
             pattern: /\b(transportation|transit|schedules)\b/,
@@ -188,8 +190,9 @@ describe('assistance resource matcher with custom rules', () => {
         const result = classify(text, assistanceRules);
         if (result !== expectedClass) {
             const rule = assistanceRules[expectedClass];
+            const matchedRule = result !== 'unknown' ? assistanceRules[result] : null;
             throw new Error(
-                `Classification failed:\nText: "${text}"\nExpected: "${expectedClass}"\nGot: "${result}"\nExpected to match pattern: ${rule.pattern}`
+                `Classification failed:\nText: "${text}"\nExpected: "${expectedClass}"\nGot: "${result}"\nExpected to match pattern: ${rule.pattern}${matchedRule ? `\nMatched pattern: ${matchedRule.pattern}` : ''}`
             );
         }
     };
@@ -234,9 +237,9 @@ describe('assistance resource matcher with custom rules', () => {
     test('should classify legal assistance requests', () => {
         const legalTexts = [
             "I lost my wallet; can someone help me replace my ID?",
-            "I need help with my housing application, can anyone guide me?",
-            "I need help with filling out forms to apply for housing—can someone assist?",
-            "Can someone help me understand my rights as a tenant or street resident?"
+            "Can someone help me understand my rights as a tenant or street resident?",
+            "I need a lawyer to help with my housing application, can anyone guide me?",
+            "I need legal help with filling out forms to apply for housing—can someone assist?",
         ];
 
         legalTexts.forEach(text => testClassification(text, 'legal'));
@@ -296,5 +299,67 @@ describe('assistance resource matcher with custom rules', () => {
         ];
 
         securityTexts.forEach(text => testClassification(text, 'security'));
+    });
+});
+
+describe('priority-based classification', () => {
+    const priorityRules: classificationMap = {
+        highPriority: {
+            pattern: /\b(test|testing)\b/,
+            classification: 'high',
+            priority: 2
+        },
+        mediumPriority: {
+            pattern: /\b(test|testing)\b/,
+            classification: 'medium',
+            priority: 1
+        },
+        lowPriority: {
+            pattern: /\b(test|testing)\b/,
+            classification: 'low',
+            priority: 0
+        },
+        defaultPriority: {
+            pattern: /\b(test|testing)\b/,
+            classification: 'default'
+            // No priority specified - should default to 0
+        }
+    };
+
+    test('should choose highest priority rule when multiple patterns match', () => {
+        expect(classify('testing 123', priorityRules)).toBe('high');
+    });
+
+    test('should handle rules with same priority correctly', () => {
+        const equalPriorityRules: classificationMap = {
+            first: {
+                pattern: /\b(test)\b/,
+                classification: 'first',
+                priority: 1
+            },
+            second: {
+                pattern: /\b(test)\b/,
+                classification: 'first',
+                priority: 1
+            }
+        };
+        // When priorities are equal, the first matching rule in iteration order should win
+        expect(classify('test', equalPriorityRules)).toBe('first');
+    });
+
+    test('should handle missing priority as 0', () => {
+        const mixedRules: classificationMap = {
+            withPriority: {
+                pattern: /\b(test)\b/,
+                classification: 'priority',
+                priority: 1
+            },
+            withoutPriority: {
+                pattern: /\b(test)\b/,
+                classification: 'no-priority'
+                // No priority specified - should default to 0
+            }
+        };
+        expect(classify('test', mixedRules)).toBe('priority');
     });
 });

@@ -664,7 +664,7 @@ function ruleFromData(decompRule: string, responses: string[], reassembRules: st
 }
 
 function sanatize(input: string): string {
-	return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
+	return input.toLowerCase().replace(/[^\w\s]/g, ' ').trim();
 }
 
 class KeywordRule implements Keyword {
