@@ -27,46 +27,32 @@ export class Eliza {
         const sanitizedInput = this.sanatize(input);
         const matchedKeywords = this.getDecompositionRules(sanitizedInput);
 
-        if (!matchedKeywords || matchedKeywords.length === 0) {
-            const response = this.pick(genericResponses);
-            return {
-                response,
-                details: {
-                    sanitizedInput,
-                    matchedKeywords: [],
-                }
-            };
-        }
-
-        // Try each keyword in order of priority
-        for (const keyword of matchedKeywords) {
-            const decompositionRule = this.getDecompositionRule(sanitizedInput, keyword.rules);
-            if (decompositionRule) {
-                const reassemblyRule = this.getReassemblyRule(decompositionRule);
-                const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.pattern);
-
-                return {
-                    response,
-                    details: {
-                        sanitizedInput,
-                        matchedKeywords,
-                        usedRule: {
+        if (matchedKeywords) {
+            for (const keyword of matchedKeywords) {
+                const decompositionRule = this.getDecompositionRule(sanitizedInput, keyword.rules);
+                if (decompositionRule) {
+                    const reassemblyRule = this.getReassemblyRule(decompositionRule);
+                    const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.pattern);
+                    return {
+                        response,
+                        details: {
+                            sanitizedInput,
+                            matchedKeywords,
                             pattern: decompositionRule.pattern,
                             response: reassemblyRule
-                        },
-                    }
-                };
+                        }
+                    };
+                }
             }
         }
 
-        // If no decomposition rules match, use the first keyword's response
-        const response = this.pick(matchedKeywords[0].rules[0].responses);
-
         return {
-            response,
+            response: 'No mathing response.',
             details: {
                 sanitizedInput,
                 matchedKeywords,
+                pattern: '',
+                response: ''
             }
         };
     }

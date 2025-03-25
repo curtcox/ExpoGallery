@@ -13,10 +13,8 @@ export interface KeywordData {
 export interface ResponseDetails {
     sanitizedInput: string;
     matchedKeywords: KeywordData[];
-    usedRule?: {
-        pattern: string;
-        response: string;
-    };
+    pattern: string;
+    response: string;
 }
 
 export interface IBot {
