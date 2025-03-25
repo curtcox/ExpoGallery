@@ -127,7 +127,7 @@ describe('weather matcher with custom rules', () => {
 describe('assistance resource matcher with custom rules', () => {
     const assistanceRules: classificationMap = {
         food: {
-            pattern: /\b(food|hungry|meal|eat|soup kitchen|meals|snack)\b/,
+            pattern: /\b(food|hungry|meal|eat|soup|kitchen|meals|snack)\b/,
             classification: 'food'
         },
         shelter: {
@@ -144,7 +144,7 @@ describe('assistance resource matcher with custom rules', () => {
             priority: 2
         },
         employment: {
-            pattern: /\b(job|work|employment|training|placement)\b/,
+            pattern: /\b(job|work|employment|training|placement|money|cash|gig)\b/,
             classification: 'employment'
         },
         hygiene: {
@@ -161,7 +161,7 @@ describe('assistance resource matcher with custom rules', () => {
             priority: 1
         },
         transportation: {
-            pattern: /\b(transportation|transit|schedules)\b/,
+            pattern: /\b(transportation|transit|schedules|bus|train|taxi|car|ride)\b/,
             classification: 'transportation'
         },
         facility: {
@@ -173,7 +173,7 @@ describe('assistance resource matcher with custom rules', () => {
             classification: 'social'
         },
         clothing: {
-            pattern: /\b(clothing|warm clothes)\b/,
+            pattern: /\b(clothing|clothes|coat|jacket|shoes)\b/,
             classification: 'clothing'
         },
         utility: {
@@ -299,6 +299,124 @@ describe('assistance resource matcher with custom rules', () => {
         ];
 
         securityTexts.forEach(text => testClassification(text, 'security'));
+    });
+
+    test('should classify informal food assistance requests', () => {
+        const informalFoodTexts = [
+            "yo im dead ass hungry, any food joints open rn?",
+            "soup kitchin info? need some hot grub now!",
+            "any free meal spots round here? i'm starvin!",
+            "what time does the soup kitchin open? need food like now."
+        ];
+
+        informalFoodTexts.forEach(text => testClassification(text, 'food'));
+    });
+
+    test('should classify informal shelter assistance requests', () => {
+        const informalShelterTexts = [
+            "any shelter available? it's freezy out here on da streetz.",
+            "i need a place 2 crash tonight, none of da usual spots open.",
+            "my dog needs care too—any shelters that take pets?",
+            "need a safe spot 2 stash my stuff overnight. any ideas?",
+            "shelter closed tonight, help me find a safe spot 2 sleep.",
+            "gimme deets on a shelter that got bed space 4 tonight."
+        ];
+
+        informalShelterTexts.forEach(text => testClassification(text, 'shelter'));
+    });
+
+    test('should classify informal medical assistance requests', () => {
+        const informalMedicalTexts = [
+            "need help pronto, feelin real sick n don't know what 2 do.",
+            "scraped my knee bad, not sure if i need 2 see a docter.",
+            "my teeth r killin me, need a free dentl clinic stat.",
+            "im strugglin with addiction, any rehab centers that won't charge me?",
+            "where do i get my meds refilled? ran out days ago.",
+            "got a nasty cut on my leg—any place 4 immediate care?"
+        ];
+
+        informalMedicalTexts.forEach(text => testClassification(text, 'medicine'));
+    });
+
+    test('should classify informal legal assistance requests', () => {
+        const informalLegalTexts = [
+            "lost ma ID, help me get a new one plz. idk how 2 start.",
+            "got mugged earlier, need help reportin it to someone who cares.",
+            "help me fill out this housing app—its super confusin.",
+            "how do i report theft? someone take my stuff last night.",
+            "any local service for legal advice for peeps like us?"
+        ];
+
+        informalLegalTexts.forEach(text => testClassification(text, 'legal'));
+    });
+
+    test('should classify informal employment assistance requests', () => {
+        const informalEmploymentTexts = [
+            "where's a quick gig? i need cash ASAP.",
+            "u know of any work training programs? i wanna learn a skill."
+        ];
+
+        informalEmploymentTexts.forEach(text => testClassification(text, 'employment'));
+    });
+
+    test('should classify informal benefits assistance requests', () => {
+        const informalBenefitsTexts = [
+            "how do i apply 4 benefits? these forms r all messed up."
+        ];
+
+        informalBenefitsTexts.forEach(text => testClassification(text, 'benefits'));
+    });
+
+    test('should classify informal mental health assistance requests', () => {
+        const informalMentalTexts = [
+            "feelin' real low, any mental helpline or someone 2 talk to?",
+            "i need someone 2 talk to, feelin' alone out here..."
+        ];
+
+        informalMentalTexts.forEach(text => testClassification(text, 'mental'));
+    });
+
+    test('should classify informal transportation assistance requests', () => {
+        const informalTransportationTexts = [
+            "bus routes r so confusin—can anyone break it down for me?"
+        ];
+
+        informalTransportationTexts.forEach(text => testClassification(text, 'transportation'));
+    });
+
+    test('should classify informal utility assistance requests', () => {
+        const informalUtilityTexts = [
+            "where do i charge my phone for free? battery goin out.",
+            "my phone charger got jacked, any free ones available?",
+            "im confused by the new update in this app—any tech help?"
+        ];
+
+        informalUtilityTexts.forEach(text => testClassification(text, 'utility'));
+    });
+
+    test('should classify informal hygiene assistance requests', () => {
+        const informalHygieneTexts = [
+            "hey, can u hook me up with info on free haircuts? need a trim.",
+            "need a shower real bad—any public facilities open rn?"
+        ];
+
+        informalHygieneTexts.forEach(text => testClassification(text, 'hygiene'));
+    });
+
+    test('should classify informal clothing assistance requests', () => {
+        const informalClothingTexts = [
+            "need a warm coat, it's freezin—any local charity help?"
+        ];
+
+        informalClothingTexts.forEach(text => testClassification(text, 'clothing'));
+    });
+
+    test('should classify informal facility assistance requests', () => {
+        const informalFacilityTexts = [
+            "can anyone tell me where a restroom's at? really need one."
+        ];
+
+        informalFacilityTexts.forEach(text => testClassification(text, 'facility'));
     });
 });
 
