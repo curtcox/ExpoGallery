@@ -1,5 +1,5 @@
-import { elizaKeywords } from '../keywords';
-import { Eliza } from '../eliza';
+import { elizaKeywords } from '../elizaRules';
+import { Eliza } from '../keyBot';
 
 describe('ELIZA Keywords', () => {
   // Helper function to find a keyword entry

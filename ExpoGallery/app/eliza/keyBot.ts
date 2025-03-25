@@ -1,5 +1,4 @@
 import { ResponseDetails, IBot } from './ibot';
-import { elizaKeywordsRules} from './keywords';
 
 export interface Keyword {
     word: string;
@@ -8,11 +7,11 @@ export interface Keyword {
 	response(input: string): string;
 }
 
-export class Eliza implements IBot {
+export class KeyBot implements IBot {
     private keywords: Keyword[];
 
-    constructor() {
-        this.keywords = elizaKeywordsRules;
+    constructor(keywords: Keyword[]) {
+        this.keywords = keywords;
     }
 
 

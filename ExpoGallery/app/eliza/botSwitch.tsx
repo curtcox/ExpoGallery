@@ -3,10 +3,11 @@
  */
 
 import { ResponseDetails } from './ibot';
-import { Eliza } from './eliza';
+import { KeyBot } from './keyBot';
 import { Profile } from '@/storage/profile';
 import { Resource } from '@/services/data';
-// import { Bitsy } from './bitsy';
+import { allRules } from './elizaRules';
+import { allFunctions } from './functions';
 export interface ChatContext {
   timestamp: Date;
   location?: {
@@ -27,8 +28,8 @@ export interface BotResponse {
  * Process user messages with context and return appropriate responses
  */
 export const localBot = (userMessage: string, context: ChatContext): BotResponse => {
-  // const bot = (true) ? new Bitsy() : new Eliza();
-  const bot = new Eliza();
+  const rules = (false) ? allRules : allFunctions;
+  const bot = new KeyBot(rules);
   const { response, details } = bot.getResponse(userMessage);
   return {
     message: response,

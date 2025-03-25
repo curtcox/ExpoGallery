@@ -1,4 +1,4 @@
-import { Keyword } from './eliza';
+import { Keyword } from './keyBot';
 const rng = Math.random;
 
 function pick<T>(array: T[]): T {
@@ -667,7 +667,6 @@ function sanatize(input: string): string {
 	return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
 }
 
-
 class KeywordRule implements Keyword {
 	word: string;
 	priority: number;
@@ -685,6 +684,6 @@ class KeywordRule implements Keyword {
 	}
 }
 
-export const elizaKeywordsRules: Keyword[] = elizaKeywords.map(
+export const allRules: Keyword[] = elizaKeywords.map(
 	([word, priority, rules]: [string, number, [string, string[]][]]): KeywordRule =>
 		 new KeywordRule(word, priority, rules.map(([decompRule, responses]: [string, string[]]) => ruleFromData(decompRule, responses, responses))));

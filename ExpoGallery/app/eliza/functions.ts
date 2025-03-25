@@ -1,10 +1,44 @@
-export const elizaKeywords: [ string, number, (x:string) => string ] [] = [
-	["math", 0, (x: string) => `The answer to ${x} is ${eval(x)}`],
-	["no|nope|nah", 0, (x: string) => `Are you sure, no one ${x} ?`],
-	["yes|yup|yep", 0, (x: string) => `Are you sure, yes one ${x} ?`],
+import { Keyword } from './keyBot';
+
+function math(x: string): string {
+	return eval(x.replace(/math/g, ''));
+}
+
+const keywords: [ string, number, (x:string) => string ] [] = [
+	["math", 0, (x: string) => `The answer to ${x} is ${math(x)}`],
+	["no",   0, (x: string) => `Are you sure, no one ${x} ?`],
+	["yes",  0, (x: string) => `Are you sure, yes one ${x} ?`],
+	["",     0, (_: string) => `Try yes, no, or math.`],
 ];
 
-export const genericResponses: string[] = [
-	"Generic response 1",
-	"Generic response 2",
-];
+function sanatize(input: string): string {
+	return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
+}
+
+class KeywordFunction implements Keyword {
+	word: string;
+	priority: number;
+	f: (x:string) => string;
+	response(input: string): string {
+		try {
+			return this.f(input);
+		} catch (e) {
+			return `Error: ${e}`;
+		}
+	}
+
+	match(input: string): boolean {
+		return input.includes(sanatize(this.word));
+	}
+
+	constructor(word: string, priority: number, f: (x:string) => string) {
+		this.word = word;
+		this.priority = priority;
+		this.f = f;
+	}
+}
+
+
+export const allFunctions: Keyword[] = keywords.map(
+	([word, priority, rule]: [string, number, (x:string) => string]): KeywordFunction =>
+		new KeywordFunction(word, priority, rule));

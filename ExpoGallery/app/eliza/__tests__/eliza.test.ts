@@ -1,5 +1,5 @@
-import { Eliza } from '../eliza';
-import { genericResponses } from '../keywords';
+import { Eliza } from '../keyBot';
+import { genericResponses } from '../elizaRules';
 
 describe('Eliza', () => {
     let eliza: Eliza;

@@ -203,6 +203,7 @@ export default function ChatScreen() {
       </View>
     );
 
+    const keywords = responseDetails.keywordResponses ? Array.from(responseDetails.keywordResponses.keys()) : [];
     return (
       <ScrollView style={styles.detailsPanel}>
         <Text style={styles.detailsTitle}>Response Details</Text>
@@ -210,7 +211,7 @@ export default function ChatScreen() {
         <View style={styles.sanitizedInputContainer}>
           <HighlightedText
             text={responseDetails.input}
-            keywords={Array.from(responseDetails.keywordResponses.keys())}
+            keywords={keywords}
           />
         </View>
       </ScrollView>
