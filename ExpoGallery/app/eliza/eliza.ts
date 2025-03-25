@@ -1,88 +1,26 @@
-import { KeywordData, Rule, ResponseDetails, IBot } from './ibot';
+import { ResponseDetails, IBot } from './ibot';
 import { elizaKeywords, genericResponses } from './keywords';
 
-export class Eliza implements IBot {
-    private keywords: KeywordData[];
-    private rng: () => number;
+const rng = Math.random;
 
-    constructor() {
-        this.keywords = elizaKeywords.map(([word, priority, rules]: [string, number, [string, string[]][]]): KeywordData => ({
-            word,
-            priority,
-            rules: rules.map(([decompRule, responses]: [string, string[]]) => ({
-                decompRule,
-                responses,
-                reassembRules: responses
-            }))
-        }));
+function pick<T>(array: T[]): T {
+    return array[Math.floor(rng() * array.length)];
+}
 
-        this.rng = Math.random;
+class Rule {
+
+    public decompRule: string;
+    public responses: string[];
+    public reassembRules: string[];
+
+    constructor(decompRule: string, responses: string[], reassembRules: string[]) {
+        this.decompRule = decompRule;
+        this.responses = responses;
+        this.reassembRules = reassembRules;
     }
 
-    private pick<T>(array: T[]): T {
-        return array[Math.floor(this.rng() * array.length)];
-    }
-
-    public getResponse(input: string): { response: string; details: ResponseDetails } {
-        const sanitizedInput = this.sanatize(input);
-        const matchedKeywords = this.getDecompositionRules(sanitizedInput);
-
-        if (matchedKeywords) {
-            for (const keyword of matchedKeywords) {
-                const decompositionRule = this.getDecompositionRule(sanitizedInput, keyword.rules);
-                if (decompositionRule) {
-                    const reassemblyRule = this.getReassemblyRule(decompositionRule);
-                    const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.decompRule);
-                    return {
-                        response,
-                        details: {
-                            sanitizedInput,
-                            matchedKeywords,
-                            pattern: decompositionRule.decompRule,
-                            response: reassemblyRule
-                        }
-                    };
-                }
-            }
-        }
-
-        return {
-            response: this.pick(genericResponses),
-            details: {
-                sanitizedInput,
-                matchedKeywords,
-                pattern: '',
-                response: ''
-            }
-        };
-    }
-
-    public getResponseFromRule(input: string, rule: Rule): string {
-        return this.reassemble(input, this.pick(rule.reassembRules), rule.decompRule);
-    }
-
-    private sanatize(input: string): string {
-        return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
-    }
-
-    private getDecompositionRules(input: string): KeywordData[] {
-        return this.keywords
-            .filter(k => input.includes(k.word))
-            .sort((a, b) => b.priority - a.priority);
-    }
-
-    private getDecompositionRule(input: string, rules: Rule[]): Rule | null {
-        for (const rule of rules) {
-            const regex = this.getRegExp(rule.decompRule);
-            if (regex.test(input)) {
-                return rule;
-            }
-        }
-        return null;
-    }
-
-    private getReassemblyRule(rule: Rule): string {
-        return this.pick(rule.reassembRules);
+    public getResponse(input: string): string {
+        return this.reassemble(input, pick(this.reassembRules), this.decompRule);
     }
 
     private getRegExp(pattern: string): RegExp {
@@ -102,5 +40,73 @@ export class Eliza implements IBot {
             result = result.replace(`(${i})`, matches[i] ? matches[i].trim() : '');
         }
         return result;
+    }
+
+}
+
+interface KeywordData {
+    word: string;
+    priority: number;
+    rules: Rule[];
+}
+
+function ruleFromData(decompRule: string, responses: string[], reassembRules: string[]): Rule {
+    return new Rule(decompRule, responses, reassembRules);
+}
+
+
+export class Eliza implements IBot {
+    private keywords: KeywordData[];
+
+    constructor() {
+        this.keywords = elizaKeywords.map(([word, priority, rules]: [string, number, [string, string[]][]]): KeywordData => ({
+            word,
+            priority,
+            rules: rules.map(([decompRule, responses]: [string, string[]]) => ruleFromData(decompRule, responses, responses))
+        }));
+    }
+
+
+    public getResponse(input: string): { response: string; details: ResponseDetails } {
+        const sanitizedInput = this.sanatize(input);
+        const matchedKeywords = this.getDecompositionRules(sanitizedInput);
+
+        if (matchedKeywords) {
+            const keywordResponses = this.responsesFromAllKeywords(sanitizedInput, matchedKeywords);
+            const response = this.responseFromOneKeyword(sanitizedInput, matchedKeywords[0]);
+            return {
+                response,
+                details: {
+                    sanitizedInput,
+                    keywordResponses
+                }
+            };
+        }
+
+        return {
+            response: pick(genericResponses),
+            details: {
+                sanitizedInput,
+                keywordResponses: new Map()
+            }
+        };
+    }
+
+    public responsesFromAllKeywords(input: string, keywords: KeywordData[]): Map<string, string> {
+        return new Map(keywords.map(keyword => [keyword.word, this.responseFromOneKeyword(input, keyword)]));
+    }
+
+    public responseFromOneKeyword(input: string, keyword: KeywordData): string {
+        return pick(keyword.rules).getResponse(input);
+    }
+
+    private sanatize(input: string): string {
+        return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
+    }
+
+    private getDecompositionRules(input: string): KeywordData[] {
+        return this.keywords
+            .filter(k => input.includes(k.word))
+            .sort((a, b) => b.priority - a.priority);
     }
 }

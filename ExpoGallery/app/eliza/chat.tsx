@@ -28,27 +28,27 @@ export const getPriorityColor = (priority: number): string => {
   return colors[Math.min(priority, colors.length - 1)] || colors[0];
 };
 
-export const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<{ word: string; priority: number }> }) => {
+export const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<string> }) => {
   // Sort keywords by length (descending) to handle overlapping matches correctly
-  const sortedKeywords = [...keywords].sort((a, b) => b.word.length - a.word.length);
+  const sortedKeywords = [...keywords].sort((a, b) => b.length - a.length);
 
   // Create segments with highlighting information
   let segments: Array<{ text: string; priority?: number }> = [{ text }];
 
-  sortedKeywords.forEach(({ word, priority }) => {
+  sortedKeywords.forEach((keyword) => {
     segments = segments.flatMap(segment => {
       if (segment.priority !== undefined) return [segment]; // Skip already highlighted segments
 
       // Find word variations: exact match, plural/singular forms, and stemmed versions
-      const wordPattern = word.endsWith('s') ?
-        `\\b(${word}|${word.slice(0, -1)})\\b` : // If keyword ends in 's', match with and without it
-        `\\b(${word}|${word}s)\\b`; // Otherwise match with and without 's'
+      const wordPattern = keyword.endsWith('s') ?
+        `\\b(${keyword}|${keyword.slice(0, -1)})\\b` : // If keyword ends in 's', match with and without it
+        `\\b(${keyword}|${keyword}s)\\b`; // Otherwise match with and without 's'
 
       const parts = segment.text.split(new RegExp(wordPattern, 'gi'));
       return parts.map(part => {
         // Check if this part matches any variation of the word
         const isMatch = new RegExp(wordPattern, 'i').test(part);
-        return isMatch ? { text: part, priority } : { text: part };
+        return isMatch ? { text: part } : { text: part };
       });
     });
   });
@@ -210,7 +210,7 @@ export default function ChatScreen() {
         <View style={styles.sanitizedInputContainer}>
           <HighlightedText
             text={responseDetails.sanitizedInput}
-            keywords={responseDetails.matchedKeywords}
+            keywords={Array.from(responseDetails.keywordResponses.keys())}
           />
         </View>
       </ScrollView>

@@ -1,20 +1,11 @@
-export interface Rule {
-    decompRule: string;
-    responses: string[];
-    reassembRules: string[];
-}
-
-export interface KeywordData {
-    word: string;
-    priority: number;
-    rules: Rule[];
-}
+/**
+ * The interface between a chat UI and a chatbot based on keyword matching.
+ * It includes some minimal diagnostic information about how the chatbot matched the user's input to a response.
+ */
 
 export interface ResponseDetails {
     sanitizedInput: string;
-    matchedKeywords: KeywordData[];
-    pattern: string;
-    response: string;
+    keywordResponses: Map<string, string>;
 }
 
 export interface IBot {
