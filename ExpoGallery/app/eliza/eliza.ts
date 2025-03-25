@@ -1,7 +1,7 @@
-import { KeywordData, Rule, ResponseDetails } from './ibot';
+import { KeywordData, Rule, ResponseDetails, IBot } from './ibot';
 import { elizaKeywords, genericResponses } from './keywords';
 
-export class Eliza {
+export class Eliza implements IBot {
     private keywords: KeywordData[];
     private rng: () => number;
 
@@ -47,7 +47,7 @@ export class Eliza {
         }
 
         return {
-            response: 'No mathing response.',
+            response: this.pick(genericResponses),
             details: {
                 sanitizedInput,
                 matchedKeywords,
