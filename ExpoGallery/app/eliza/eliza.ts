@@ -1,5 +1,12 @@
 import { ResponseDetails, IBot } from './ibot';
-import { elizaKeywordsRules, Keyword} from './keywords';
+import { elizaKeywordsRules} from './keywords';
+
+export interface Keyword {
+    word: string;
+    priority: number;
+	match(input: string): boolean;
+	response(input: string): string;
+}
 
 export class Eliza implements IBot {
     private keywords: Keyword[];

@@ -209,7 +209,7 @@ export default function ChatScreen() {
         <Text style={styles.detailsLabel}>Sanitized Input:</Text>
         <View style={styles.sanitizedInputContainer}>
           <HighlightedText
-            text={responseDetails.sanitizedInput}
+            text={responseDetails.input}
             keywords={Array.from(responseDetails.keywordResponses.keys())}
           />
         </View>

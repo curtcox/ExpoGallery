@@ -1,4 +1,4 @@
-
+import { Keyword } from './eliza';
 const rng = Math.random;
 
 function pick<T>(array: T[]): T {
@@ -661,14 +661,6 @@ class Rule {
 
 function ruleFromData(decompRule: string, responses: string[], reassembRules: string[]): Rule {
     return new Rule(decompRule, responses, reassembRules);
-}
-
-export interface Keyword {
-    word: string;
-    priority: number;
-    rules: Rule[];
-	match(input: string): boolean;
-	response(input: string): string;
 }
 
 function sanatize(input: string): string {
