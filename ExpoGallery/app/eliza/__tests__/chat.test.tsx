@@ -25,7 +25,7 @@ describe('HighlightedText', () => {
     const { toJSON } = render(
       <HighlightedText
         text="I work with computers"
-        keywords={[{ word: 'computers', priority: 1 }]}
+        keywords={['computers']}
       />
     );
     const result = toJSON();
@@ -42,10 +42,7 @@ describe('HighlightedText', () => {
     const { toJSON } = render(
       <HighlightedText
         text="I am very sad today"
-        keywords={[
-          { word: 'am', priority: 0 },
-          { word: 'sad', priority: 2 }
-        ]}
+        keywords={['am', 'sad']}
       />
     );
     const result = toJSON();
@@ -79,7 +76,7 @@ describe('HighlightedText', () => {
       const { toJSON } = render(
         <HighlightedText
           text={text}
-          keywords={[{ word: keyword, priority: 1 }]}
+          keywords={[keyword]}
         />
       );
       const result = toJSON();
@@ -98,7 +95,7 @@ describe('HighlightedText', () => {
     const { toJSON } = render(
       <HighlightedText
         text="Tired am I today"
-        keywords={[{ word: 'i', priority: 1 }]}
+        keywords={['i']}
       />
     );
     const result = toJSON();
@@ -117,10 +114,7 @@ describe('HighlightedText', () => {
     const { toJSON } = render(
       <HighlightedText
         text="I am feeling very sad"
-        keywords={[
-          { word: 'very sad', priority: 2 },
-          { word: 'sad', priority: 1 }
-        ]}
+        keywords={['very sad', 'sad']}
       />
     );
     const result = toJSON();
@@ -140,10 +134,7 @@ describe('HighlightedText', () => {
     const { toJSON } = render(
       <HighlightedText
         text="I AM feeling SAD"
-        keywords={[
-          { word: 'am', priority: 1 },
-          { word: 'sad', priority: 2 }
-        ]}
+        keywords={['am', 'sad']}
       />
     );
     const result = toJSON();

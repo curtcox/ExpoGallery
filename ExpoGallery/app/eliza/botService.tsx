@@ -63,9 +63,8 @@ export const processUserMessage = async (userMessage: string, timeoutDuration?: 
       message: ERROR_MESSAGES.GENERAL,
       hasLocation,
       details: {
-        sanitizedInput: userMessage,
-        matchedKeywords: [],
-        isGenericResponse: true
+        input: userMessage,
+        keywordResponses: new Map(),
       }
     };
   }
