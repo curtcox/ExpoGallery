@@ -9,8 +9,8 @@ export class Eliza {
         this.keywords = elizaKeywords.map(([word, priority, rules]: [string, number, [string, string[]][]]): KeywordData => ({
             word,
             priority,
-            rules: rules.map(([pattern, responses]: [string, string[]]) => ({
-                pattern,
+            rules: rules.map(([decompRule, responses]: [string, string[]]) => ({
+                decompRule,
                 responses,
                 reassembRules: responses
             }))
@@ -32,13 +32,13 @@ export class Eliza {
                 const decompositionRule = this.getDecompositionRule(sanitizedInput, keyword.rules);
                 if (decompositionRule) {
                     const reassemblyRule = this.getReassemblyRule(decompositionRule);
-                    const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.pattern);
+                    const response = this.reassemble(sanitizedInput, reassemblyRule, decompositionRule.decompRule);
                     return {
                         response,
                         details: {
                             sanitizedInput,
                             matchedKeywords,
-                            pattern: decompositionRule.pattern,
+                            pattern: decompositionRule.decompRule,
                             response: reassemblyRule
                         }
                     };
@@ -57,25 +57,23 @@ export class Eliza {
         };
     }
 
+    public getResponseFromRule(input: string, rule: Rule): string {
+        return this.reassemble(input, this.pick(rule.reassembRules), rule.decompRule);
+    }
+
     private sanatize(input: string): string {
         return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
     }
 
-    private matchesKeyword(input: string, keyword: string): boolean {
-        // Split keyword by | to handle multiple variations
-        const variations = keyword.split('|');
-        return variations.some(variation => input.includes(variation));
-    }
-
     private getDecompositionRules(input: string): KeywordData[] {
         return this.keywords
-            .filter(k => this.matchesKeyword(input, k.word))
+            .filter(k => input.includes(k.word))
             .sort((a, b) => b.priority - a.priority);
     }
 
     private getDecompositionRule(input: string, rules: Rule[]): Rule | null {
         for (const rule of rules) {
-            const regex = this.getRegExp(rule.pattern);
+            const regex = this.getRegExp(rule.decompRule);
             if (regex.test(input)) {
                 return rule;
             }

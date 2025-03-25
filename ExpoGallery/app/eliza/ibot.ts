@@ -1,5 +1,5 @@
 export interface Rule {
-    pattern: string;
+    decompRule: string;
     responses: string[];
     reassembRules: string[];
 }
