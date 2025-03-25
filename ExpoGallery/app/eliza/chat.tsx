@@ -5,12 +5,12 @@ import {
   createBotMessage,
   processUserMessage,
   BOT_USER
-} from './elizaService';
+} from './botService';
 import { Link, router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 import { error, info } from '@/utils/logger';
 import { getCurrentLocation } from '@/services/location';
-import { ResponseDetails } from './eliza';
+import { ResponseDetails } from './ibot';
 
 const isServerSideRendering = () => {
   return Platform.OS === 'web' && typeof window === 'undefined';
@@ -198,7 +198,7 @@ export default function ChatScreen() {
       <View style={styles.detailsPanel}>
           <Text style={styles.detailsText}>Very simple Eliza chatbot adapted from </Text>
           <Link href="https://github.com/Adventvr/Eliza" style={styles.link}>Adventvr/Eliza</Link>
-          <Text style={styles.detailsText}>A more complex version is available </Text>
+           <Text style={styles.detailsText}>A more complex version is available </Text>
           <Link href="https://curtcox.github.io/elizabot-js/" style={styles.link}>here.</Link>
       </View>
     );
@@ -213,66 +213,6 @@ export default function ChatScreen() {
             keywords={responseDetails.matchedKeywords}
           />
         </View>
-
-        <Text style={styles.detailsLabel}>Matched Keywords:</Text>
-        <View style={styles.keywordsContainer}>
-          {[...responseDetails.matchedKeywords, ...(responseDetails.alternativeResponses || [])].sort((a, b) => b.priority - a.priority).map((k, index) => {
-            const isKeywordData = 'word' in k;
-            const keyword = isKeywordData ? k.word : k.keyword;
-            const pattern = isKeywordData ? (k.rules?.[0]?.pattern) : k.pattern;
-            const responses = isKeywordData ? k.responses : k.possibleResponses;
-
-            return (
-              <View key={index} style={styles.keywordItem}>
-                <Text style={styles.detailsText}>
-                  {keyword} (priority: {k.priority})
-                  {k === responseDetails.matchedKeywords[0] && " - Primary Response"}
-                </Text>
-                {pattern && (
-                  <Text style={styles.patternText}>Pattern: {pattern}</Text>
-                )}
-                {responses && (
-                  <Text style={styles.responsesText}>
-                    Possible responses:{'\n'}
-                    {responses.map((resp: string, i: number) => `${i + 1}. ${resp}`).join('\n')}
-                  </Text>
-                )}
-              </View>
-            );
-          })}
-        </View>
-
-        {responseDetails.isGenericResponse ? (
-          <Text style={styles.detailsText}>Using generic response</Text>
-        ) : responseDetails.usedRule ? (
-          <>
-            <Text style={styles.detailsLabel}>Used Rule:</Text>
-            <Text style={styles.detailsText}>Pattern: {responseDetails.usedRule.pattern}</Text>
-            <Text style={styles.detailsText}>Response template: {responseDetails.usedRule.response}</Text>
-          </>
-        ) : (
-          <Text style={styles.detailsText}>Using keyword response without decomposition rule</Text>
-        )}
-
-        {responseDetails.alternativeResponses && responseDetails.alternativeResponses.length > 0 && (
-          <>
-            <Text style={[styles.detailsLabel, styles.alternativesHeader]}>Alternative Responses:</Text>
-            {responseDetails.alternativeResponses.map((alt, index) => (
-              <View key={index} style={styles.alternativeResponse}>
-                <Text style={styles.alternativeKeyword}>
-                  {alt.keyword} (priority: {alt.priority})
-                </Text>
-                {alt.pattern && (
-                  <Text style={styles.detailsText}>Pattern: {alt.pattern}</Text>
-                )}
-                <Text style={styles.detailsText}>
-                  Possible responses:{'\n'}
-                  {alt.possibleResponses.map((resp, i) => `${i + 1}. ${resp}`).join('\n')}
-                </Text>
-              </View>
-            ))}
-          </>
-        )}
       </ScrollView>
     );
   };

@@ -1,11 +1,11 @@
 import { error } from '@/utils/index';
-import { localBot, ChatContext, BotResponse } from './elizaBot';
+import { localBot, ChatContext, BotResponse } from './botSwitch';
 import { profile } from '@/storage/profile';
 import { getAllResources } from '@/services/data';
 import { LocationObject } from 'expo-location';
 import { getCurrentLocation } from '@/services/location';
 import { IMessage } from '@/components/Chat';
-import { ResponseDetails } from './eliza';
+import { ResponseDetails } from './ibot';
 
 // Error messages
 export const ERROR_MESSAGES = {
@@ -21,13 +21,6 @@ export const BOT_USER = {
   name: 'React Native',
   avatar: 'https://placecats.com/140/140',
 };
-
-export class ChatServiceError extends Error {
-  constructor(message: string, public readonly errorType: keyof typeof ERROR_MESSAGES = 'GENERAL') {
-    super(message);
-    this.name = 'ChatServiceError';
-  }
-}
 
 export interface ChatResult {
   message: string;
@@ -64,19 +57,6 @@ export const processUserMessage = async (userMessage: string, timeoutDuration?: 
     };
   } catch (e) {
     error('Error in processUserMessage:', e);
-
-    // Determine which error message to return based on the error type
-    if (e instanceof ChatServiceError) {
-      return {
-        message: ERROR_MESSAGES[e.errorType],
-        hasLocation,
-        details: {
-          sanitizedInput: userMessage,
-          matchedKeywords: [],
-          isGenericResponse: true
-        }
-      };
-    }
 
     // Default error message for unexpected errors
     return {
@@ -118,7 +98,6 @@ export const generateBotResponse = async (
   location: LocationObject | null,
   timeoutDuration?: number
 ): Promise<BotResponse> => {
-  try {
     const context: ChatContext = {
       timestamp: new Date(),
       location: location ? {
@@ -130,14 +109,4 @@ export const generateBotResponse = async (
     };
 
     return localBot(userMessage, context);
-  } catch (e) {
-    error('Error generating bot response:', e);
-
-    // Return appropriate error based on the type of error
-    if (e instanceof ChatServiceError) {
-      throw e; // Re-throw ChatServiceError for the component to handle
-    } else {
-      throw new ChatServiceError('An unexpected error occurred', 'GENERAL');
-    }
-  }
 };
