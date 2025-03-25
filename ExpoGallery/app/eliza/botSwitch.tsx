@@ -2,10 +2,12 @@
  * Local chatbot implementation with context-aware responses
  */
 
-import { Eliza, ResponseDetails } from './eliza';
+import { ResponseDetails } from './ibot';
+import { KeyBot } from './keyBot';
 import { Profile } from '@/storage/profile';
 import { Resource } from '@/services/data';
-
+import { allRules } from './elizaRules';
+import { allFunctions } from './functions';
 export interface ChatContext {
   timestamp: Date;
   location?: {
@@ -26,8 +28,9 @@ export interface BotResponse {
  * Process user messages with context and return appropriate responses
  */
 export const localBot = (userMessage: string, context: ChatContext): BotResponse => {
-  const eliza = new Eliza();
-  const { response, details } = eliza.getResponse(userMessage);
+  const rules = (false) ? allRules : allFunctions;
+  const bot = new KeyBot(rules);
+  const { response, details } = bot.getResponse(userMessage);
   return {
     message: response,
     details,

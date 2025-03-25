@@ -5,16 +5,70 @@ import {
   createBotMessage,
   processUserMessage,
   BOT_USER
-} from './elizaService';
-import { router } from 'expo-router';
+} from './botService';
+import { Link, router } from 'expo-router';
 import { subscribeToMessageChanges, updateMessages } from '@/storage/messages';
 import { error, info } from '@/utils/logger';
 import { getCurrentLocation } from '@/services/location';
-import LocationIndicator from '@/components/LocationIndicator';
-import { ResponseDetails } from './eliza';
+import { ResponseDetails } from './ibot';
 
 const isServerSideRendering = () => {
   return Platform.OS === 'web' && typeof window === 'undefined';
+};
+
+export const getPriorityColor = (priority: number): string => {
+  // Color scale from high priority (warm colors) to low priority (cool colors)
+  const colors = [
+    '#ffcdd2', // Priority 0 (lowest) - Light red
+    '#fff9c4', // Priority 1 - Light yellow
+    '#c8e6c9', // Priority 2 - Light green
+    '#bbdefb', // Priority 3 - Light blue
+    '#e1bee7', // Priority 4 - Light purple
+  ];
+  return colors[Math.min(priority, colors.length - 1)] || colors[0];
+};
+
+export const HighlightedText = ({ text, keywords }: { text: string, keywords: Array<string> }) => {
+  // Sort keywords by length (descending) to handle overlapping matches correctly
+  const sortedKeywords = [...keywords].sort((a, b) => b.length - a.length);
+
+  // Create segments with highlighting information
+  let segments: Array<{ text: string; priority?: number }> = [{ text }];
+
+  sortedKeywords.forEach((keyword) => {
+    segments = segments.flatMap(segment => {
+      if (segment.priority !== undefined) return [segment]; // Skip already highlighted segments
+
+      // Find word variations: exact match, plural/singular forms, and stemmed versions
+      const wordPattern = keyword.endsWith('s') ?
+        `\\b(${keyword}|${keyword.slice(0, -1)})\\b` : // If keyword ends in 's', match with and without it
+        `\\b(${keyword}|${keyword}s)\\b`; // Otherwise match with and without 's'
+
+      const parts = segment.text.split(new RegExp(wordPattern, 'gi'));
+      return parts.map(part => {
+        // Check if this part matches any variation of the word
+        const isMatch = new RegExp(wordPattern, 'i').test(part);
+        return isMatch ? { text: part } : { text: part };
+      });
+    });
+  });
+
+  return (
+    <Text>
+      {segments.map((segment, index) => (
+        <Text
+          key={index}
+          style={segment.priority !== undefined ? {
+            backgroundColor: getPriorityColor(segment.priority),
+            borderRadius: 2,
+            paddingHorizontal: 2,
+          } : undefined}
+        >
+          {segment.text}
+        </Text>
+      ))}
+    </Text>
+  );
 };
 
 export default function ChatScreen() {
@@ -140,57 +194,32 @@ export default function ChatScreen() {
   }
 
   const renderResponseDetails = () => {
-    if (!responseDetails) return null;
+    if (!responseDetails) return (
+      <View style={styles.detailsPanel}>
+          <Text style={styles.detailsText}>Very simple Eliza chatbot adapted from </Text>
+          <Link href="https://github.com/Adventvr/Eliza" style={styles.link}>Adventvr/Eliza</Link>
+           <Text style={styles.detailsText}>A more complex version is available </Text>
+          <Link href="https://curtcox.github.io/elizabot-js/" style={styles.link}>here.</Link>
+      </View>
+    );
 
+    const keywords = responseDetails.keywordResponses ? Array.from(responseDetails.keywordResponses.keys()) : [];
     return (
       <ScrollView style={styles.detailsPanel}>
         <Text style={styles.detailsTitle}>Response Details</Text>
         <Text style={styles.detailsLabel}>Sanitized Input:</Text>
-        <Text style={styles.detailsText}>{responseDetails.sanitizedInput}</Text>
-
-        <Text style={styles.detailsLabel}>Matched Keywords:</Text>
-        <Text style={styles.detailsText}>
-          {responseDetails.matchedKeywords.map(k => `${k.word} (priority: ${k.priority})`).join('\n')}
-        </Text>
-
-        {responseDetails.isGenericResponse ? (
-          <Text style={styles.detailsText}>Using generic response</Text>
-        ) : responseDetails.usedRule ? (
-          <>
-            <Text style={styles.detailsLabel}>Used Rule:</Text>
-            <Text style={styles.detailsText}>Pattern: {responseDetails.usedRule.pattern}</Text>
-            <Text style={styles.detailsText}>Response template: {responseDetails.usedRule.response}</Text>
-          </>
-        ) : (
-          <Text style={styles.detailsText}>Using keyword response without decomposition rule</Text>
-        )}
-
-        {responseDetails.alternativeResponses && responseDetails.alternativeResponses.length > 0 && (
-          <>
-            <Text style={[styles.detailsLabel, styles.alternativesHeader]}>Alternative Responses:</Text>
-            {responseDetails.alternativeResponses.map((alt, index) => (
-              <View key={index} style={styles.alternativeResponse}>
-                <Text style={styles.alternativeKeyword}>
-                  {alt.keyword} (priority: {alt.priority})
-                </Text>
-                {alt.pattern && (
-                  <Text style={styles.detailsText}>Pattern: {alt.pattern}</Text>
-                )}
-                <Text style={styles.detailsText}>
-                  Possible responses:{'\n'}
-                  {alt.possibleResponses.map((resp, i) => `${i + 1}. ${resp}`).join('\n')}
-                </Text>
-              </View>
-            ))}
-          </>
-        )}
+        <View style={styles.sanitizedInputContainer}>
+          <HighlightedText
+            text={responseDetails.input}
+            keywords={keywords}
+          />
+        </View>
       </ScrollView>
     );
   };
 
   return (
     <View style={styles.container}>
-      <LocationIndicator top={10} right={20} size={14} hasLocation={hasLocation} />
       <View
         style={styles.splitContainer}
         onLayout={(e) => containerWidth.setValue(e.nativeEvent.layout.width)}
@@ -263,7 +292,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   detailsText: {
-    fontSize: 14,
+    fontSize: 16,
     marginTop: 4,
     marginBottom: 8,
   },
@@ -283,5 +312,40 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#555',
     marginBottom: 4,
+  },
+  sanitizedInputContainer: {
+    marginVertical: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    backgroundColor: 'white',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  keywordsContainer: {
+    marginTop: 8,
+  },
+  keywordItem: {
+    marginBottom: 12,
+    paddingLeft: 8,
+    borderLeftWidth: 2,
+    borderLeftColor: '#ddd',
+  },
+  patternText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  responsesText: {
+    fontSize: 14,
+    color: '#444',
+    marginTop: 4,
+    marginLeft: 8,
+  },
+  link: {
+    fontSize: 16,
+    color: '#2196F3',
+    textDecorationLine: 'underline',
+    marginVertical: 4,
   },
 });
