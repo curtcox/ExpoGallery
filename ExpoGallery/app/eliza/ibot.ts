@@ -4,7 +4,7 @@
  */
 
 export interface ResponseDetails {
-    sanitizedInput: string;
+    input: string;
     keywordResponses: Map<string, string>;
 }
 

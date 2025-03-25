@@ -1,4 +1,11 @@
-export const elizaKeywords: [string, number, [string, string[]][]][] = [
+
+const rng = Math.random;
+
+function pick<T>(array: T[]): T {
+    return array[Math.floor(rng() * array.length)];
+}
+
+const elizaKeywords: [string, number, [string, string[]][]][] = [
 	["sorry", 0, [
 		["*", [
 			"Please don't apologize.",
@@ -591,24 +598,101 @@ export const elizaKeywords: [string, number, [string, string[]][]][] = [
 			"Could there be some connection, do you suppose ?",
 			"How ?"
 		]]
+	]],
+	["", -1, [
+		["*", [
+			"I'm not sure I understand you fully.",
+			"Please go on.",
+			"Can you repeat that please ?",
+			"What does that suggest to you ?",
+			"Do you feel strongly about discussing such things ?",
+			"That is interesting.  Please continue.",
+			"Tell me more about that.",
+			"Do go on.",
+			"Please talk more about it",
+			"Does talking about this bother you ?",
+			"Can you rephrase that ?",
+			"I see. Tell me more.",
+			"Interesting. Is this something you are sorry about ?",
+			"Mmm hmmm. Is this is your favorite subject ?",
+			"Now we are getting somewhere. Explain more.",
+			"I see. How does that make you feel ?"
+		]]
 	]]
+
 ];
 
-export const genericResponses: string[] = [
-	"I'm not sure I understand you fully.",
-	"Please go on.",
-	"Can you repeat that please ?",
-	"What does that suggest to you ?",
-	"Do you feel strongly about discussing such things ?",
-	"That is interesting.  Please continue.",
-	"Tell me more about that.",
-	"Do go on.",
-	"Please talk more about it",
-	"Does talking about this bother you ?",
-	"Can you rephrase that ?",
-	"I see. Tell me more.",
-	"Interesting. Is this something you are sorry about ?",
-	"Mmm hmmm. Is this is your favorite subject ?",
-	"Now we are getting somewhere. Explain more.",
-	"I see. How does that make you feel ?"
-];
+class Rule {
+
+    public decompRule: string;
+    public responses: string[];
+    public reassembRules: string[];
+
+    constructor(decompRule: string, responses: string[], reassembRules: string[]) {
+        this.decompRule = decompRule;
+        this.responses = responses;
+        this.reassembRules = reassembRules;
+    }
+
+    public getResponse(input: string): string {
+        return this.reassemble(input, pick(this.reassembRules), this.decompRule);
+    }
+
+    private getRegExp(pattern: string): RegExp {
+        const parts = pattern.split('*').map(part => part.trim());
+        const regexParts = parts.map(part => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        const regexPattern = regexParts.join('(.*)');
+        return new RegExp(regexPattern);
+    }
+
+    private reassemble(input: string, reassemblyRule: string, decompositionRule: string): string {
+        const regex = this.getRegExp(decompositionRule);
+        const matches = input.match(regex);
+        if (!matches) return reassemblyRule;
+
+        let result = reassemblyRule;
+        for (let i = 1; i < matches.length; i++) {
+            result = result.replace(`(${i})`, matches[i] ? matches[i].trim() : '');
+        }
+        return result;
+    }
+
+}
+
+function ruleFromData(decompRule: string, responses: string[], reassembRules: string[]): Rule {
+    return new Rule(decompRule, responses, reassembRules);
+}
+
+export interface Keyword {
+    word: string;
+    priority: number;
+    rules: Rule[];
+	match(input: string): boolean;
+	response(input: string): string;
+}
+
+function sanatize(input: string): string {
+	return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
+}
+
+
+class KeywordRule implements Keyword {
+	word: string;
+	priority: number;
+	rules: Rule[];
+	response(input: string): string {
+		return pick(this.rules).getResponse(input);
+	}
+	match(input: string): boolean {
+		return input.includes(sanatize(this.word));
+	}
+	constructor(word: string, priority: number, rules: Rule[]) {
+		this.word = word;
+		this.priority = priority;
+		this.rules = rules;
+	}
+}
+
+export const elizaKeywordsRules: Keyword[] = elizaKeywords.map(
+	([word, priority, rules]: [string, number, [string, string[]][]]): KeywordRule =>
+		 new KeywordRule(word, priority, rules.map(([decompRule, responses]: [string, string[]]) => ruleFromData(decompRule, responses, responses))));
