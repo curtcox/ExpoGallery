@@ -1,4 +1,4 @@
-import { classify, classificationMap } from '../classifier';
+import { classify, classificationMap } from '../simpleClassifier';
 
 describe('resource matcher with default rules', () => {
     const rules: classificationMap = {
