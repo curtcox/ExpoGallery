@@ -10,20 +10,23 @@ export interface ResourceRule {
 
 export type classificationMap = Record<string, ResourceRule>;
 
-export function classify(text: string, rulesMap: classificationMap): string {
+export function classify(text: string, rulesMap: classificationMap): string[] {
     const input = sanatize(text);
-    let highestPriority = -1;
-    let bestMatch = 'unknown';
+    const matches: Array<{classification: string; priority: number}> = [];
 
+    // Collect all matches with their priorities
     for (const rule of Object.values(rulesMap)) {
         if (rule.pattern.test(input)) {
-            const priority = rule.priority ?? 0;  // Use nullish coalescing to default to 0
-            if (priority > highestPriority) {
-                highestPriority = priority;
-                bestMatch = rule.classification;
-            }
+            matches.push({
+                classification: rule.classification,
+                priority: rule.priority ?? 0
+            });
         }
     }
 
-    return bestMatch;
+    // Sort matches by priority in descending order
+    matches.sort((a, b) => b.priority - a.priority);
+
+    // Return array of classifications
+    return matches.map(match => match.classification);
 }
