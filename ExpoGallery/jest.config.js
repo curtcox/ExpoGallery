@@ -1,32 +1,19 @@
-const config = {
-  preset: 'jest-expo',
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: [
-    '@testing-library/jest-dom',
-    '<rootDir>/jest.setup.js'
-  ],
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: {
+        allowJs: true,
+      }
+    }],
+    '^.+\\.jsx?$': 'babel-jest'
   },
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)'
+    'node_modules/(?!(stemmer|double-metaphone)/)'
   ],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
-  },
-  testMatch: [
-    "**/__tests__/**/*.test.ts",
-    "**/__tests__/**/*.test.tsx"
-  ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  // Ignore specific example files that aren't actual tests
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    'externalChatExample.ts',
-    'manualExample.js',
-    '/dist/',
-    '/public/'
-  ]
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  }
 };
-
-module.exports = config;
