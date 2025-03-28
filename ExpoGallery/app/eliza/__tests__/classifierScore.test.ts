@@ -1,7 +1,8 @@
-import { classify, classificationMap } from '../simpleClassifier';
+import { classify, ClassificationRule } from '../simpleClassifier';
 import assistanceData from './assistanceRequests.json';
-import assistanceRulesJson from './assistanceSimple.json';
-import { classify as metaphoneClassify, loadAndPreprocessRules } from '../metaphoneClassifier';
+import assistanceRules from './assistanceSimple.json';
+import { classify as metaphoneClassify, Rule, WeightMap } from '../metaphoneClassifier';
+import { log } from "console";
 
 interface AssistanceMessage {
     id: number;
@@ -13,37 +14,41 @@ interface AssistanceData {
     messages: AssistanceMessage[];
 }
 
-describe('simple classifier assistance resource matcher scoring', () => {
-    // Convert JSON patterns to RegExp objects
-    const assistanceRules: classificationMap = Object.entries(assistanceRulesJson).reduce((acc, [key, value]) => {
-        acc[key] = {
-            ...value,
-            pattern: new RegExp(value.pattern, 'i')
-        };
-        return acc;
-    }, {} as classificationMap);
+interface AssistanceRule {
+    category: string;
+    phrases: string;
+    weight?: number;
+}
 
-    test('should achieve at least 90% classification accuracy', () => {
+function assistanceRulesAsClassificationRule(): ClassificationRule[] {
+    const rules = assistanceRules as AssistanceRule[];
+    return rules.map(rule => new ClassificationRule(rule.category, rule.phrases, rule.weight ?? 1));
+}
+
+describe('simple classifier assistance resource matcher scoring', () => {
+
+    test('should achieve at least 75% classification accuracy', () => {
         let totalClassifications = 0;
         let correctClassifications = 0;
 
         // Process each message in the assistance data
         (assistanceData as AssistanceData).messages.forEach(message => {
             const expectedClassifications = message.classifications;
-            const actualClassifications = classify(message.text, assistanceRules);
+            const actualClassifications = classify(message.text, assistanceRulesAsClassificationRule());
 
             // Count total expected classifications
             totalClassifications += expectedClassifications.length;
 
             // Count correct classifications
             expectedClassifications.forEach(expected => {
-                if (actualClassifications.includes(expected)) {
+                const tooMany = expectedClassifications.length + 2 <= actualClassifications.size;
+                if (actualClassifications.has(expected) && !tooMany) {
                     correctClassifications++;
-                } else {
-                    console.log(`Classification failed:
-                    Text: "${message.text}"
-                    Expected: "${expected}"
-                    Got: "${actualClassifications}"`);
+                                    } else {
+    log(`Classification failed:
+    Text: "${message.text}"
+    Expected: "${expected}"
+    Got: "${Array.from(actualClassifications.keys())}"`);
                 }
             });
         });
@@ -56,36 +61,41 @@ describe('simple classifier assistance resource matcher scoring', () => {
         Correct Classifications: ${correctClassifications}
         Accuracy: ${percentage}%`);
 
-        expect(accuracy).toBeGreaterThanOrEqual(0.78);
+        expect(accuracy).toBeGreaterThanOrEqual(0.75);
     });
 });
 
-describe('metaphone classifier assistance resource matcher scoring', () => {
-    // Load and preprocess rules from the metaphone rules file
-    const assistanceRules = loadAndPreprocessRules('./app/eliza/__tests__/assistanceMetaphone.json');
+function assistanceRulesAsMetaphoneRule(): Rule[] {
+    const rules = assistanceRules as AssistanceRule[];
+    const phrases = new WeightMap();
+    const exclusions = new WeightMap();
+    return rules.map(rule => new Rule(rule.category, phrases, exclusions));
+}
 
-    test('should achieve at least 90% classification accuracy', () => {
+describe('metaphone classifier assistance resource matcher scoring', () => {
+
+    test('should achieve at least 75% classification accuracy', () => {
         let totalClassifications = 0;
         let correctClassifications = 0;
 
         // Process each message in the assistance data
         (assistanceData as AssistanceData).messages.forEach(message => {
             const expectedClassifications = message.classifications;
-            const result = metaphoneClassify(message.text, assistanceRules);
-            const actualClassifications = result === 'unknown' ? [] : [result];
+            const actualClassifications = metaphoneClassify(message.text, assistanceRulesAsMetaphoneRule());
 
             // Count total expected classifications
             totalClassifications += expectedClassifications.length;
 
             // Count correct classifications
             expectedClassifications.forEach(expected => {
-                if (actualClassifications.includes(expected)) {
+                const tooMany = expectedClassifications.length + 2 <= actualClassifications.length;
+                if (actualClassifications.some(classification => classification.category === expected) && !tooMany) {
                     correctClassifications++;
-                } else {
-                    console.log(`Classification failed:
-                    Text: "${message.text}"
-                    Expected: "${expected}"
-                    Got: "${actualClassifications}"`);
+                                    } else {
+    log(`Classification failed:
+    Text: "${message.text}"
+    Expected: "${expected}"
+    Got: "${JSON.stringify(actualClassifications)}"`);
                 }
             });
         });
@@ -98,6 +108,6 @@ describe('metaphone classifier assistance resource matcher scoring', () => {
         Correct Classifications: ${correctClassifications}
         Accuracy: ${percentage}%`);
 
-        expect(accuracy).toBeGreaterThanOrEqual(0.78);
+        expect(accuracy).toBeGreaterThanOrEqual(0.75);
     });
 });

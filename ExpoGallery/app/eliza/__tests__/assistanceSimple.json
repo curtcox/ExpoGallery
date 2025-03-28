@@ -1,60 +1,59 @@
-{
-    "food": {
-        "pattern": "\\b(food|hungry|meal|eat|soup|kitchen|meals|snack)\\b",
-        "classification": "food"
+[
+    {
+        "category": "food",
+        "phrases": "food,hungry,meal,eat,soup,kitchen,meals,snack"
     },
-    "shelter": {
-        "pattern": "\\b(shelter|sleep|overnight|housing|store belongings|night shelter)\\b",
-        "classification": "shelter"
+    {
+        "category": "shelter",
+        "phrases": "shelter,sleep,overnight,housing,store belongings,night shelter"
     },
-    "medicine": {
-        "pattern": "\\b(sick|clinic|medical|health|injury|dental|treatment|rehab|hospital|doctor|dentist|nurse|ambulance|emergency|cut)\\b",
-        "classification": "medicine"
+    {
+        "category": "medicine",
+        "phrases": "sick,clinic,medical,health,injury,dental,treatment,rehab,hospital,doctor,dentist,nurse,ambulance,emergency,cut"
     },
-    "legal": {
-        "pattern": "\\b(ID|legal|rights|forms|application|crime|report|lawyer|law|attorney|judge|court|jail|prison)\\b",
-        "classification": "legal",
-        "priority": 2
+    {
+        "category": "legal",
+        "phrases": "ID,legal,rights,forms,application,crime,report,lawyer,law,attorney,judge,court,jail,prison"
     },
-    "employment": {
-        "pattern": "\\b(job|work|employment|training|placement|money|cash|gig)\\b",
-        "classification": "employment"
+    {
+        "category": "employment",
+        "phrases": "job,work,employment,training,placement,money,cash,gig"
     },
-    "hygiene": {
-        "pattern": "\\b(shower|clean|clothes|grooming|haircut)\\b",
-        "classification": "hygiene"
+    {
+        "category": "hygiene",
+        "phrases": "shower,clean,clothes,grooming,haircut"
     },
-    "benefits": {
-        "pattern": "\\b(benefits|government|assistance programs)\\b",
-        "classification": "benefits"
+    {
+        "category": "benefits",
+        "phrases": "benefits,government,assistance programs"
     },
-    "mental": {
-        "pattern": "\\b(mental|counseling|down|support)\\b",
-        "classification": "mental",
-        "priority": 1
+    {
+        "category": "mental",
+        "phrases": "mental,counseling,down,support"
     },
-    "transportation": {
-        "pattern": "\\b(transportation|transit|schedules|bus|train|taxi|car|ride)\\b",
-        "classification": "transportation"
+    {
+        "category": "transportation",
+        "phrases": "transportation,transit,schedules,bus,train,taxi,car,ride"
     },
-    "facility": {
-        "pattern": "\\b(library|computer|facility|toilet|bathroom|restroom)\\b",
-        "classification": "facility"
+    {
+        "category": "facility",
+        "phrases": "library,computer,facility,toilet,bathroom,restroom"
     },
-    "social": {
-        "pattern": "\\b(family|isolated|contact|social)\\b",
-        "classification": "social"
+    {
+        "category": "social",
+        "phrases": "family,isolated,contact,social"
     },
-    "clothing": {
-        "pattern": "\\b(clothing|clothes|coat|jacket|shoes)\\b",
-        "classification": "clothing"
+    {
+        "category": "clothing",
+        "phrases": "clothing,clothes,coat,jacket,shoes"
     },
-    "utility": {
-        "pattern": "\\b(charge|phone|charger)\\b",
-        "classification": "utility"
+    {
+        "category": "utility",
+        "phrases": "charge,phone,charger"
     },
-    "security": {
-        "pattern": "\\b(safely|secure|mail|packages|bike)\\b",
-        "classification": "security"
+    {
+        "category": "security",
+        "phrases": "safely,secure,mail,packages,bike"
     }
-}
+
+]

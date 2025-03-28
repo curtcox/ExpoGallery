@@ -1,24 +1,12 @@
-import { classify, classificationMap } from '../simpleClassifier';
+import { classify, ClassificationRule } from '../simpleClassifier';
 
 describe('resource matcher with default rules', () => {
-    const rules: classificationMap = {
-        computer: {
-            pattern: /\b(computer|cpu|ram|disk|memory|processor|storage|hardware)\b/,
-            classification: 'computer'
-        },
-        human: {
-            pattern: /\b(tired|energy|sleep|exhausted|fatigue|rest|strength)\b/,
-            classification: 'human'
-        },
-        financial: {
-            pattern: /\b(money|budget|savings|cost|financial|expensive|price|afford)\b/,
-            classification: 'financial'
-        },
-        time: {
-            pattern: /\b(time|hours|schedule|deadline|duration)\b/,
-            classification: 'time'
-        }
-    };
+    const rules: ClassificationRule[] = [
+        new ClassificationRule('computer', "computer,cpu,ram,disk,memory,processor,storage,hardware"),
+        new ClassificationRule('human', "tired,energy,sleep,exhausted,fatigue,rest,strength"),
+        new ClassificationRule('financial', "money,budget,savings,cost,financial,expensive,price,afford"),
+        new ClassificationRule('time', "time,hours,schedule,deadline,duration"),
+    ];
 
     test('should classify text about computer resources correctly', () => {
         const computerTexts = [
@@ -29,7 +17,7 @@ describe('resource matcher with default rules', () => {
         ];
 
         computerTexts.forEach(text => {
-            expect(classify(text, rules)).toEqual(['computer']);
+            expect(classify(text, rules)).toEqual(new Map([['computer', 1]]));
         });
     });
 
@@ -42,7 +30,7 @@ describe('resource matcher with default rules', () => {
         ];
 
         humanTexts.forEach(text => {
-            expect(classify(text, rules)).toEqual(['human']);
+            expect(classify(text, rules)).toEqual(new Map([['human',1]]));
         });
     });
 
@@ -55,7 +43,7 @@ describe('resource matcher with default rules', () => {
         ];
 
         financialTexts.forEach(text => {
-            expect(classify(text, rules)).toEqual(['financial']);
+            expect(classify(text, rules)).toEqual(new Map([['financial', 1]]));
         });
     });
 
@@ -68,7 +56,7 @@ describe('resource matcher with default rules', () => {
         ];
 
         timeTexts.forEach(text => {
-            expect(classify(text, rules)).toEqual(['time']);
+            expect(classify(text, rules)).toEqual(new Map([['time', 1]]));
         });
     });
 
@@ -81,123 +69,73 @@ describe('resource matcher with default rules', () => {
         ];
 
         unknownTexts.forEach(text => {
-            expect(classify(text, rules)).toEqual([]);
+            expect(classify(text, rules)).toEqual(new Map());
         });
     });
 
     test('should handle empty strings and whitespace', () => {
-        expect(classify('', rules)).toEqual([]);
-        expect(classify('   ', rules)).toEqual([]);
+        expect(classify('', rules)).toEqual(new Map());
+        expect(classify('   ', rules)).toEqual(new Map());
     });
 
     test('should be case insensitive', () => {
-        expect(classify('MY COMPUTER IS SLOW', rules)).toEqual(['computer']);
-        expect(classify('i need more Money', rules)).toEqual(['financial']);
+        expect(classify('MY COMPUTER IS SLOW', rules)).toEqual(new Map([['computer', 1]]));
+        expect(classify('i need more Money', rules)).toEqual(new Map([['financial', 1]]));
     });
 
     test('should return multiple classifications when text matches multiple patterns', () => {
         expect(classify('My computer is running slow and I am tired', rules))
-            .toEqual(expect.arrayContaining(['computer', 'human']));
+            .toEqual(new Map([['computer', 1], ['human', 1]]));
     });
 });
 
 describe('weather matcher with custom rules', () => {
-    const customRules: classificationMap = {
-        food: {
-            pattern: /\b(hungry|food|eat|meal|snack|dinner|lunch|breakfast)\b/,
-            classification: 'nutrition'
-        },
-        weather: {
-            pattern: /\b(rain|sun|snow|wind|storm|temperature|weather)\b/,
-            classification: 'weather'
-        }
-    };
+    const customRules: ClassificationRule[] = [
+        new ClassificationRule('nutrition', "hungry,food,eat,meal,snack,dinner,lunch,breakfast"),
+        new ClassificationRule('weather', "rain,sun,snow,wind,storm,temperature,weather"),
+    ];
 
     test('should classify text using custom rules', () => {
-        expect(classify('I am hungry', customRules)).toEqual(['nutrition']);
-        expect(classify('It might rain today', customRules)).toEqual(['weather']);
-        expect(classify('I need more RAM', customRules)).toEqual([]);
+        expect(classify('I am hungry', customRules)).toEqual(new Map([['nutrition', 1]]));
+        expect(classify('It might rain today', customRules)).toEqual(new Map([['weather', 1]]));
+        expect(classify('I need more RAM', customRules)).toEqual(new Map());
     });
 
     test('should handle empty custom rules', () => {
-        expect(classify('any text', {})).toEqual([]);
+        expect(classify('any text', [])).toEqual(new Map());
     });
 
     test('should be case insensitive with custom rules', () => {
-        expect(classify('FEELING HUNGRY', customRules)).toEqual(['nutrition']);
-        expect(classify('The WEATHER is nice', customRules)).toEqual(['weather']);
+        expect(classify('FEELING HUNGRY', customRules)).toEqual(new Map([['nutrition', 1]]));
+        expect(classify('The WEATHER is nice', customRules)).toEqual(new Map([['weather', 1]]));
     });
 });
 
 describe('assistance resource matcher with custom rules', () => {
-    const assistanceRules: classificationMap = {
-        food: {
-            pattern: /\b(food|hungry|meal|eat|soup|kitchen|meals|snack)\b/,
-            classification: 'food'
-        },
-        shelter: {
-            pattern: /\b(shelter|sleep|overnight|housing|store belongings|night shelter)\b/,
-            classification: 'shelter'
-        },
-        medicine: {
-            pattern: /\b(sick|clinic|medical|health|injury|dental|treatment|rehab|hospital|doctor|dentist|nurse|ambulance|emergency|cut)\b/,
-            classification: 'medicine'
-        },
-        legal: {
-            pattern: /\b(ID|legal|rights|forms|application|crime|report|lawyer|law|attorney|judge|court|jail|prison)\b/i,
-            classification: 'legal',
-            priority: 2
-        },
-        employment: {
-            pattern: /\b(job|work|employment|training|placement|money|cash|gig)\b/,
-            classification: 'employment'
-        },
-        hygiene: {
-            pattern: /\b(shower|clean|clothes|grooming|haircut)\b/,
-            classification: 'hygiene'
-        },
-        benefits: {
-            pattern: /\b(benefits|government|assistance programs)\b/,
-            classification: 'benefits'
-        },
-        mental: {
-            pattern: /\b(mental|counseling|down|support)\b/,
-            classification: 'mental',
-            priority: 1
-        },
-        transportation: {
-            pattern: /\b(transportation|transit|schedules|bus|train|taxi|car|ride)\b/,
-            classification: 'transportation'
-        },
-        facility: {
-            pattern: /\b(library|computer|facility|toilet|bathroom|restroom)\b/,
-            classification: 'facility'
-        },
-        social: {
-            pattern: /\b(family|isolated|contact|social)\b/,
-            classification: 'social'
-        },
-        clothing: {
-            pattern: /\b(clothing|clothes|coat|jacket|shoes)\b/,
-            classification: 'clothing'
-        },
-        utility: {
-            pattern: /\b(charge|phone|charger)\b/,
-            classification: 'utility'
-        },
-        security: {
-            pattern: /\b(safely|secure|mail|packages|bike)\b/,
-            classification: 'security'
-        }
-    };
+    const assistanceRules: ClassificationRule[] = [
+        new ClassificationRule('food', "food,hungry,meal,eat,soup,kitchen,meals,snack"),
+        new ClassificationRule('shelter', "shelter,sleep,overnight,housing,store belongings,night shelter"),
+        new ClassificationRule('medicine', "sick,clinic,medical,health,injury,dental,treatment,rehab,hospital,doctor,dentist,nurse,ambulance,emergency,cut"),
+        new ClassificationRule('legal', "ID,legal,rights,forms,application,crime,report,lawyer,law,attorney,judge,court,jail,prison"),
+        new ClassificationRule('employment', "job,work,employment,training,placement,money,cash,gig"),
+        new ClassificationRule('hygiene', "shower,clean,clothes,grooming,haircut"),
+        new ClassificationRule('benefits', "benefits,government,assistance programs"),
+        new ClassificationRule('mental', "mental,counseling,down,support"),
+        new ClassificationRule('transportation', "transportation,transit,schedules,bus,train,taxi,car,ride"),
+        new ClassificationRule('facility', "library,computer,facility,toilet,bathroom,restroom"),
+        new ClassificationRule('social', "family,isolated,contact,social"),
+        new ClassificationRule('clothing', "clothing,clothes,coat,jacket,shoes"),
+        new ClassificationRule('utility', "charge,phone,charger"),
+        new ClassificationRule('security', "safely,secure,mail,packages,bike"),
+    ];
 
     const testClassification = (text: string, expectedClass: string) => {
         const result = classify(text, assistanceRules);
-        if (!result.includes(expectedClass)) {
-            const rule = assistanceRules[expectedClass];
-            const matchedRules = result.map(classification => assistanceRules[classification]);
+        if (!result.get(expectedClass)) {
+            const rule = assistanceRules.find(r => r.category === expectedClass);
+            const matchedRules = Array.from(result.keys());
             throw new Error(
-                `Classification failed:\nText: "${text}"\nExpected to include: "${expectedClass}"\nGot: ${JSON.stringify(result)}\nExpected to match pattern: ${rule.pattern}${matchedRules.length ? `\nMatched patterns: ${matchedRules.map(r => r.pattern).join(', ')}` : ''}`
+                `Classification failed:\nText: "${text}"\nExpected to include: "${expectedClass}"\nGot: ${JSON.stringify(result)}\nExpected to match pattern: ${rule}${matchedRules.length ? `\nMatched patterns: ${matchedRules.map(r => r).join(', ')}` : ''}`
             );
         }
     };
@@ -426,68 +364,34 @@ describe('assistance resource matcher with custom rules', () => {
 });
 
 describe('priority-based classification', () => {
-    const priorityRules: classificationMap = {
-        highPriority: {
-            pattern: /\b(test|testing)\b/,
-            classification: 'high',
-            priority: 2
-        },
-        mediumPriority: {
-            pattern: /\b(test|testing)\b/,
-            classification: 'medium',
-            priority: 1
-        },
-        lowPriority: {
-            pattern: /\b(test|testing)\b/,
-            classification: 'low',
-            priority: 0
-        },
-        defaultPriority: {
-            pattern: /\b(test|testing)\b/,
-            classification: 'default'
-            // No priority specified - should default to 0
-        }
-    };
+    const priorityRules: ClassificationRule[] = [
+        new ClassificationRule('high', "test,testing", 2),
+        new ClassificationRule('medium', "test,testing", 1),
+        new ClassificationRule('low', "test,testing", 0),
+        new ClassificationRule('default', "test,testing", 0),
+    ];
 
     test('should return classifications ordered by priority when multiple patterns match', () => {
         expect(classify('testing 123', priorityRules))
-            .toEqual(['high', 'medium', 'low', 'default']);
+            .toEqual(new Map([['high', 2], ['medium', 1]]));
     });
 
     test('should handle rules with same priority correctly', () => {
-        const equalPriorityRules: classificationMap = {
-            first: {
-                pattern: /\b(test)\b/,
-                classification: 'first',
-                priority: 1
-            },
-            second: {
-                pattern: /\b(test)\b/,
-                classification: 'second',
-                priority: 1
-            }
-        };
+        const equalPriorityRules: ClassificationRule[] = [
+            new ClassificationRule('first', "test,testing", 1),
+            new ClassificationRule('second', "test,testing", 1),
+        ];
         // When priorities are equal, maintain order based on rule definition
         const result = classify('test', equalPriorityRules);
-        expect(result).toHaveLength(2);
-        expect(result).toContain('first');
-        expect(result).toContain('second');
+        expect(result).toEqual(new Map([['first', 1], ['second', 1]]));
     });
 
     test('should handle missing priority as 0', () => {
-        const mixedRules: classificationMap = {
-            withPriority: {
-                pattern: /\b(test)\b/,
-                classification: 'priority',
-                priority: 1
-            },
-            withoutPriority: {
-                pattern: /\b(test)\b/,
-                classification: 'no-priority'
-                // No priority specified - should default to 0
-            }
-        };
+        const mixedRules: ClassificationRule[] = [
+            new ClassificationRule('withPriority', "test,testing", 1),
+            new ClassificationRule('no-priority', "test,testing", 0),
+        ];
         expect(classify('test', mixedRules))
-            .toEqual(['priority', 'no-priority']);
+            .toEqual(new Map([['withPriority', 1]]));
     });
 });

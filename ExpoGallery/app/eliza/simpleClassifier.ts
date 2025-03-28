@@ -1,32 +1,45 @@
+import { log } from "console";
+
 function sanatize(input: string): string {
     return input.toLowerCase().replace(/[^\w\s]/g, ' ').trim();
 }
 
-export interface ClassificationRule {
-    pattern: RegExp;
-    classification: string;
-    priority?: number;  // Optional priority field, defaults to 0
-}
+export class ClassificationRule {
+    category: string;
+    phrases: string;
+    weight: number;  // Optional priority field, defaults to 0
 
-export type classificationMap = Record<string, ClassificationRule>;
-
-export function classify(text: string, rulesMap: classificationMap): string[] {
-    const input = sanatize(text);
-    const matches: Array<{classification: string; priority: number}> = [];
-
-    // Collect all matches with their priorities
-    for (const rule of Object.values(rulesMap)) {
-        if (rule.pattern.test(input)) {
-            matches.push({
-                classification: rule.classification,
-                priority: rule.priority ?? 0
-            });
-        }
+    constructor(category: string, phrases: string, weight?: number) {
+        this.category = category;
+        this.phrases = phrases;
+        this.weight = weight ?? 1;
     }
 
-    // Sort matches by priority in descending order
-    matches.sort((a, b) => b.priority - a.priority);
+    score(text: string): number {
+        const input = sanatize(text);
+        const words = input.split(/\s+/);
+        const phraseWords = this.phrases.split(/,/).map(word => word.toLocaleLowerCase());
 
-    // Return array of classifications
-    return matches.map(match => match.classification);
+        let score = 0;
+        for (const word of words) {
+            if (phraseWords.includes(word)) {
+                score += 1;
+            }
+        }
+        return score * this.weight;
+    }
+}
+
+export function classify(text: string, rules: ClassificationRule[]): Map<string,number> {
+    const input = sanatize(text);
+    const matches: Map<string,number> = new Map();
+
+    for (const rule of rules) {
+        const score = rule.score(input);
+        if (score > 0) {
+            matches.set(rule.category, score);
+        }
+    }
+    // log('matches', matches);
+    return matches;
 }
