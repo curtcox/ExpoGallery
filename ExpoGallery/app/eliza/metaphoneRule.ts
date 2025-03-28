@@ -43,9 +43,38 @@ export class MetaphoneRule implements WeightRule {
     }
 }
 
+const EXACT_MATCH = 1.0;
+const CASELESS_MATCH = 0.9;
+const STEM_MATCH = 0.7;
+const METHAPHONE_MATCH = 0.5;
+const NO_MATCH = 0;
+
 export function wordMatchScore(word: string, keyword: string): number {
-    return word.toLowerCase().includes(keyword.toLowerCase()) ? 1 : 0;
+    if (word === keyword) {
+        return EXACT_MATCH;
+    }
+    return inexactMatchScore(normalizeText(word), normalizeText(keyword));
 }
+
+function inexactMatchScore(word: string, keyword: string): number {
+    if (word === keyword)              return CASELESS_MATCH;
+    if (stemMatch(word, keyword))      return STEM_MATCH;
+    if (metaphoneMatch(word, keyword)) return METHAPHONE_MATCH;
+    return NO_MATCH;
+}
+
+function stemMatch(word: string, keyword: string): boolean {
+    const wordStem = stemmer(word);
+    const keywordStem = stemmer(keyword);
+    return wordStem === keywordStem;
+}
+
+function metaphoneMatch(word: string, keyword: string): boolean {
+    const wordCodes = generateMetaphoneCodes(word);
+    const keywordCodes = generateMetaphoneCodes(keyword);
+    return Array.from(wordCodes).some(code => keywordCodes.has(code));
+}
+
 
 export function phraseMatchScore(words: string[], phrase: string, index: number): number {
     return words.slice(index, index + phrase.length).join(' ') === phrase ? 1 : 0;

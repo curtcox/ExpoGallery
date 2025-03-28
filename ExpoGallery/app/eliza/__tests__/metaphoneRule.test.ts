@@ -1,4 +1,4 @@
-import { metaphones, stemmed } from '../metaphoneRule';
+import { metaphones, stemmed, wordMatchScore } from '../metaphoneRule';
 
 describe('metaphones function', () => {
     test('should generate metaphone codes for a single simple word', () => {
@@ -93,5 +93,100 @@ describe('stemmed function', () => {
         expect(result.has('run')).toBeTruthy();  // 'runs' -> 'run'
         expect(result.has('ran')).toBeTruthy();  // 'ran' stays as 'ran'
         expect(result.size).toBe(2);  // 'run' and 'ran'
+    });
+});
+
+describe('wordMatchScore function', () => {
+    test('identical strings should have the highest score', () => {
+        const exactMatch = wordMatchScore('hello', 'hello');
+        expect(exactMatch).toBe(1.0);
+    });
+
+    test('case-insensitive matches should score lower than exact but higher than stem matches', () => {
+        const exactMatch = wordMatchScore('hello', 'hello');
+        const caseMatch = wordMatchScore('hello', 'HELLO');
+        const stemMatch = wordMatchScore('running', 'run');
+
+        expect(caseMatch).toBeLessThan(exactMatch);
+        expect(caseMatch).toBeGreaterThan(stemMatch);
+        expect(caseMatch).toBeGreaterThan(0.8); // High score but not perfect
+    });
+
+    test('stem matches should score lower than case-insensitive but higher than metaphone matches', () => {
+        const caseMatch = wordMatchScore('hello', 'HELLO');
+        const stemMatch = wordMatchScore('running', 'run');
+        const metaphoneMatch = wordMatchScore('phone', 'fone');
+
+        expect(stemMatch).toBeLessThan(caseMatch);
+        expect(stemMatch).toBeGreaterThan(metaphoneMatch);
+        expect(stemMatch).toBeGreaterThan(0.6); // Good score but clearly below case match
+    });
+
+    test('metaphone matches should score lower than stem matches but higher than no match', () => {
+        const stemMatch = wordMatchScore('running', 'run');
+        const metaphoneMatch = wordMatchScore('phone', 'fone');
+        const noMatch = wordMatchScore('hello', 'world');
+
+        expect(metaphoneMatch).toBeLessThan(stemMatch);
+        expect(metaphoneMatch).toBeGreaterThan(noMatch);
+        expect(metaphoneMatch).toBeGreaterThan(0.4); // Moderate score
+    });
+
+    test('no matches should have the lowest score of 0', () => {
+        const noMatch = wordMatchScore('hello', 'world');
+        expect(noMatch).toBe(0);
+    });
+
+    test('score hierarchy should be consistent across different examples', () => {
+        // Different word sets should follow same hierarchy
+        const exact = wordMatchScore('testing', 'testing');
+        const caseVariant = wordMatchScore('testing', 'TESTING');
+        const stemVariant = wordMatchScore('testing', 'test');
+        const phoneticMatch = wordMatchScore('write', 'rite');
+        const different = wordMatchScore('testing', 'banana');
+
+        expect(exact).toBeGreaterThan(caseVariant);
+        expect(caseVariant).toBeGreaterThan(stemVariant);
+        expect(stemVariant).toBeGreaterThan(phoneticMatch);
+        expect(phoneticMatch).toBeGreaterThan(different);
+    });
+
+    test('similar words should follow the hierarchy rules', () => {
+        // Test with words that could match multiple categories
+        const exact = wordMatchScore('writing', 'writing');
+        const caseMatch = wordMatchScore('writing', 'WRITING');
+        const stemMatch = wordMatchScore('writing', 'write');
+        const soundMatch = wordMatchScore('writing', 'riting');
+
+        expect(exact).toBeGreaterThan(caseMatch);
+        expect(caseMatch).toBeGreaterThan(stemMatch);
+        expect(stemMatch).toBeGreaterThan(soundMatch);
+    });
+
+    test('scores should be normalized between 0 and 1', () => {
+        // Test various matches to ensure scores stay in range
+        const scores = [
+            wordMatchScore('hello', 'hello'),      // exact
+            wordMatchScore('hello', 'HELLO'),      // case
+            wordMatchScore('running', 'run'),      // stem
+            wordMatchScore('phone', 'fone'),       // metaphone
+            wordMatchScore('hello', 'world')       // no match
+        ];
+
+        scores.forEach(score => {
+            expect(score).toBeGreaterThanOrEqual(0);
+            expect(score).toBeLessThanOrEqual(1);
+        });
+    });
+
+    test('longer words should follow same hierarchy', () => {
+        const exact = wordMatchScore('implementation', 'implementation');
+        const caseMatch = wordMatchScore('implementation', 'IMPLEMENTATION');
+        const stemMatch = wordMatchScore('implementation', 'implement');
+        const phoneticMatch = wordMatchScore('implementation', 'implementashun');
+
+        expect(exact).toBeGreaterThan(caseMatch);
+        expect(caseMatch).toBeGreaterThan(stemMatch);
+        expect(stemMatch).toBeGreaterThan(phoneticMatch);
     });
 });
