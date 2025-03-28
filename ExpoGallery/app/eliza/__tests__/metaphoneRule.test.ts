@@ -1,4 +1,4 @@
-import { metaphones, stemmed, wordMatchScore } from '../metaphoneRule';
+import { metaphones, stemmed, wordMatchScore, phraseMatchScore } from '../metaphoneRule';
 
 describe('metaphones function', () => {
     test('should generate metaphone codes for a single simple word', () => {
@@ -188,5 +188,49 @@ describe('wordMatchScore function', () => {
         expect(exact).toBeGreaterThan(caseMatch);
         expect(caseMatch).toBeGreaterThan(stemMatch);
         expect(stemMatch).toBeGreaterThan(phoneticMatch);
+    });
+});
+
+describe('phraseMatchScore function', () => {
+    test('single word phrase should use metaphone matching', () => {
+        const words = ['phone', 'test', 'hello'];
+        const phrase = ['fone'];
+
+        // Should match 'phone' at index 0
+        expect(phraseMatchScore(words, phrase, 0)).toBe(0.5); // Metaphone match score
+        // Should not match 'test' at index 1
+        expect(phraseMatchScore(words, phrase, 1)).toBe(0);
+    });
+
+    test('multi-word phrase should consider subsequent words', () => {
+        const phrase = ['write', 'some', 'code'];
+        expect(phraseMatchScore(['write', 'some', 'code',   'today'], phrase, 0)).toBe(1.0);
+        expect(phraseMatchScore(['write', 'sum',  'code',   'today'], phrase, 0)).toBeCloseTo(0.833);
+        expect(phraseMatchScore(['rite',  'some', 'code',   'today'], phrase, 0)).toBeCloseTo(0.833);
+        expect(phraseMatchScore(['rite',  'sum',  'code',   'today'], phrase, 0)).toBeCloseTo(0.666);
+        expect(phraseMatchScore(['eat',   'my',   'shorts', 'today'], phrase, 0)).toBe(0.0);
+    });
+
+    test('phrase longer than remaining words should return lower score', () => {
+        const words = ['write', 'some'];
+        const phrase = ['rite', 'sum', 'code'];
+
+        const score = phraseMatchScore(words, phrase, 0);
+        expect(score).toBeLessThan(0.5); // Should be lower due to missing matches
+    });
+
+    test('no matches should return zero', () => {
+        const words = ['hello', 'world'];
+        const phrase = ['goodbye', 'earth'];
+
+        expect(phraseMatchScore(words, phrase, 0)).toBe(0);
+    });
+
+    test('exact matches in multi-word phrase should score higher', () => {
+        const words = ['hello', 'world', 'today'];
+        const phrase = ['hello', 'world'];
+
+        const score = phraseMatchScore(words, phrase, 0);
+        expect(score).toBeGreaterThan(0.9); // Should be very high due to exact matches
     });
 });

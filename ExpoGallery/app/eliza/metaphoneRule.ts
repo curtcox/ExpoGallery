@@ -16,7 +16,7 @@ export class MetaphoneRule implements WeightRule {
         const calculated = new WeightMap();
         for (let index = 0; index < words.length; index++) {
             for (const phrase of this.phrases.keys()) {
-                const score = phraseMatchScore(words, phrase, index);
+                const score = phraseMatchScore(words, phrase.split(' '), index);
                 calculated.add(phrase, score);
             }
         }
@@ -75,9 +75,15 @@ function metaphoneMatch(word: string, keyword: string): boolean {
     return Array.from(wordCodes).some(code => keywordCodes.has(code));
 }
 
+export function phraseMatchScore(words: string[], phrase: string[], index: number): number {
+    let total = 0;
+    for (let i = 0; i < phrase.length; i++) {
+        if (index + i < words.length) {
+            total += wordMatchScore(words[index + i], phrase[i]);
+        }
+    }
 
-export function phraseMatchScore(words: string[], phrase: string, index: number): number {
-    return words.slice(index, index + phrase.length).join(' ') === phrase ? 1 : 0;
+    return total / phrase.length;
 }
 
 /**
