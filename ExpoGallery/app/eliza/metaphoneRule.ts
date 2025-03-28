@@ -1,27 +1,8 @@
 const { stemmer } = require('stemmer');
 const { doubleMetaphone } = require('double-metaphone');
+import { WeightMap, WeightRule } from './weightedClassifier';
 
-export class WeightMap {
-    private weights: { [key: string]: number } = {};
-    keys(): string[] { return Object.keys(this.weights); }
-    get(key: string): number { return this.weights[key] || 0; }
-    set(key: string, value: number): void {
-        if (value == 0) {
-            delete this.weights[key];
-        } else {
-            this.weights[key] = value;
-        }
-    }
-    add(key: string, value: number): void { this.set(key, this.get(key) + value); }
-    addAll(weights: WeightMap): void {
-        for (const key in weights.weights) {
-            this.add(key, weights.get(key));
-        }
-    }
-    total(): number { return Object.values(this.weights).reduce((acc, val) => acc + val, 0); }
-}
-
-export class Rule {
+export class MetaphoneRule implements WeightRule {
     categoryName: string;
     phrases: WeightMap;
     exclusions: WeightMap;
@@ -58,34 +39,16 @@ export class Rule {
         const weights = new WeightMap();
         weights.addAll(this.phraseScores(words));
         weights.addAll(this.exclusionScores(words));
-        return weights
+        return weights;
     }
 }
 
-function wordMatchScore(word: string, keyword: string): number {
+export function wordMatchScore(word: string, keyword: string): number {
     return word.toLowerCase().includes(keyword.toLowerCase()) ? 1 : 0;
 }
 
-function phraseMatchScore(words: string[], phrase: string, index: number): number {
+export function phraseMatchScore(words: string[], phrase: string, index: number): number {
     return words.slice(index, index + phrase.length).join(' ') === phrase ? 1 : 0;
-}
-
-export interface RankedCategory {
-    category: string;
-    score: WeightMap;
-}
-
-export function classify(
-    userRequest: string,
-    classificationRules: Rule[]
-): RankedCategory[] {
-    const rankedCategories: RankedCategory[] = [];
-
-    for (const rule of classificationRules) {
-        const score = rule.score(userRequest);
-        rankedCategories.push({ category: rule.categoryName, score });
-    }
-    return rankedCategories.filter(c => c.score.total() > 0).sort((a, b) => b.score.total() - a.score.total());
 }
 
 /**
@@ -111,7 +74,7 @@ function generateMetaphoneCodes(word: string): Set<string> {
     return new Set(codes.filter((code: string) => code));
 }
 
-function stemmed(keywords: string[]): Set<string> {
+export function stemmed(keywords: string[]): Set<string> {
     const set = new Set<string>();
 
     keywords.forEach(keyword => {
@@ -125,7 +88,7 @@ function stemmed(keywords: string[]): Set<string> {
     return set;
 }
 
-function metaphones(keywords: string[]): Set<string> {
+export function metaphones(keywords: string[]): Set<string> {
     const set = new Set<string>();
 
     keywords.forEach(keyword => {

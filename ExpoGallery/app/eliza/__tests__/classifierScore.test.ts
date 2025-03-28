@@ -1,8 +1,9 @@
 import { classify, ClassificationRule } from '../simpleClassifier';
 import assistanceData from './assistanceRequests.json';
 import assistanceRules from './assistanceSimple.json';
-import { classify as metaphoneClassify, Rule, WeightMap } from '../metaphoneClassifier';
+import { classify as metaphoneClassify, WeightRule, WeightMap } from '../weightedClassifier';
 import { log } from "console";
+import { MetaphoneRule } from '../metaphoneRule';
 
 interface AssistanceMessage {
     id: number;
@@ -65,11 +66,11 @@ describe('simple classifier assistance resource matcher scoring', () => {
     });
 });
 
-function assistanceRulesAsMetaphoneRule(): Rule[] {
+function assistanceRulesAsMetaphoneRule(): WeightRule[] {
     const rules = assistanceRules as AssistanceRule[];
     const phrases = new WeightMap();
     const exclusions = new WeightMap();
-    return rules.map(rule => new Rule(rule.category, phrases, exclusions));
+    return rules.map(rule => new MetaphoneRule(rule.category, phrases, exclusions));
 }
 
 describe('metaphone classifier assistance resource matcher scoring', () => {
