@@ -1,3 +1,4 @@
+import '@/utils/reactGlobal';
 import '@/components/LocationPatch';
 
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';

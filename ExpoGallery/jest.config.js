@@ -1,32 +1,37 @@
-const config = {
-  preset: 'jest-expo',
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: {
+        allowJs: true,
+        jsx: 'react'
+      }
+    }],
+    '^.+\\.jsx?$': ['babel-jest', {
+      presets: ['babel-preset-expo']
+    }]
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(stemmer|double-metaphone|@teovilla/react-native-web-maps|react-native|expo-.*|@expo.*|@react-native.*)/)'
+  ],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@/(.*)$': '<rootDir>/$1',
+    '^react-native$': 'react-native-web',
+    '^react-native/Libraries/Utilities/Platform$': '<rootDir>/node_modules/react-native-web/dist/exports/Platform'
+  },
   setupFilesAfterEnv: [
     '@testing-library/jest-dom',
     '<rootDir>/jest.setup.js'
   ],
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest'
-  },
-  transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)'
-  ],
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
-  },
-  testMatch: [
-    "**/__tests__/**/*.test.ts",
-    "**/__tests__/**/*.test.tsx"
-  ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  // Ignore specific example files that aren't actual tests
   testPathIgnorePatterns: [
     '/node_modules/',
-    'externalChatExample.ts',
-    'manualExample.js',
-    '/dist/',
-    '/public/'
-  ]
+    '/public/',
+    '/dist/'
+  ],
+  globals: {
+    __DEV__: true
+  }
 };
-
-module.exports = config;

@@ -39,45 +39,47 @@ beforeEach(() => {
  * This file is executed before each test file
  */
 
-// Mock expo-constants module
-jest.mock('expo-constants', () => ({
+// Import required test utilities
+import '@testing-library/jest-dom';
+
+// Mock Expo modules
+const mockExpoConstants = {
   expoConfig: {
     extra: {
-      // Use environment variables with fallbacks
-      chatApiEndpoint: process.env.CHAT_API_ENDPOINT || 'https://api.example.com/chat',
-      defaultChatLocation: process.env.DEFAULT_CHAT_LOCATION || 'dqcjqcp0',
-      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || 'test_google_maps_api_key',
-      buildDate: process.env.BUILD_DATE || '2023-10-10',
-      gitSha: process.env.GITHUB_SHA || 'abcdef1234567890',
+      chatApiEndpoint: 'https://api.example.com/chat',
+      defaultChatLocation: 'dqcjqcp0',
+      googleMapsApiKey: 'test_google_maps_api_key',
+      buildDate: '2023-10-10',
+      gitSha: 'abcdef1234567890'
     }
-  },
-  installationId: 'test-installation-id',
-  sessionId: 'test-session-id',
-}), { virtual: true });
+  }
+};
 
-// Mock expo-device
+Object.defineProperty(global, 'expo-constants', {
+  value: mockExpoConstants,
+  writable: false
+});
+
+jest.mock('expo-constants', () => mockExpoConstants);
+
 jest.mock('expo-device', () => ({
   isDevice: true,
-  brand: 'Apple',
-  manufacturer: 'Apple',
-  modelName: 'iPhone 12',
-  modelId: 'iPhone12,1',
-  deviceYearClass: 2020,
-  deviceName: 'Test Device',
-  totalMemory: 4000000000,
+  brand: 'test-brand',
+  manufacturer: 'test-manufacturer',
+  modelName: 'test-model',
+  deviceName: 'test-device',
+  deviceYearClass: 2023,
+  totalMemory: 8000,
   supportedCpuArchitectures: ['arm64'],
   osName: 'iOS',
   osVersion: '16.0',
-  osBuildId: '20A362',
-  osInternalBuildId: '20A362',
-  osBuildFingerprint: 'Apple/iOS/16.0',
-  platformApiLevel: 16,
-  deviceType: 1, // Phone
-  isEmulator: false,
-}), { virtual: true });
+  osBuildId: 'test-build',
+  osInternalBuildId: 'test-internal-build',
+  deviceId: 'test-device-id',
+}));
 
-// Mock expo-location
 jest.mock('expo-location', () => ({
+  requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
   getCurrentPositionAsync: jest.fn().mockResolvedValue({
     coords: {
       latitude: 37.7749,
@@ -86,70 +88,55 @@ jest.mock('expo-location', () => ({
       accuracy: 5,
       altitudeAccuracy: 5,
       heading: 0,
-      speed: 0,
+      speed: 0
     },
-    timestamp: Date.now(),
-  }),
-  requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  requestBackgroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  getForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  getBackgroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  hasServicesEnabledAsync: jest.fn().mockResolvedValue(true),
-  getLastKnownPositionAsync: jest.fn().mockResolvedValue({
-    coords: {
-      latitude: 37.7749,
-      longitude: -122.4194,
-      altitude: 0,
-      accuracy: 5,
-      altitudeAccuracy: 5,
-      heading: 0,
-      speed: 0,
-    },
-    timestamp: Date.now() - 1000, // 1 second ago
-  }),
-  watchPositionAsync: jest.fn().mockReturnValue({
-    remove: jest.fn(),
+    timestamp: 1234567890
   }),
   LocationAccuracy: {
-    Balanced: 'balanced',
-    BestForNavigation: 'bestForNavigation',
-    Best: 'best',
-    Highest: 'highest',
-    Low: 'low',
-    Lowest: 'lowest',
-  },
-  LocationActivityType: {
-    Automotive: 'automotive',
-    Fitness: 'fitness',
-    Other: 'other',
-  },
-  LocationGeofencingEventType: {
-    Enter: 'enter',
-    Exit: 'exit',
-  },
-  LocationGeofencingRegionState: {
-    Inside: 'inside',
-    Outside: 'outside',
-    Unknown: 'unknown',
-  },
-}), { virtual: true });
+    Balanced: 3,
+    High: 4,
+    Highest: 5,
+    Low: 2,
+    Lowest: 1
+  }
+}));
 
-// Mock expo modules that are causing issues
-jest.mock('expo-asset', () => ({}), { virtual: true });
-jest.mock('expo-file-system', () => ({}), { virtual: true });
+// Mock EventEmitter
 jest.mock('expo-modules-core', () => ({
-  requireNativeModule: () => ({}),
-}), { virtual: true });
+  EventEmitter: class {
+    constructor() {}
+    addListener() { return { remove: () => {} }; }
+    removeAllListeners() {}
+    emit() {}
+  }
+}));
+
+// Mock react-native-web modules
+jest.mock('react-native/Libraries/Utilities/Platform', () => ({
+  OS: 'web',
+  select: jest.fn((obj) => obj.web),
+}));
+
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn(),
+  getItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+}));
+
+// Mock react-native-maps
+jest.mock('react-native-maps', () => ({
+  __esModule: true,
+  default: () => null,
+  Marker: () => null,
+  Callout: () => null,
+}));
 
 // Skip console.error output in environment tests
 const originalConsoleError = console.error;
 console.error = (...args) => {
-  // Filter out known environment error messages in tests
-  const message = args.join(' ');
-  if (message.includes('ENVIRONMENT ERROR') ||
-      message.includes('Environment variable') ||
-      message.includes('missing or invalid')) {
-    // Skip printing these in test output
+  if (args[0]?.includes?.('Unable to install Expo modules')) {
     return;
   }
   originalConsoleError(...args);

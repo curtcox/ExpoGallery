@@ -12,7 +12,7 @@ const keywords: [ string, number, (x:string) => string ] [] = [
 ];
 
 function sanatize(input: string): string {
-	return input.toLowerCase().replace(/[^\w\s]/g, '').trim();
+	return input.toLowerCase().replace(/[^\w\s]/g, ' ').trim();
 }
 
 class KeywordFunction implements Keyword {

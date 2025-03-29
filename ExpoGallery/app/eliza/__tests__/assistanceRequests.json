@@ -1,0 +1,554 @@
+{
+  "messages": [
+    {
+      "id": 1,
+      "text": "I'm really hungry—are there any food assistance programs nearby?",
+      "classifications": ["food"]
+    },
+    {
+      "id": 2,
+      "text": "Can anyone point me to a safe place to sleep tonight?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 3,
+      "text": "I'm feeling really sick; is there a free clinic in the area?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 4,
+      "text": "I lost my wallet; can someone help me replace my ID?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 5,
+      "text": "Are there any temporary job opportunities available right now?",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 6,
+      "text": "Where can I get a warm meal today?",
+      "classifications": ["food"]
+    },
+    {
+      "id": 7,
+      "text": "I need a shower and some clean clothes—any ideas where I can go?",
+      "classifications": ["hygiene"]
+    },
+    {
+      "id": 8,
+      "text": "I have a sprained ankle; is there a place for free medical help?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 9,
+      "text": "Can someone help me figure out how to apply for government benefits?",
+      "classifications": ["benefits"]
+    },
+    {
+      "id": 10,
+      "text": "I need to report a crime that happened to me—who can assist?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 11,
+      "text": "Is there a shelter nearby that welcomes pets?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 12,
+      "text": "I’m feeling really down—can I speak to someone about mental health support?",
+      "classifications": ["mental"]
+    },
+    {
+      "id": 13,
+      "text": "Where can I find a free soup kitchen that’s open now?",
+      "classifications": ["food"]
+    },
+    {
+      "id": 14,
+      "text": "I need help with my housing application, can anyone guide me?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 15,
+      "text": "Are there any programs that offer job training or work placement?",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 16,
+      "text": "I need somewhere safe to store my belongings overnight.",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 17,
+      "text": "Can someone direct me to a free dental clinic?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 18,
+      "text": "I’m looking for information on local transportation schedules—any help?",
+      "classifications": ["transportation"]
+    },
+    {
+      "id": 19,
+      "text": "Is there a public library nearby where I can use a computer?",
+      "classifications": ["facility"]
+    },
+    {
+      "id": 20,
+      "text": "Can I get help contacting a family member? I’m really isolated.",
+      "classifications": ["social"]
+    },
+    {
+      "id": 21,
+      "text": "I need advice on managing my limited funds—any free financial counseling available?",
+      "classifications": ["financial"]
+    },
+    {
+      "id": 22,
+      "text": "Where can I go for a free hair cut or grooming services?",
+      "classifications": ["hygiene"]
+    },
+    {
+      "id": 23,
+      "text": "I’m having trouble with substance abuse; is there a rehab center nearby?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 24,
+      "text": "Can someone tell me if there’s a night shelter open in this area?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 25,
+      "text": "Are there any community centers that offer warm clothing in winter?",
+      "classifications": ["clothing"]
+    },
+    {
+      "id": 26,
+      "text": "I need help with filling out forms to apply for housing—can someone assist?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 27,
+      "text": "Where can I charge my phone without paying?",
+      "classifications": ["utility"]
+    },
+    {
+      "id": 28,
+      "text": "I have a minor injury and no money for treatment—any ideas for free care?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 29,
+      "text": "What are the operating hours of the nearest shelter?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 30,
+      "text": "I'm looking for a part-time job; any leads on work nearby?",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 31,
+      "text": "Do you know of any outreach programs that distribute food regularly?",
+      "classifications": ["food"]
+    },
+    {
+      "id": 32,
+      "text": "I'm having difficulty navigating public transit—can someone help?",
+      "classifications": ["transportation"]
+    },
+    {
+      "id": 33,
+      "text": "I need assistance with getting my mail or packages collected safely.",
+      "classifications": ["security"]
+    },
+    {
+      "id": 34,
+      "text": "Are there any community meals being served today?",
+      "classifications": ["food"]
+    },
+    {
+      "id": 35,
+      "text": "I lost my phone charger—can anyone recommend a place to get one for free?",
+      "classifications": ["utility"]
+    },
+    {
+      "id": 36,
+      "text": "I need to find a place where I can safely leave my bike.",
+      "classifications": ["security"]
+    },
+    {
+      "id": 37,
+      "text": "Is there a clinic that offers mental health counseling without a fee?",
+      "classifications": ["mental"]
+    },
+    {
+      "id": 38,
+      "text": "Can someone help me understand my rights as a tenant or street resident?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 39,
+      "text": "I'm trying to get back on my feet—are there any programs that assist with job placement?",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 40,
+      "text": "Where can I find a shelter that allows for storing personal belongings safely?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 41,
+      "text": "yo im dead ass hungry, any food joints open rn?",
+      "classifications": ["food"]
+    },
+    {
+      "id": 42,
+      "text": "any shelter available? it's freezy out here on da streetz.",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 43,
+      "text": "need help pronto, feelin real sick n don’t know what 2 do.",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 44,
+      "text": "lost ma ID, help me get a new one plz. idk how 2 start.",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 45,
+      "text": "where's a quick gig? i need cash ASAP.",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 46,
+      "text": "soup kitchin info? need some hot grub now!",
+      "classifications": ["food"]
+    },
+    {
+      "id": 47,
+      "text": "i need a place 2 crash tonight, none of da usual spots open.",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 48,
+      "text": "scraped my knee bad, not sure if i need 2 see a docter.",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 49,
+      "text": "how do i apply 4 benefits? these forms r all messed up.",
+      "classifications": ["benefits"]
+    },
+    {
+      "id": 50,
+      "text": "got mugged earlier, need help reportin it to someone who cares.",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 51,
+      "text": "my dog needs care too—any shelters that take pets?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 52,
+      "text": "feelin' real low, any mental helpline or someone 2 talk to?",
+      "classifications": ["mental"]
+    },
+    {
+      "id": 53,
+      "text": "any free meal spots round here? i'm starvin!",
+      "classifications": ["food"]
+    },
+    {
+      "id": 54,
+      "text": "help me fill out this housing app—its super confusin.",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 55,
+      "text": "u know of any work training programs? i wanna learn a skill.",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 56,
+      "text": "need a safe spot 2 stash my stuff overnight. any ideas?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 57,
+      "text": "my teeth r killin me, need a free dentl clinic stat.",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 58,
+      "text": "bus routes r so confusin—can anyone break it down for me?",
+      "classifications": ["transportation"]
+    },
+    {
+      "id": 59,
+      "text": "where do i charge my phone for free? battery goin out.",
+      "classifications": ["utility"]
+    },
+    {
+      "id": 60,
+      "text": "got no cash, any free financial advise out there?",
+      "classifications": ["financial"]
+    },
+    {
+      "id": 61,
+      "text": "hey, can u hook me up with info on free haircuts? need a trim.",
+      "classifications": ["hygiene"]
+    },
+    {
+      "id": 62,
+      "text": "need a shower real bad—any public facilities open rn?",
+      "classifications": ["hygiene"]
+    },
+    {
+      "id": 63,
+      "text": "im strugglin with addiction, any rehab centers that won't charge me?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 64,
+      "text": "shelter closed tonight, help me find a safe spot 2 sleep.",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 65,
+      "text": "how do i report theft? someone take my stuff last night.",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 66,
+      "text": "i need someone 2 talk to, feelin' alone out here...",
+      "classifications": ["mental"]
+    },
+    {
+      "id": 67,
+      "text": "my phone charger got jacked, any free ones available?",
+      "classifications": ["utility"]
+    },
+    {
+      "id": 68,
+      "text": "need a warm coat, it's freezin—any local charity help?",
+      "classifications": ["clothing"]
+    },
+    {
+      "id": 69,
+      "text": "can anyone tell me where a restroom’s at? really need one.",
+      "classifications": ["facility"]
+    },
+    {
+      "id": 70,
+      "text": "what time does the soup kitchin open? need food like now.",
+      "classifications": ["food"]
+    },
+    {
+      "id": 71,
+      "text": "im confused by the new update in this app—any tech help?",
+      "classifications": ["utility"]
+    },
+    {
+      "id": 72,
+      "text": "where do i get my meds refilled? ran out days ago.",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 73,
+      "text": "got a nasty cut on my leg—any place 4 immediate care?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 74,
+      "text": "any local service for legal advice for peeps like us?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 75,
+      "text": "gimme deets on a shelter that got bed space 4 tonight.",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 76,
+      "text": "hey, any chance i can score a free bus pass? ridin ain't cheap",
+      "classifications": ["transportation"]
+    },
+    {
+      "id": 77,
+      "text": "i need to see a doc for some weird pain, can't afford to wait any longer",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 78,
+      "text": "sup? got no crib to crash at tonight, any safe spots?",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 79,
+      "text": "i need a hot meal ASAP—starvin out here in the cold",
+      "classifications": ["food"]
+    },
+    {
+      "id": 80,
+      "text": "lost my wallet & ID again, can anyone help me sort this mess?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 81,
+      "text": "where can i get a shower? i ain't been clean in days",
+      "classifications": ["hygiene"]
+    },
+    {
+      "id": 82,
+      "text": "anyone know a spot for free haircuts? need to clean up a bit",
+      "classifications": ["hygiene"]
+    },
+    {
+      "id": 83,
+      "text": "i got mugged last night, need help with the police but ain't sure how to start",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 84,
+      "text": "need a pair of decent shoes, these ones are fallin apart",
+      "classifications": ["clothing"]
+    },
+    {
+      "id": 85,
+      "text": "got a bad cough, any free clinics where i can grab some meds?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 86,
+      "text": "help me out, i'm tryna apply for a job but need some computer skills training",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 87,
+      "text": "any advice on where i can get free financial counseling? runnin' outta cash",
+      "classifications": ["financial"]
+    },
+    {
+      "id": 88,
+      "text": "i need help with my mental health—feelin' super alone out here",
+      "classifications": ["mental"]
+    },
+    {
+      "id": 89,
+      "text": "what's the deal with free meal programs round here? need the deets",
+      "classifications": ["food"]
+    },
+    {
+      "id": 90,
+      "text": "i need to replace my glasses, can't see a thing—any free service available?",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 91,
+      "text": "any shelters that accept dogs? my buddy's with me and needs a spot too",
+      "classifications": ["shelter"]
+    },
+    {
+      "id": 92,
+      "text": "i got injured from a fall, need urgent care but got no money",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 93,
+      "text": "can someone help me fill out these aid forms? they're so confusin",
+      "classifications": ["benefits"]
+    },
+    {
+      "id": 94,
+      "text": "yo, need a safe spot to stash my stuff so it don't get jacked",
+      "classifications": ["security"]
+    },
+    {
+      "id": 95,
+      "text": "any community centers open late where i can chill and use wifi?",
+      "classifications": ["facility"]
+    },
+    {
+      "id": 96,
+      "text": "my phone's battery drains fast, any free chargin spots around here?",
+      "classifications": ["utility"]
+    },
+    {
+      "id": 97,
+      "text": "im feelin' really anxious—any hotline or someone to talk to?",
+      "classifications": ["mental"]
+    },
+    {
+      "id": 98,
+      "text": "any day labor gigs posted nearby? need to earn some quick cash",
+      "classifications": ["employment"]
+    },
+    {
+      "id": 99,
+      "text": "where do i get a free dental checkup? my teeth are hurtin bad",
+      "classifications": ["medicine"]
+    },
+    {
+      "id": 100,
+      "text": "i keep gettin' mugged, what legal steps can i take to protect myself?",
+      "classifications": ["legal"]
+    },
+    {
+      "id": 101,
+      "text": "yo, i'm starvin n need a safe spot to crash tonight – plus my phone's nearly dead, any free chargin' station?",
+      "classifications": ["food", "shelter", "utility"]
+    },
+    {
+      "id": 102,
+      "text": "got mugged and banged up, need to see a doc ASAP and get legal help to report it.",
+      "classifications": ["medicine", "legal"]
+    },
+    {
+      "id": 103,
+      "text": "im desperate – no food, no shelter, and no cash; any info on meal programs, a safe place to sleep, and a quick gig?",
+      "classifications": ["food", "shelter", "employment"]
+    },
+    {
+      "id": 104,
+      "text": "lost my wallet & got into a fight over it, need help replacing my ID and checking my injuries.",
+      "classifications": ["legal", "medicine"]
+    },
+    {
+      "id": 105,
+      "text": "any free meal spots? also, these benefits forms are all jumbled up – need help on that too.",
+      "classifications": ["food", "benefits"]
+    },
+    {
+      "id": 106,
+      "text": "my dog and i are freezin; need a shelter that takes pets, some warm food, and maybe a jacket too.",
+      "classifications": ["shelter", "food", "clothing"]
+    },
+    {
+      "id": 107,
+      "text": "i got hurt real bad and got mugged – need urgent clinic care and a lawyer to help me sort this mess.",
+      "classifications": ["medicine", "legal"]
+    },
+    {
+      "id": 108,
+      "text": "im feelin' super low and lost – any hotline for mental help and info on work training programs?",
+      "classifications": ["mental", "employment"]
+    },
+    {
+      "id": 109,
+      "text": "lost my charger and got jacked on the bus, so i need free power for my phone and help getting legal advice.",
+      "classifications": ["utility", "legal"]
+    },
+    {
+      "id": 110,
+      "text": "hey, need directions to a shelter fast while also tryna find a free meal – everything's fallin apart today.",
+      "classifications": ["shelter", "food"]
+    }
+  ]
+}

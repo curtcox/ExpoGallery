@@ -1,0 +1,122 @@
+[
+    {
+      "categoryName": "food",
+      "keywords": ["hungry", "food", "meal", "eat", "soup", "kitchen", "grub", "starving", "nutrition", "grocery", "dinner", "lunch", "breakfast", "bread", "drink", "thirsty", "water"],
+      "phrases": ["warm meal", "soup kitchen", "food bank", "food stamps", "SNAP", "community meal", "free meal"],
+      "exclusions": ["not hungry", "already ate"],
+      "keywordWeight": 1.0,
+      "phraseWeight": 2.0
+    },
+    {
+      "categoryName": "shelter",
+      "keywords": ["shelter", "sleep", "housing", "roof", "homeless", "street", "crash", "safe", "place", "overnight", "bed", "store", "belongings", "evict", "rent", "couch", "temporary"],
+      "phrases": ["place to sleep", "safe place", "housing application", "store my stuff", "night shelter", "emergency shelter", "roof over head"],
+      "exclusions": ["storage unit", "public storage"],
+      "keywordWeight": 1.0,
+      "phraseWeight": 2.5
+    },
+    {
+      "categoryName": "medicine",
+      "keywords": ["sick", "health", "medical", "clinic", "hospital", "doctor", "nurse", "ill", "injury", "pain", "prescription", "meds", "medicine", "treatment", "ankle", "sprain", "cut", "wound", "dental", "teeth", "tooth", "therapy", "rehab", "substance", "abuse", "addiction", "ER", "emergency room"],
+      "phrases": ["free clinic", "medical help", "mental health", "substance abuse", "ER visit", "feel sick", "need doctor"],
+      "exclusions": ["vet", "animal", "pet health"],
+      "keywordWeight": 1.2,
+      "phraseWeight": 2.0
+    },
+    {
+      "categoryName": "legal",
+      "keywords": ["legal", "rights", "police", "crime", "report", "arrest", "lawyer", "court", "eviction", "id", "identification", "wallet", "benefits", "apply", "application", "form", "tenant", "mugged", "theft", "stolen", "witness"],
+      "phrases": ["replace id", "report crime", "legal aid", "fill out form", "housing application", "government benefits", "understand rights"],
+      "exclusions": [],
+      "keywordWeight": 1.0,
+      "phraseWeight": 2.0
+    },
+    {
+      "categoryName": "employment",
+      "keywords": ["job", "work", "employment", "gig", "hire", "cash", "money", "paycheck", "career", "resume", "interview", "skill", "training", "placement"],
+      "phrases": ["temporary job", "job training", "work placement", "part-time job", "looking for work", "need cash"],
+      "exclusions": [],
+      "keywordWeight": 1.0,
+      "phraseWeight": 2.0
+    },
+    {
+      "categoryName": "hygiene",
+      "keywords": ["shower", "clean", "clothes", "laundry", "soap", "shampoo", "toothbrush", "toothpaste", "grooming", "haircut", "trim", "wash", "bathroom", "restroom"],
+      "phrases": ["take a shower", "clean clothes", "wash clothes", "public restroom", "free haircut"],
+      "exclusions": [],
+      "keywordWeight": 1.0,
+      "phraseWeight": 1.5
+    },
+    {
+      "categoryName": "benefits",
+      "keywords": ["benefits", "apply", "application", "government", "assistance", "disability", "unemployment", "welfare", "snap", "food stamps", "social security", "ssi", "ssd"],
+      "phrases": ["apply for benefits", "government benefits", "social security", "food stamps application"],
+      "exclusions": ["job benefits"],
+      "keywordWeight": 1.0,
+      "phraseWeight": 2.0
+    },
+    {
+      "categoryName": "mental",
+      "keywords": ["mental", "health", "counseling", "therapy", "therapist", "psychiatrist", "depression", "anxiety", "stress", "suicide", "feeling down", "lonely", "isolated", "support group"],
+      "phrases": ["mental health", "talk to someone", "feeling down", "support group", "counseling services"],
+      "exclusions": [],
+      "keywordWeight": 1.2,
+      "phraseWeight": 2.0
+    },
+    {
+      "categoryName": "transportation",
+      "keywords": ["transport", "transportation", "bus", "train", "subway", "transit", "schedule", "route", "fare", "pass", "ride", "car", "vehicle", "bike", "bicycle"],
+      "phrases": ["bus schedule", "public transit", "get a ride", "train route"],
+      "exclusions": [],
+      "keywordWeight": 1.0,
+      "phraseWeight": 1.5
+    },
+    {
+      "categoryName": "facility",
+      "keywords": ["facility", "library", "computer", "internet", "wifi", "restroom", "bathroom", "community center", "building", "place"],
+      "phrases": ["public library", "use computer", "community center", "public restroom"],
+      "exclusions": ["medical facility"],
+      "keywordWeight": 1.0,
+      "phraseWeight": 1.5
+    },
+    {
+      "categoryName": "utility",
+      "keywords": ["charge", "phone", "battery", "power", "electricity", "outlet", "charger", "wifi", "internet", "data"],
+      "phrases": ["charge my phone", "phone charger", "free wifi"],
+      "exclusions": [],
+      "keywordWeight": 1.0,
+      "phraseWeight": 1.5
+    },
+     {
+      "categoryName": "clothing",
+      "keywords": ["clothing", "clothes", "coat", "jacket", "shirt", "pants", "shoes", "socks", "warm", "winter", "apparel"],
+      "phrases": ["warm clothes", "winter coat"],
+      "exclusions": ["clean clothes"],
+      "keywordWeight": 1.0,
+      "phraseWeight": 1.5
+    },
+    {
+      "categoryName": "security",
+       "keywords": ["safe", "security", "store", "belongings", "locker", "theft", "stolen", "crime", "police", "report", "bike lock", "personal property"],
+       "phrases": ["store belongings", "keep safe", "report theft", "safe place"],
+       "exclusions": ["job security"],
+       "keywordWeight": 1.0,
+       "phraseWeight": 2.0
+     },
+     {
+       "categoryName": "social",
+       "keywords": ["social", "connect", "family", "friend", "contact", "phone call", "lonely", "isolated", "community"],
+       "phrases": ["contact family", "make phone call"],
+       "exclusions": ["social security"],
+       "keywordWeight": 1.0,
+       "phraseWeight": 1.5
+     },
+     {
+       "categoryName": "financial",
+       "keywords": ["financial", "money", "cash", "funds", "budget", "counseling", "debt", "banking", "account", "advice"],
+       "phrases": ["financial counseling", "manage money", "budget help"],
+       "exclusions": ["cash assistance", "need cash"],
+       "keywordWeight": 1.0,
+       "phraseWeight": 1.8
+     }
+  ]
