@@ -11,6 +11,7 @@
     "serve-build": "npx serve dist",
     "build": "npm run create-version-json && npm run copy-sources && WEB=true EXPO_PUBLIC_BASE_URL=/ dotenv -e .env.local -- expo export -p web",
     "build-and-serve": "npm run build && npm run serve-build",
+    "build-and-serve-for-debug": "NODE_ENV=development npm run create-version-json && npm run copy-sources && WEB=true EXPO_PUBLIC_BASE_URL=/ dotenv -e .env.local -- expo export -p web --no-minify && npm run serve-build",
     "test": "rm -rf public dist && dotenv -e .env.local -- jest --ci",
     "watchTests": "dotenv -e .env.local -- jest --watchAll",
     "lint": "expo lint",

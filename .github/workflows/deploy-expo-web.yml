@@ -16,6 +16,7 @@ env:
   GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
   CHAT_API_ENDPOINT: ${{ vars.CHAT_API_ENDPOINT }}
   DEFAULT_CHAT_LOCATION: ${{ vars.DEFAULT_CHAT_LOCATION }}
+  NODE_ENV: development
 
 jobs:
   build-and-deploy:
@@ -46,7 +47,7 @@ jobs:
         run: |
           cd ExpoGallery
           npm run predeploy
-          npx expo export --platform web
+          npx expo export --platform web --no-minify
           touch dist/.nojekyll
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
