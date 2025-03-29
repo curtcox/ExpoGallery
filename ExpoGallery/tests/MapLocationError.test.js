@@ -4,13 +4,15 @@ import '@testing-library/jest-dom';
 
 // We need to mock these imports
 jest.mock('@teovilla/react-native-web-maps', () => {
+  // Import React inside the mock factory
+  const React = require('react');
   // Actual implementation from the library that causes the error
   const originalModule = jest.requireActual('@teovilla/react-native-web-maps');
   return {
     __esModule: true,
     ...originalModule,
     // We'll observe if this default export is called with the expected props
-    default: jest.fn((props) => <div data-testid="mock-map-view">{props.children}</div>),
+    default: jest.fn((props) => React.createElement('div', { 'data-testid': 'mock-map-view' }, props.children)),
   };
 });
 
@@ -66,13 +68,11 @@ const ErrorMapView = (props) => {
   const MapView = require('@teovilla/react-native-web-maps').default;
 
   // This will invoke the location subscription
-  return (
-    <MapView
-      followsUserLocation={true}
-      showsUserLocation={true}
-      {...props}
-    />
-  );
+  return React.createElement(MapView, {
+    followsUserLocation: true,
+    showsUserLocation: true,
+    ...props
+  });
 };
 
 // Create a function to get a fresh instance of the component
@@ -80,13 +80,11 @@ const ErrorMapView = (props) => {
 const getErrorMapView = () => {
   const MapView = require('@teovilla/react-native-web-maps').default;
 
-  return (props) => (
-    <MapView
-      followsUserLocation={true}
-      showsUserLocation={true}
-      {...props}
-    />
-  );
+  return (props) => React.createElement(MapView, {
+    followsUserLocation: true,
+    showsUserLocation: true,
+    ...props
+  });
 };
 
 describe('MapView Location Subscription Tests', () => {
