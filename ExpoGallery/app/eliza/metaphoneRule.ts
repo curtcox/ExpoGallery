@@ -1,18 +1,19 @@
 const { stemmer } = require('stemmer');
 const { doubleMetaphone } = require('double-metaphone');
-import { WeightMap, WeightRule } from './weightedClassifier';
+import { WeightMap, WeightRule, WeightValues } from './weightedClassifier';
+import { log } from "console";
 
 export class MetaphoneRule implements WeightRule {
     categoryName: string;
-    phrases: WeightMap;
-    exclusions: WeightMap;
-    constructor(categoryName: string, phrases: WeightMap, exclusions: WeightMap) {
+    phrases: WeightValues;
+    exclusions: WeightValues;
+    constructor(categoryName: string, phrases: WeightValues, exclusions: WeightValues) {
         this.categoryName = categoryName;
         this.phrases = phrases;
         this.exclusions = exclusions;
     }
 
-    phraseScores(words: string[]): WeightMap {
+    phraseScores(words: string[]): WeightValues {
         const calculated = new WeightMap();
         for (let index = 0; index < words.length; index++) {
             for (const phrase of this.phrases.keys()) {
@@ -23,18 +24,18 @@ export class MetaphoneRule implements WeightRule {
         return calculated;
     }
 
-    exclusionScores(words: string[]): WeightMap {
+    exclusionScores(words: string[]): WeightValues {
         const calculated = new WeightMap();
         for (let index = 0; index < words.length; index++) {
             for (const exclusion of this.exclusions.keys()) {
-                const score = wordMatchScore(words[index], exclusion);
-                calculated.add(exclusion, -score);
+                const score = phraseMatchScore(words, exclusion.split(' '), index);
+                calculated.add(exclusion, score);
             }
         }
         return calculated;
     }
 
-    score(text: string): WeightMap {
+    score(text: string): WeightValues {
         const words = splitIntoWords(text);
         const weights = new WeightMap();
         weights.addAll(this.phraseScores(words));
@@ -82,7 +83,6 @@ export function phraseMatchScore(words: string[], phrase: string[], index: numbe
             total += wordMatchScore(words[index + i], phrase[i]);
         }
     }
-
     return total / phrase.length;
 }
 

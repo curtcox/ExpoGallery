@@ -1,4 +1,11 @@
-export class WeightMap {
+import { log } from "console";
+export interface WeightValues {
+    keys(): string[];
+    get(key: string): number;
+    total(): number;
+}
+
+export class WeightMap implements WeightValues {
     private weights: { [key: string]: number } = {};
     keys(): string[] { return Object.keys(this.weights); }
     get(key: string): number { return this.weights[key] || 0; }
@@ -10,9 +17,9 @@ export class WeightMap {
         }
     }
     add(key: string, value: number): void { this.set(key, this.get(key) + value); }
-    addAll(weights: WeightMap): void {
-        for (const key in weights.weights) {
-            this.add(key, weights.get(key));
+    addAll(beingAdded: WeightValues): void {
+        for (const key of beingAdded.keys()) {
+            this.add(key, beingAdded.get(key));
         }
     }
     total(): number { return Object.values(this.weights).reduce((acc, val) => acc + val, 0); }
@@ -20,12 +27,12 @@ export class WeightMap {
 
 export interface RankedCategory {
     category: string;
-    score: WeightMap;
+    score: WeightValues;
 }
 
 export interface WeightRule {
     categoryName: string;
-    score(text: string): WeightMap;
+    score(text: string): WeightValues;
 }
 
 function ranked(
@@ -43,7 +50,7 @@ function ranked(
 }
 
 function top(rankedCategories: RankedCategory[]): RankedCategory[] {
-    return rankedCategories.filter(c => c.score.total() > 0).sort((a, b) => b.score.total() - a.score.total());
+    return rankedCategories.filter(c => c.score.total() > 0).sort((a, b) => b.score.total() - a.score.total()).slice(0, 2);
 }
 
 export const classify = (userRequest: string, classificationRules: WeightRule[]): RankedCategory[] =>

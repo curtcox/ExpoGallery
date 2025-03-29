@@ -1,10 +1,21 @@
 import { WeightMap, WeightRule, classify } from '../weightedClassifier';
 
 describe('WeightedClassifier Tests', () => {
-    test('WeightMap should correctly handle basic operations', () => {
+
+    test('WeightMap should correctly handle basic operations 1', () => {
+        const weights = new WeightMap();
+        weights.set('k', 3);
+        expect(weights.keys()).toEqual(['k']);
+
+        expect(weights.get('k')).toBe(3);
+        expect(weights.total()).toBe(3);
+    });
+
+    test('WeightMap should correctly handle basic operations 2', () => {
         const weights = new WeightMap();
         weights.set('key1', 5);
         weights.set('key2', 3);
+        expect(weights.keys()).toEqual(['key1', 'key2']);
 
         expect(weights.get('key1')).toBe(5);
         expect(weights.get('key2')).toBe(3);
@@ -17,11 +28,33 @@ describe('WeightedClassifier Tests', () => {
         expect(weights.keys()).toEqual(['key2']);
     });
 
-    test('WeightMap should correctly add weights', () => {
-        const weights1 = new WeightMap();
-        const weights2 = new WeightMap();
+    test('WeightMap should correctly add weights with one key', () => {
+        const weights = new WeightMap();
+        weights.set('k', 1);
+        weights.add('k', 1);
 
+        expect(weights.get('k')).toBe(2);
+        expect(weights.total()).toBe(2);
+    });
+
+    test('WeightMap should correctly addAll weights with one key', () => {
+        const weights1 = new WeightMap();
+        weights1.set('k', 1);
+
+        const weights2 = new WeightMap();
+        weights2.set('k', 1);
+
+        weights1.addAll(weights2);
+
+        expect(weights1.get('k')).toBe(2);
+        expect(weights1.total()).toBe(2);
+    });
+
+    test('WeightMap should correctly add weights with two keys', () => {
+        const weights1 = new WeightMap();
         weights1.set('key1', 5);
+
+        const weights2 = new WeightMap();
         weights2.set('key1', 3);
         weights2.set('key2', 2);
 
@@ -162,5 +195,33 @@ describe('WeightedClassifier Tests', () => {
         result = classify(longString, rules);
         expect(result.length).toBe(1);
         expect(result[0].category).toBe('category1');
+    });
+
+    describe('WeightMap total() Tests', () => {
+        test('total() should return 0 when there are no weights', () => {
+            const weights = new WeightMap();
+            expect(weights.total()).toBe(0);
+        });
+
+        test('total() should return the value of the weight when there is one weight', () => {
+            const weights = new WeightMap();
+            weights.set('key1', 5);
+            expect(weights.total()).toBe(5);
+        });
+
+        test('total() should return the sum of the weight values when there are two weights', () => {
+            const weights = new WeightMap();
+            weights.set('key1', 5);
+            weights.set('key2', 3);
+            expect(weights.total()).toBe(8);
+        });
+
+        test('total() should return the sum of three weights when there are three weights', () => {
+            const weights = new WeightMap();
+            weights.set('key1', 5);
+            weights.set('key2', 3);
+            weights.set('key3', 2);
+            expect(weights.total()).toBe(10);
+        });
     });
 });

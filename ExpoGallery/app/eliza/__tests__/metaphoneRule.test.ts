@@ -1,4 +1,5 @@
-import { metaphones, stemmed, wordMatchScore, phraseMatchScore } from '../metaphoneRule';
+import { metaphones, stemmed, wordMatchScore, phraseMatchScore, MetaphoneRule } from '../metaphoneRule';
+import { WeightMap } from '../weightedClassifier';
 
 describe('metaphones function', () => {
     test('should generate metaphone codes for a single simple word', () => {
@@ -232,5 +233,57 @@ describe('phraseMatchScore function', () => {
 
         const score = phraseMatchScore(words, phrase, 0);
         expect(score).toBeGreaterThan(0.9); // Should be very high due to exact matches
+    });
+});
+
+describe('MetaphoneRule single word classification', () => {
+    test.only('single word classification should match wordMatchScore', () => {
+        // Create a MetaphoneRule with a single word phrase
+        const phrases = new WeightMap();
+        phrases.set('hello', 1.0);
+        const rule = new MetaphoneRule('test', phrases, new WeightMap());
+
+        // Test exact match
+        const exactScore = rule.score('hello').total();
+        expect(exactScore).toBe(wordMatchScore('hello', 'hello'));
+
+        // Test case-insensitive match
+        const caseScore = rule.score('HELLO').total();
+        expect(caseScore).toBe(wordMatchScore('HELLO', 'hello'));
+
+        // Test metaphone match
+        const metaphoneScore = rule.score('helo').total();
+        expect(metaphoneScore).toBe(wordMatchScore('helo', 'hello'));
+
+        // Test no match
+        const noMatchScore = rule.score('world').total();
+        expect(noMatchScore).toBe(wordMatchScore('world', 'hello'));
+    });
+
+    test('single word classification with exclusions', () => {
+        const phrases = new WeightMap();
+        phrases.set('phone', 1.0);
+        const exclusions = new WeightMap();
+        exclusions.set('telephone', 1.0);
+        const rule = new MetaphoneRule('test', phrases, exclusions);
+
+        // Test basic match with exclusion
+        const score = rule.score('telephone').total();
+        expect(score).toBeLessThanOrEqual(0); // Should be negative or zero due to exclusion
+
+        // Test metaphone match with exclusion
+        const metaphoneScore = rule.score('fone').total();
+        expect(metaphoneScore).toBe(wordMatchScore('fone', 'phone')); // Exclusion shouldn't affect this
+    });
+
+    test('single word classification with multiple phrases', () => {
+        const phrases = new WeightMap();
+        phrases.set('write', 1.0);
+        phrases.set('right', 0.5); // Different weight
+        const rule = new MetaphoneRule('test', phrases, new WeightMap());
+
+        // Test that it matches the highest weighted similar word
+        const score = rule.score('rite').total();
+        expect(score).toBe(wordMatchScore('rite', 'write'));
     });
 });

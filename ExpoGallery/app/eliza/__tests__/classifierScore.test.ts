@@ -66,23 +66,34 @@ describe('simple classifier assistance resource matcher scoring', () => {
     });
 });
 
-function assistanceRulesAsMetaphoneRule(): WeightRule[] {
-    const rules = assistanceRules as AssistanceRule[];
+function assistanceRulesAsMetaphoneRule(rule: AssistanceRule): WeightRule {
     const phrases = new WeightMap();
     const exclusions = new WeightMap();
-    return rules.map(rule => new MetaphoneRule(rule.category, phrases, exclusions));
+    const words = rule.phrases.split(',');
+    for (const word of words) {
+        phrases.set(word, 1);
+    }
+    for (const word of words) {
+        exclusions.set(word, 1);
+    }
+    return new MetaphoneRule(rule.category, phrases, exclusions);
+}
+
+function assistanceRulesAsMetaphoneRules(): WeightRule[] {
+    const rules = assistanceRules as AssistanceRule[];
+    return rules.map(rule => assistanceRulesAsMetaphoneRule(rule));
 }
 
 describe('metaphone classifier assistance resource matcher scoring', () => {
 
-    test('should achieve at least 75% classification accuracy', () => {
+    test('should achieve at least 80% classification accuracy', () => {
         let totalClassifications = 0;
         let correctClassifications = 0;
 
         // Process each message in the assistance data
         (assistanceData as AssistanceData).messages.forEach(message => {
             const expectedClassifications = message.classifications;
-            const actualClassifications = metaphoneClassify(message.text, assistanceRulesAsMetaphoneRule());
+            const actualClassifications = metaphoneClassify(message.text, assistanceRulesAsMetaphoneRules());
 
             // Count total expected classifications
             totalClassifications += expectedClassifications.length;
@@ -109,6 +120,6 @@ describe('metaphone classifier assistance resource matcher scoring', () => {
         Correct Classifications: ${correctClassifications}
         Accuracy: ${percentage}%`);
 
-        expect(accuracy).toBeGreaterThanOrEqual(0.75);
+        expect(accuracy).toBeGreaterThanOrEqual(0.80);
     });
 });
