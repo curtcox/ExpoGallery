@@ -8,16 +8,45 @@ permissions:
   checks: write
   contents: read
   pull-requests: write
+
 jobs:
+
   build_and_preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - run: |
+
+      - name: Checkout public repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'ExpoGallery/package-lock.json'
+
+      - name: Install dependencies
+        run: |
+            cd ExpoGallery
+            npm ci
+
+      - name: Build Expo web
+        run: |
+            cd ExpoGallery
+            npm run predeploy:root
+            npx expo export --platform web --dev --output-dir ../site/public
+        env:
+            NODE_OPTIONS: "--max_old_space_size=4096"
+
+      - name: Replace GITHUB_SHA in about.html
+        run: |
           cd site
           sed -i.bak 's/GITHUB_SHA/'${GITHUB_SHA}'/g' public/about.html
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+
+      - name: Deploy to Firebase Hosting Preview Channel
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPCHATAI }}
