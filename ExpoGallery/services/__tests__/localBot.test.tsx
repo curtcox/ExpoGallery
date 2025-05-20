@@ -299,7 +299,7 @@ describe('localBot', () => {
     };
     const result = localBot('I need shelter', contextWithLocation);
     expect(result).toContain('LifeMoves | Montgomery Street Inn');
-    expect(result).toContain('358 N Mongomery St, San Jose, CA 95110');
+    expect(result).toContain('358 N Montgomery St, San Jose, CA 95110');
   });
 
   test('provides Salvation Army as closest shelter in North San Jose', () => {
