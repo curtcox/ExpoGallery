@@ -71,6 +71,25 @@ npm run deploy
 - `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`: Set Xcode developer directory
 - `npm install expo-speech-recognition`: Example of adding a specific Expo package
 
+## Branching Strategy
+
+This project follows a specific branching strategy to ensure code quality and stability:
+
+- `main` only accepts Pull Requests (PRs) from `prod`.
+- `prod` only accepts PRs from `test`.
+- `test` only accepts PRs from `dev`.
+- `dev` can accept PRs from feature branches.
+
+This flow ensures that code is thoroughly tested and reviewed before it reaches the `main` branch.
+
+```mermaid
+graph LR
+    feature_branches --> dev;
+    dev --> test;
+    test --> prod;
+    prod --> main;
+```
+
 ## Preview Channels
 
 You can access live previews of different branches:
