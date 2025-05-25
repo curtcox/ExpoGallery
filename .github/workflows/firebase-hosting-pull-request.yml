@@ -3,7 +3,10 @@
 # See https://github.com/FirebaseExtended/action-hosting-deploy
 
 name: Deploy to Firebase Hosting on PR
-on: pull_request
+on:
+  push:
+    branches-ignore:
+      - main
 permissions:
   checks: write
   contents: read
@@ -45,10 +48,72 @@ jobs:
           cd site
           sed -i.bak 's/GITHUB_SHA/'${GITHUB_SHA}'/g' public/about.html
 
+      - name: Prepare Channel ID
+        id: prepare_channel_id
+        run: |
+          # Get the branch name, convert to lowercase
+          BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]')
+          # Replace invalid characters (not alphanumeric or hyphen) with a hyphen
+          SANITIZED_NAME=$(echo "$BRANCH_NAME" | sed 's/[^a-z0-9-]/-/g')
+          # Trim to 36 characters
+          TRIMMED_NAME=$(echo "$SANITIZED_NAME" | cut -c1-36)
+          # Ensure it doesn't start or end with a hyphen (Firebase requirement)
+          # This is a bit tricky with sed and cut, might need a more robust approach if it becomes an issue.
+          # For now, we'll rely on common branch naming conventions not causing this.
+          # A simple fix if it ends with a hyphen:
+          if [[ "$TRIMMED_NAME" == *- ]]; then
+            TRIMMED_NAME=$(echo "$TRIMMED_NAME" | sed 's/-$//')
+          fi
+          # A simple fix if it starts with a hyphen (less likely for branches):
+          if [[ "$TRIMMED_NAME" == -* ]]; then
+            TRIMMED_NAME=$(echo "$TRIMMED_NAME" | sed 's/^-//')
+          fi
+          # If after sanitization, name is empty (e.g. branch was just '/'), use a default.
+          if [ -z "$TRIMMED_NAME" ]; then
+            TRIMMED_NAME="preview"
+          fi
+          echo "channel_id=$TRIMMED_NAME" >> $GITHUB_OUTPUT
+
       - name: Deploy to Firebase Hosting Preview Channel
         uses: FirebaseExtended/action-hosting-deploy@v0
+        id: deploy_preview
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPCHATAI }}
           entryPoint: site
           projectId: mapchatai
+          channelId: ${{ steps.prepare_channel_id.outputs.channel_id }}
+          target: ${{ github.event.repository.name }}-${{ steps.prepare_channel_id.outputs.channel_id }}
+
+      - name: Validate Deployment
+        run: |
+          PROJECT_ID="mapchatai" # Hardcoded as it's specified in the workflow
+          CHANNEL_ID="${{ steps.prepare_channel_id.outputs.channel_id }}"
+          # Construct the preview URL. Firebase preview URLs are typically https://<project-id>--<channel-id>.web.app
+          # However, the action output 'details_url' from the deployment step is the most reliable source.
+          # The action 'FirebaseExtended/action-hosting-deploy@v0' outputs the URL of the preview channel as 'details_url'.
+          # Let's use that.
+          PREVIEW_URL="${{ steps.deploy_preview.outputs.details_url }}"
+          
+          echo "Preview URL: $PREVIEW_URL"
+          
+          # Check if PREVIEW_URL is empty or not a valid URL (basic check)
+          if [ -z "$PREVIEW_URL" ] || [[ ! "$PREVIEW_URL" =~ ^https?:// ]]; then
+            echo "Error: Invalid or empty preview URL: $PREVIEW_URL"
+            exit 1
+          fi
+          
+          # Perform a GET request. Fail if the HTTP status code is not 200.
+          # The --silent option suppresses progress meter, --show-error shows errors, 
+          # --fail causes curl to exit with 22 on server errors (4xx, 5xx).
+          # We also check the output status code explicitly.
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PREVIEW_URL")
+          
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "Successfully accessed preview URL. Status: $HTTP_STATUS"
+          else
+            echo "Error: Failed to access preview URL. Status: $HTTP_STATUS"
+            # Attempt to get more details if it failed
+            curl -v "$PREVIEW_URL"
+            exit 1
+          fi

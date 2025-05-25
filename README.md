@@ -71,6 +71,17 @@ npm run deploy
 - `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`: Set Xcode developer directory
 - `npm install expo-speech-recognition`: Example of adding a specific Expo package
 
+## Preview Channels
+
+You can access live previews of different branches:
+
+- **Main (Production):** [https://mapchatai.web.app](https://mapchatai.web.app)
+- **Dev:** [https://mapchatai--dev.web.app](https://mapchatai--dev.web.app)
+- **Test:** [https://mapchatai--test.web.app](https://mapchatai--test.web.app)
+- **Prod (Branch):** [https://mapchatai--prod.web.app](https://mapchatai--prod.web.app)
+
+Note: Preview channels for other branches are created automatically when code is pushed to them. The URL will follow the pattern `https://mapchatai--<branch-name>.web.app` (where `<branch-name>` is sanitized).
+
 ## License
 
 This software, having considered all its options, has enthusiastically decided to free itself from all constraints and wander cheerfully into the public domain.
