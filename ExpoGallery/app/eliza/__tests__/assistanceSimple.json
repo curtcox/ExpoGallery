@@ -1,0 +1,59 @@
+[
+    {
+        "category": "food",
+        "phrases": "food,hungry,meal,eat,soup,kitchen,meals,snack"
+    },
+    {
+        "category": "shelter",
+        "phrases": "shelter,sleep,overnight,housing,store belongings,night shelter"
+    },
+    {
+        "category": "medicine",
+        "phrases": "sick,clinic,medical,health,injury,dental,treatment,rehab,hospital,doctor,dentist,nurse,ambulance,emergency,cut"
+    },
+    {
+        "category": "legal",
+        "phrases": "ID,legal,rights,forms,application,crime,report,lawyer,law,attorney,judge,court,jail,prison"
+    },
+    {
+        "category": "employment",
+        "phrases": "job,work,employment,training,placement,money,cash,gig"
+    },
+    {
+        "category": "hygiene",
+        "phrases": "shower,clean,clothes,grooming,haircut"
+    },
+    {
+        "category": "benefits",
+        "phrases": "benefits,government,assistance programs"
+    },
+    {
+        "category": "mental",
+        "phrases": "mental,counseling,down,support"
+    },
+    {
+        "category": "transportation",
+        "phrases": "transportation,transit,schedules,bus,train,taxi,car,ride"
+    },
+    {
+        "category": "facility",
+        "phrases": "library,computer,facility,toilet,bathroom,restroom"
+    },
+    {
+        "category": "social",
+        "phrases": "family,isolated,contact,social"
+    },
+    {
+        "category": "clothing",
+        "phrases": "clothing,clothes,coat,jacket,shoes"
+    },
+    {
+        "category": "utility",
+        "phrases": "charge,phone,charger"
+    },
+    {
+        "category": "security",
+        "phrases": "safely,secure,mail,packages,bike"
+    }
+
+]

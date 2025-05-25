@@ -37,7 +37,12 @@ const deviceLocationService: DeviceLocationService = {
    * Request permission to access the device's location
    */
   async requestForegroundPermissionsAsync(): Promise<{ status: string }> {
-    return await Location.requestForegroundPermissionsAsync();
+    try {
+      return await Location.requestForegroundPermissionsAsync();
+    } catch (e) {
+      error('Error requesting location permissions:', e);
+      return { status: 'denied' };
+    }
   },
 
   /**
@@ -45,9 +50,7 @@ const deviceLocationService: DeviceLocationService = {
    */
   async initLocationWatching(): Promise<void> {
     // Clean up any existing subscription
-    if (locationSubscription) {
-      locationSubscription.remove();
-    }
+    this.stopLocationWatching();
 
     try {
       // Request permission if needed
@@ -84,24 +87,41 @@ const deviceLocationService: DeviceLocationService = {
    * @returns Most recent LocationObject or null if no location data is available
    */
   async getCurrentLocation(): Promise<LocationObject | null> {
-    // If we don't have a location subscription yet, initialize it
-    if (!locationSubscription) {
-      await this.initLocationWatching();
-    }
-
-    // If we still don't have a location, try to get the last known position
-    if (!mostRecentLocation) {
-      try {
-        mostRecentLocation = await Location.getLastKnownPositionAsync({
-          requiredAccuracy: 1000, // meters (1 km)
-          maxAge: 60 * 60 * 1000, // milliseconds (1 hour)
-        });
-      } catch (e) {
-        error('Error getting last known position:', e);
+    try {
+      // If we don't have a location subscription yet, initialize it
+      if (!locationSubscription) {
+        await this.initLocationWatching();
       }
-    }
 
-    // Convert Expo's LocationObject to our common interface
+      // If we still don't have a location, try to get the last known position
+      if (!mostRecentLocation) {
+        try {
+          const lastPosition = await Location.getLastKnownPositionAsync({
+            requiredAccuracy: 1000, // meters (1 km)
+            maxAge: 60 * 60 * 1000, // milliseconds (1 hour)
+          });
+
+          if (lastPosition) {
+            mostRecentLocation = lastPosition;
+          }
+        } catch (e) {
+          error('Error getting last known position:', e);
+        }
+      }
+
+      // Convert Expo's LocationObject to our common interface
+      return convertToLocationObject(mostRecentLocation);
+    } catch (e) {
+      error('Error in getCurrentLocation:', e);
+      return null;
+    }
+  },
+
+  /**
+   * Gets the last known location without blocking or initializing watching
+   * @returns Most recent LocationObject or null if no location data is available
+   */
+  getLastKnownLocation(): LocationObject | null {
     return convertToLocationObject(mostRecentLocation);
   },
 
@@ -110,10 +130,16 @@ const deviceLocationService: DeviceLocationService = {
    * Should be called when the app is closing or when location watching is no longer needed
    */
   stopLocationWatching(): void {
-    if (locationSubscription) {
-      locationSubscription.remove();
+    try {
+      if (locationSubscription) {
+        locationSubscription.remove();
+        info('Location watching stopped');
+      }
+    } catch (e) {
+      error('Error stopping location watching:', e);
+    } finally {
+      // Always reset the subscription object even if there was an error
       locationSubscription = null;
-      info('Location watching stopped');
     }
   }
 };

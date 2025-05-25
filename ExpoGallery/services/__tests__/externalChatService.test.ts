@@ -90,7 +90,7 @@ describe('externalChatService', () => {
       },
       body: JSON.stringify({
         message: 'Food?',
-        location: '9yzey5mxsb',
+        location: 'dqcjqcp0',
       }),
     });
   });

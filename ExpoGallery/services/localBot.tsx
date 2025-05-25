@@ -2,9 +2,9 @@
  * Local chatbot implementation with context-aware responses
  */
 
-import { Profile } from '../storage/profile';
-import { Resource } from './data';
-import { calculateDistance } from './location';
+import { Profile } from '@/storage/profile';
+import { Resource } from '@/services/data';
+import { calculateDistance } from '@/services/location';
 
 export interface ChatContext {
   timestamp: Date;

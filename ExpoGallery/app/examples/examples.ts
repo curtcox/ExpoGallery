@@ -7,6 +7,14 @@ export type ExampleItem = {
 };
 
 export const ALL_EXAMPLES: ExampleItem[] = [
+  { name: 'clock',              text: 'clock',                  icon: 'clock',                  url: 'clock' },
+  { name: 'dom',                text: 'DOM',                    icon: 'dom',                    url: 'https://docs.expo.dev/guides/dom-components/' },
+  { name: 'lucide',             text: 'lucide',                 icon: 'lucide',                 url: 'https://lucide.dev/guide/packages/lucide-react-native' },
+  { name: 'elevenlabs',         text: 'Eleven Labs',            icon: 'voice',                  url: 'https://elevenlabs.io/docs/conversational-ai/guides/integrations/expo-react-native' },
+  { name: 'webview',            text: 'Web View',               icon: 'web-view',               url: 'versions/latest/sdk/webview/' },
+  { name: 'glview',             text: 'GL View',                icon: 'image-outline',          url: 'versions/latest/sdk/gl-view/' },
+  { name: 'markdown-renderer',  text: 'Markdown Renderer',      icon: 'ntfy',                   url: 'https://github.com/iamacup/react-native-markdown-display' },
+  { name: 'markdown-link',      text: 'Markdown Link',          icon: 'ntfy',                   url: 'https://github.com/iamacup/react-native-markdown-display' },
   { name: 'ntfy',               text: 'ntfy',                   icon: 'ntfy',                   url: 'https://docs.ntfy.sh/publish/' },
   { name: 'sensors',            text: 'Sensors',                icon: 'pulse-outline',          url: 'versions/latest/sdk/sensors/' },
   { name: 'auth-session',       text: 'Auth Session',           icon: 'auth-session',           url: 'versions/latest/sdk/auth-session/' },

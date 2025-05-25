@@ -1,3 +1,4 @@
+import '@/utils/reactGlobal';
 import { Link, Stack, usePathname, useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
