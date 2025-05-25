@@ -61,13 +61,8 @@ jobs:
           # This is a bit tricky with sed and cut, might need a more robust approach if it becomes an issue.
           # For now, we'll rely on common branch naming conventions not causing this.
           # A simple fix if it ends with a hyphen:
-          if [[ "$TRIMMED_NAME" == *- ]]; then
-            TRIMMED_NAME=$(echo "$TRIMMED_NAME" | sed 's/-$//')
-          fi
-          # A simple fix if it starts with a hyphen (less likely for branches):
-          if [[ "$TRIMMED_NAME" == -* ]]; then
-            TRIMMED_NAME=$(echo "$TRIMMED_NAME" | sed 's/^-//')
-          fi
+          # Remove all leading and trailing hyphens using a regex
+          TRIMMED_NAME=$(echo "$TRIMMED_NAME" | sed 's/^-*\(.*[^-]\)-*$/\1/')
           # If after sanitization, name is empty (e.g. branch was just '/'), use a default.
           if [ -z "$TRIMMED_NAME" ]; then
             TRIMMED_NAME="preview"
