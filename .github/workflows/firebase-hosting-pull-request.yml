@@ -19,6 +19,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check PR source branch
+        run: |
+          if [[ "${{ github.base_ref }}" == "prod" && "${{ github.head_ref }}" != "test" ]]; then
+            echo "PRs to prod must come from test."
+            exit 1
+          elif [[ "${{ github.base_ref }}" == "test" && "${{ github.head_ref }}" != "dev" ]]; then
+            echo "PRs to test must come from dev."
+            exit 1
+          else
+            echo "PR branch restrictions met."
+          fi
+        shell: bash
 
       - name: Checkout public repository
         uses: actions/checkout@v4
