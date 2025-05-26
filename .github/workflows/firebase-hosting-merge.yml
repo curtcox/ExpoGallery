@@ -2,17 +2,16 @@
 # https://github.com/firebase/firebase-tools
 # See https://github.com/FirebaseExtended/action-hosting-deploy
 
-name: Deploy to Firebase Hosting on merge
+name: Deploy to Firebase Hosting (Branch Preview & Live)
 on:
-  push:
-    branches:
-      - main
+  push: # Runs on all pushes to any branch
+  workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
 
   build_and_deploy:
     runs-on: ubuntu-latest
-
+    # Manual trigger enabled
     steps:
 
         - name: Checkout public repository
@@ -43,11 +42,48 @@ jobs:
             cd site
             sed -i.bak 's/GITHUB_SHA/'${GITHUB_SHA}'/g' public/about.html
 
-        - name: Deploy to Firebase Hosting Preview Channel
+        - name: Deploy to Firebase Hosting
           uses: FirebaseExtended/action-hosting-deploy@v0
           with:
             repoToken: ${{ secrets.GITHUB_TOKEN }}
             firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPCHATAI }}
             entryPoint: site
             projectId: mapchatai
-            channelId: live
+            channelId: ${{ github.ref == 'refs/heads/main' && 'live' || format('preview-{0}', github.head_ref || github.ref_name) }}
+
+      - name: Verify deployed SHA
+        env:
+          IS_MAIN_BRANCH: ${{ github.ref == 'refs/heads/main' }}
+          BRANCH_NAME_SLUG: ${{ github.head_ref || github.ref_name }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          if [ "$IS_MAIN_BRANCH" = "true" ]; then
+            DEPLOYED_VERSION_URL="https://mapchatai.web.app/version.json"
+          else
+            # Sanitize BRANCH_NAME_SLUG for URL (replace / with - or similar if needed, though Firebase might handle it)
+            # For now, assuming Firebase or the action handles slugification for channel names if needed.
+            # The format for preview channels is typically project-id--channel-id.web.app
+            DEPLOYED_VERSION_URL="https://mapchatai--preview-${BRANCH_NAME_SLUG}.web.app/version.json"
+          fi
+          echo "Fetching deployed version from: $DEPLOYED_VERSION_URL"
+          # Add retries for curl as the deployment might take a few seconds to be live
+          for i in 1 2 3 4 5; do
+            DEPLOYED_SHA=$(curl -s --fail $DEPLOYED_VERSION_URL | jq -r '.build')
+            if [ -n "$DEPLOYED_SHA" ] && [ "$DEPLOYED_SHA" != "null" ]; then
+              break
+            fi
+            echo "Attempt $i: version.json not found or build field is null. Retrying in 5 seconds..."
+            sleep 5
+          done
+          EXPECTED_SHA="${{ github.sha }}"
+          echo "Deployed SHA: $DEPLOYED_SHA"
+          echo "Expected SHA: $EXPECTED_SHA"
+          if [ -z "$DEPLOYED_SHA" ] || [ "$DEPLOYED_SHA" == "null" ]; then
+            echo "Error: Could not fetch deployed SHA from $DEPLOYED_VERSION_URL after multiple retries."
+            exit 1
+          fi
+          if [ "$DEPLOYED_SHA" != "$EXPECTED_SHA" ]; then
+            echo "Error: Deployed SHA ($DEPLOYED_SHA) does not match expected SHA ($EXPECTED_SHA)."
+            exit 1
+          fi
+          echo "Successfully verified deployed SHA."
