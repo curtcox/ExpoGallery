@@ -9,7 +9,6 @@ on:
       - main # Only run on PRs targeting the main branch
   workflow_dispatch: # Allow manual triggering of the workflow
 
-# Add permissions needed for GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -21,63 +20,34 @@ env:
   DEFAULT_CHAT_LOCATION: ${{ vars.DEFAULT_CHAT_LOCATION }}
 
 jobs:
-  build-and-deploy:
+  call_reusable_build:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      node-version: '18'
+      expo-working-directory: 'ExpoGallery'
+      output-path: 'dist'
+
+  deploy_to_pages:
+    needs: call_reusable_build
     runs-on: ubuntu-latest
-
+    # Add environment for GitHub Pages deployment URL
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
         with:
-          node-version: '18' # Use the Node.js version compatible with our Expo version
-          cache: 'npm'
-          cache-dependency-path: 'ExpoGallery/package-lock.json'
-
-      - name: Install dependencies
-        run: |
-          cd ExpoGallery
-          npm ci
-
-      - name: Run tests
-        run: |
-          cd ExpoGallery
-          npm test
-
-      - name: Build Expo web
-        run: |
-          cd ExpoGallery
-          npm run predeploy
-          npx expo export --platform web --no-minify --dev
-          touch dist/.nojekyll
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
-
-      - name: Save latest deployment artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: expo-web-build-latest
-          path: |
-            ExpoGallery/dist
-            ExpoGallery/public/version.json
-
-      - name: Save historical deployment artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: expo-web-build-${{ github.sha }}
-          path: |
-            ExpoGallery/dist
-            ExpoGallery/public/version.json
-          retention-days: 90
+          name: ${{ needs.call_reusable_build.outputs.build_artifact_name }}
+          path: downloaded-artifact # Artifact content will be in 'dist' if output-path was 'dist'
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Upload artifact
+      - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './ExpoGallery/dist'
+          path: './downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }}'
 
       - name: Deploy to GitHub Pages
         id: deployment
@@ -85,15 +55,54 @@ jobs:
 
       - name: Verify deployed SHA
         run: |
-          sudo apt-get update && sudo apt-get install -y jq
-          DEPLOYED_VERSION_URL="${{ steps.deployment.outputs.page_url }}/version.json"
-          echo "Fetching deployed version from: $DEPLOYED_VERSION_URL"
-          DEPLOYED_SHA=$(curl -s $DEPLOYED_VERSION_URL | jq -r '.build')
           EXPECTED_SHA="${{ github.sha }}"
-          echo "Deployed SHA: $DEPLOYED_SHA"
+          # Construct the URL to version.json using the base URL from deployment and the relative path from the reusable workflow's output
+          DEPLOYED_VERSION_URL="${{ steps.deployment.outputs.page_url }}/${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
+          
+          echo "Verifying deployment..."
           echo "Expected SHA: $EXPECTED_SHA"
-          if [ "$DEPLOYED_SHA" != "$EXPECTED_SHA" ]; then
-            echo "Error: Deployed SHA ($DEPLOYED_SHA) does not match expected SHA ($EXPECTED_SHA)."
+          echo "Fetching deployed version from: $DEPLOYED_VERSION_URL"
+          
+          DEPLOYED_SHA=""
+          for i in 1 2 3 4 5; do
+            # Save curl output to a file and capture HTTP status code
+            # Added -L to follow redirects, which can be common for GitHub Pages initial deployment.
+            HTTP_CODE=$(curl -s -L -w "%{http_code}" -o response.json "$DEPLOYED_VERSION_URL")
+            if [ "$HTTP_CODE" -eq 200 ]; then
+              # Check if response.json is not empty and contains valid JSON with a non-null .build field
+              if [ -s response.json ] && jq -e '.build != null' response.json > /dev/null; then
+                DEPLOYED_SHA=$(jq -r '.build' response.json)
+                # Additional check to ensure DEPLOYED_SHA is not empty string after jq
+                if [ -n "$DEPLOYED_SHA" ]; then
+                   echo "Successfully fetched deployed SHA: $DEPLOYED_SHA"
+                   break
+                else
+                   echo "Attempt $i: Fetched 'build' field is empty."
+                fi
+              else
+                echo "Attempt $i: Fetched content is not valid JSON, 'build' key is missing, or 'build' key is null."
+                echo "Response content:"
+                cat response.json
+              fi
+            else
+              echo "Attempt $i: HTTP request failed with status code $HTTP_CODE."
+              # It's useful to see the response body even on HTTP errors, if any.
+              echo "Response content (if any):"
+              cat response.json
+            fi
+            echo "Retrying in 10 seconds..."
+            sleep 10
+          done
+
+          if [ -z "$DEPLOYED_SHA" ] || [ "$DEPLOYED_SHA" == "null" ]; then
+            echo "::error::Could not fetch or parse deployed SHA from $DEPLOYED_VERSION_URL after multiple retries."
+            # response.json was already cat-ed in the loop if it existed
             exit 1
           fi
-          echo "Successfully verified deployed SHA."
+
+          if [ "$DEPLOYED_SHA" != "$EXPECTED_SHA" ]; then
+            echo "::error::Deployed SHA ($DEPLOYED_SHA) does not match expected SHA ($EXPECTED_SHA)."
+            exit 1
+          fi
+          echo "Successfully verified deployed SHA ($DEPLOYED_SHA) on $DEPLOYED_VERSION_URL."
+        shell: bash
