@@ -129,14 +129,26 @@ jobs:
         env:
           CHANNEL_ID_OUTPUT: ${{ steps.channel_id.outputs.channel_id }}
           FIREBASE_PROJECT_ID: mapchatai
+          FIREBASE_DEPLOY_DETAILS: ${{ steps.firebase_deploy.outputs.details }}
         run: |
-          sudo apt-get update && sudo apt-get install -y jq
-          DEPLOYED_VERSION_URL=""
+          sudo apt-get update && sudo apt-get install -y jq # Keep this line
+          echo "Firebase Deploy Details: $FIREBASE_DEPLOY_DETAILS" # For debugging
+
+          ACTUAL_SITE_URL=""
           if [ "$CHANNEL_ID_OUTPUT" == "live" ]; then
-            DEPLOYED_VERSION_URL="https://$FIREBASE_PROJECT_ID.web.app/version.json"
+            ACTUAL_SITE_URL=$(echo "$FIREBASE_DEPLOY_DETAILS" | jq -r --arg project_id "$FIREBASE_PROJECT_ID" '.[$project_id].live.url')
           else
-            DEPLOYED_VERSION_URL="https://$FIREBASE_PROJECT_ID--$CHANNEL_ID_OUTPUT.web.app/version.json"
+            # Find the key that starts with the CHANNEL_ID_OUTPUT (e.g., "preview-dev")
+            # The channel ID from firebase_deploy details might have a suffix (e.g., "preview-dev-randomsuffix")
+            ACTUAL_SITE_URL=$(echo "$FIREBASE_DEPLOY_DETAILS" | jq -r --arg project_id "$FIREBASE_PROJECT_ID" --arg channel_prefix "$CHANNEL_ID_OUTPUT" '.[$project_id] | to_entries[] | select(.key | startswith($channel_prefix)) | .value.url')
           fi
+
+          if [ -z "$ACTUAL_SITE_URL" ] || [ "$ACTUAL_SITE_URL" == "null" ]; then
+            echo "::error::Could not extract site URL from Firebase deployment details."
+            exit 1
+          fi
+
+          DEPLOYED_VERSION_URL="$ACTUAL_SITE_URL/version.json"
           echo "Fetching deployed version from: $DEPLOYED_VERSION_URL"
           for i in 1 2 3 4 5; do
             HTTP_CODE=$(curl -s -w "%{http_code}" -o response.json $DEPLOYED_VERSION_URL)
