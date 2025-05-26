@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Consistent with other workflows
+          node-version: '20' # Consistent with other workflows
           cache: 'npm'
           cache-dependency-path: 'ExpoGallery/package-lock.json'
 
@@ -56,7 +56,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Consistent with test job
+          node-version: '20' # Consistent with test job
           cache: 'npm'
           cache-dependency-path: 'ExpoGallery/package-lock.json'
 
