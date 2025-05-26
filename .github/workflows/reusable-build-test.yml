@@ -1,0 +1,101 @@
+name: Reusable Expo Web Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '18'
+      cache-dependency-path:
+        description: 'Path to package-lock.json or similar for caching'
+        required: false
+        type: string
+        default: 'ExpoGallery/package-lock.json'
+      expo-working-directory:
+        description: 'Directory where Expo project is located'
+        required: false
+        type: string
+        default: 'ExpoGallery'
+      output-path:
+        description: 'Directory relative to expo-working-directory to output the build artifacts'
+        required: false
+        type: string
+        default: 'dist'
+    outputs:
+      build_artifact_name:
+        description: "The name of the uploaded build artifact."
+        value: ${{ jobs.build_and_test.outputs.job_build_artifact_name }}
+      build_output_dir_name:
+        description: "The name of the directory containing the build output, relative to the artifact root (this is the value of inputs.output-path)."
+        value: ${{ inputs.output-path }}
+      version_json_relative_path:
+        description: "Relative path to version.json within the build output directory (e.g., public/version.json)."
+        value: "public/version.json"
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    outputs:
+      job_build_artifact_name: expo-web-build-${{ github.run_id }}
+      # The following are not strictly needed as job outputs if workflow outputs can derive them from inputs
+      # but defining them for clarity if direct reference from job is ever preferred.
+      # For this setup, workflow outputs directly use inputs or fixed values where appropriate.
+      # job_build_output_path_relative: ${{ inputs.output-path }} # This is the name of the folder, e.g. "dist"
+      # job_version_json_path_relative: public/version.json # Relative to the output-path
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+          cache-dependency-path: ${{ inputs.cache-dependency-path }}
+
+      - name: Install dependencies
+        run: |
+          cd ${{ inputs.expo-working-directory }}
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd ${{ inputs.expo-working-directory }}
+          npm test
+
+      - name: Run predeploy script
+        run: |
+          cd ${{ inputs.expo-working-directory }}
+          npm run predeploy 
+          # This script is expected to copy assets/index.html to ${{ inputs.output-path }}/
+          # and potentially an initial assets/version.json to ${{ inputs.output-path }}/public/
+
+      - name: Create/Overwrite version.json
+        run: |
+          cd ${{ inputs.expo-working-directory }}
+          mkdir -p ${{ inputs.output-path }}/public
+          echo '{"build": "${{ github.sha }}"}' > ${{ inputs.output-path }}/public/version.json
+        shell: bash
+
+      - name: Build Expo web application
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: |
+          cd ${{ inputs.expo-working-directory }}
+          npx expo export --platform web --no-minify --dev --output-dir ./${{ inputs.output-path }}
+
+      - name: Create .nojekyll file
+        run: |
+          touch ${{ inputs.expo-working-directory }}/${{ inputs.output-path }}/.nojekyll
+        shell: bash
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: expo-web-build-${{ github.run_id }}
+          path: ${{ inputs.expo-working-directory }}/${{ inputs.output-path }}
+          if-no-files-found: error # Fail the workflow if the build output is missing
+          retention-days: 7 # Optional: configure how long to keep the artifact
