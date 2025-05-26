@@ -1,8 +1,10 @@
 # ExpoGallery
-![Deploy Expo Web to GitHub Pages](https://github.com/curtcox/ExpoGallery/actions/workflows/deploy-expo-web.yml/badge.svg) via
-[deploy-expo-web.yml](https://github.com/curtcox/ExpoGallery/actions/workflows/deploy-expo-web.yml)
 
-![Dev](https://github.com/curtcox/ExpoGallery/actions/workflows/run-tests.yml/badge.svg?branch=dev)
+## Workflow Badges
+
+![Deploy Expo Web to GitHub Pages](https://github.com/curtcox/ExpoGallery/actions/workflows/deploy-expo-web.yml/badge.svg)
+![Deploy to Firebase Hosting](https://github.com/curtcox/ExpoGallery/actions/workflows/deploy-firebase.yml/badge.svg)
+![Run Tests (dev branch)](https://github.com/curtcox/ExpoGallery/actions/workflows/run-tests.yml/badge.svg?branch=dev)
 
 A comprehensive gallery showcasing Expo and React Native features, components, and API capabilities. This project serves as both a reference and demonstration of what's possible with Expo.
 
@@ -56,12 +58,53 @@ This will open the Expo Developer Tools in your browser. From there you can:
 - [`/utils`](/ExpoGallery/utils): Utility functions
 - [`/storage`](/ExpoGallery/storage): Storage-related functionality
 
-## Deployment
+## Automated Deployments & Previews
 
-This project is configured to deploy the web version to GitHub Pages:
-```
-npm run deploy
-```
+This project utilizes GitHub Actions for automated testing, building, and deployment to GitHub Pages and Firebase Hosting.
+
+### Deployment Triggers and Conditions
+
+All automated deployments are contingent upon the successful completion of build processes and automated tests. If tests or the build fail, deployment will not proceed.
+
+### GitHub Pages
+
+*   **Target**: Serves the web version of the application.
+*   **Triggered by**:
+    *   Pushes (or merges) to the `main` branch.
+    *   Pull Requests targeting the `main` branch.
+*   **URL**: [https://curtcox.github.io/ExpoGallery/](https://curtcox.github.io/ExpoGallery/) (Note: This is the general GitHub Pages URL structure; the actual live URL might be different if a custom domain is configured or if it's hosted under a specific path).
+*   **Workflow**: `deploy-expo-web.yml`
+
+### Firebase Hosting
+
+*   **Live Channel**:
+    *   **Purpose**: Production deployment.
+    *   **Triggered by**: Pushes (or merges) to the `main` branch.
+    *   **URL**: [https://mapchatai.web.app](https://mapchatai.web.app)
+    *   **Channel ID**: `live`
+
+*   **Branch Preview Channels**:
+    *   **Purpose**: Preview deployments for feature branches.
+    *   **Triggered by**: Pushes to any branch *other than* `main`.
+    *   **URL**: `https://mapchatai--preview-<sanitized-branch-name>.web.app` (e.g., `https://mapchatai--preview-dev.web.app` for the `dev` branch).
+    *   Note: Firebase may append a unique identifier to this URL (e.g., `https://mapchatai--preview-dev-xxxxxxx.web.app`). The deployment system automatically handles this.
+    *   **Channel ID**: `preview-<sanitized-branch-name>`
+
+*   **Pull Request Preview Channels**:
+    *   **Purpose**: Preview deployments for active Pull Requests.
+    *   **Triggered by**: Opening or updating a Pull Request (targeting any branch).
+    *   **URL**: `https://mapchatai--preview-pr-<pr-number>.web.app` (e.g., `https://mapchatai--preview-pr-123.web.app` for PR #123).
+    *   Note: Firebase may append a unique identifier to this URL (e.g., `https://mapchatai--preview-pr-123-xxxxxxx.web.app`). The deployment system automatically handles this.
+    *   **Channel ID**: `preview-pr-<pr-number>`
+
+*   **Workflow**: `deploy-firebase.yml`
+
+### Manual Deployments
+
+Deployments can also be triggered manually:
+
+*   **GitHub Pages (main branch)**: Navigate to Actions > `Deploy Expo Web to GitHub Pages` > Run workflow.
+*   **Firebase Hosting (any branch)**: Navigate to Actions > `Deploy to Firebase Hosting` > Run workflow. You will be prompted to enter the branch name you wish to deploy.
 
 ## Development Tools
 
@@ -89,17 +132,6 @@ graph LR
     test --> prod;
     prod --> main;
 ```
-
-## Preview Channels
-
-You can access live previews of different branches:
-
-- **Main (Production):** [https://mapchatai.web.app](https://mapchatai.web.app)
-- **Dev:** [https://mapchatai--dev.web.app](https://mapchatai--dev.web.app)
-- **Test:** [https://mapchatai--test.web.app](https://mapchatai--test.web.app)
-- **Prod (Branch):** [https://mapchatai--prod.web.app](https://mapchatai--prod.web.app)
-
-Note: Preview channels for other branches are created automatically when code is pushed to them. The URL will follow the pattern `https://mapchatai--<branch-name>.web.app` (where `<branch-name>` is sanitized).
 
 ## License
 

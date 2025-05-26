@@ -12,35 +12,13 @@ env:
   DEFAULT_CHAT_LOCATION: ${{ vars.DEFAULT_CHAT_LOCATION }}
 
 jobs:
-  test-and-build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18' # Use the Node.js version compatible with our Expo version
-          cache: 'npm'
-          cache-dependency-path: 'ExpoGallery/package-lock.json'
-
-      - name: Install dependencies
-        run: |
-          cd ExpoGallery
-          npm ci
-
-      - name: Run tests
-        run: |
-          cd ExpoGallery
-          npm test
-
-      - name: Build Expo web
-        run: |
-          cd ExpoGallery
-          npm run predeploy
-          npx expo export --platform web --no-minify --dev
-          touch dist/.nojekyll
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
+  run_build_and_tests_via_reusable_workflow: # Renamed job for clarity
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      node-version: '18'
+      expo-working-directory: 'ExpoGallery'
+      output-path: 'dist' # Standard output path, though not used here
+      cache-dependency-path: 'ExpoGallery/package-lock.json'
+    # If the reusable workflow needed secrets for the build/test process:
+    # secrets:
+    #   SOME_SECRET: ${{ secrets.SOME_SECRET_IN_CALLER }}
