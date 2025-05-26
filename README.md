@@ -87,12 +87,14 @@ All automated deployments are contingent upon the successful completion of build
     *   **Purpose**: Preview deployments for feature branches.
     *   **Triggered by**: Pushes to any branch *other than* `main`.
     *   **URL**: `https://mapchatai--preview-<sanitized-branch-name>.web.app` (e.g., `https://mapchatai--preview-dev.web.app` for the `dev` branch).
+    *   Note: Firebase may append a unique identifier to this URL (e.g., `https://mapchatai--preview-dev-xxxxxxx.web.app`). The deployment system automatically handles this.
     *   **Channel ID**: `preview-<sanitized-branch-name>`
 
 *   **Pull Request Preview Channels**:
     *   **Purpose**: Preview deployments for active Pull Requests.
     *   **Triggered by**: Opening or updating a Pull Request (targeting any branch).
     *   **URL**: `https://mapchatai--preview-pr-<pr-number>.web.app` (e.g., `https://mapchatai--preview-pr-123.web.app` for PR #123).
+    *   Note: Firebase may append a unique identifier to this URL (e.g., `https://mapchatai--preview-pr-123-xxxxxxx.web.app`). The deployment system automatically handles this.
     *   **Channel ID**: `preview-pr-<pr-number>`
 
 *   **Workflow**: `deploy-firebase.yml`
