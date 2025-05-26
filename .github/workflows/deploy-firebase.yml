@@ -79,7 +79,8 @@ jobs:
             CHANNEL_ID="preview-pr-${{ github.event.number }}"
           elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             BRANCH_NAME=$(echo "${{ github.event.inputs.branch }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-36 | sed 's/^-*\(.*[^-]\)-*$/\1/')
-            if [ "${{ github.event.inputs.branch }}" == "main" ]; then
+            NORMALIZED_BRANCH=$(echo "${{ github.event.inputs.branch }}" | tr '[:upper:]' '[:lower:]')
+            if [ "$NORMALIZED_BRANCH" == "main" ]; then
                 CHANNEL_ID="live"
             elif [ -z "$BRANCH_NAME" ]; then 
                 CHANNEL_ID="preview-manual"
