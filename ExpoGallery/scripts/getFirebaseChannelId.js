@@ -2,7 +2,7 @@ function sanitizeBranchName(name) {
   if (!name) return '';
   let sanitized = name.toLowerCase();
   sanitized = sanitized.replace(/[^a-z0-9-]/g, '-');
-  sanitized = sanitized.slice(0, 36);
+  sanitized = sanitized.slice(0, 34);
   sanitized = sanitized.replace(/^-+/, '').replace(/-+$/, '');
   return sanitized;
 }
