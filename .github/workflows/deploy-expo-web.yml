@@ -79,3 +79,18 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify deployed SHA
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          DEPLOYED_VERSION_URL="${{ steps.deployment.outputs.page_url }}/version.json"
+          echo "Fetching deployed version from: $DEPLOYED_VERSION_URL"
+          DEPLOYED_SHA=$(curl -s $DEPLOYED_VERSION_URL | jq -r '.build')
+          EXPECTED_SHA="${{ github.sha }}"
+          echo "Deployed SHA: $DEPLOYED_SHA"
+          echo "Expected SHA: $EXPECTED_SHA"
+          if [ "$DEPLOYED_SHA" != "$EXPECTED_SHA" ]; then
+            echo "Error: Deployed SHA ($DEPLOYED_SHA) does not match expected SHA ($EXPECTED_SHA)."
+            exit 1
+          fi
+          echo "Successfully verified deployed SHA."
