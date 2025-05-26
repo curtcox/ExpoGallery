@@ -1,6 +1,6 @@
-const fetch = global.fetch;
 
-async function fetchJson(url) {
+
+async function fetchJson(url, fetch) {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);
