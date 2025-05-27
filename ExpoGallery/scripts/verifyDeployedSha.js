@@ -28,6 +28,7 @@ async function fetchJsonWithRetry(url, attempts = 5, delayMs = 10000) {
     try {
       return await fetchJson(url);
     } catch (err) {
+      console.error(`Attempt ${i} of ${attempts} failed: ${err.message}`);
       if (i === attempts) throw err;
       await new Promise(resolve => setTimeout(resolve, delayMs));
     }
