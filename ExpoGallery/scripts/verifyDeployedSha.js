@@ -32,8 +32,6 @@ async function fetchJsonWithRetry(url, attempts = 5, delayMs = 10000) {
       await new Promise(resolve => setTimeout(resolve, delayMs));
     }
   }
-  // Should never reach here
-  throw new Error('Failed to fetch JSON');
 }
 
 function getSiteUrl(details, channelId, projectId) {
