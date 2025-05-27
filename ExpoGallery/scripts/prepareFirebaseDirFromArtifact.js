@@ -12,11 +12,12 @@ function run(buildArtifactName, buildOutputDirName, versionJsonRelativePath) {
   console.log(`- Build output directory: ${buildOutputDirName}`);
   console.log(`- Source directory resolved to: ${sourceDir}`);
 
-  if (fs.existsSync('downloaded-artifact')) {
-    const entries = fs.readdirSync('downloaded-artifact');
-    console.log(`Contents of downloaded-artifact: ${entries.join(', ')}`);
+  if (fs.existsSync(artifactDir)) {
+    const entries = fs.readdirSync(artifactDir);
+    console.log(`Contents of artifact directory (${artifactDir}): ${entries.join(', ')}`);
   } else {
-    console.log('downloaded-artifact directory does not exist');
+    console.log(`Artifact directory does not exist: ${artifactDir}`);
+    process.exit(1);
   }
 
   prepareFirebaseDir(sourceDir, destDir, versionJsonRelativePath);
