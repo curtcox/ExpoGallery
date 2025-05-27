@@ -36,9 +36,8 @@ jobs:
 
       - name: Prepare Firebase deployment directory
         run: |
-          node ExpoGallery/scripts/prepareFirebaseDir.js \
-            "downloaded-artifact/ExpoGallery/${{ needs.call_reusable_build.outputs.build_output_dir_name }}" \
-            site/public \
+          node ExpoGallery/scripts/prepareFirebaseDirFromArtifact.js \
+            "${{ needs.call_reusable_build.outputs.build_output_dir_name }}" \
             "${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
 
       - name: Determine Firebase Channel ID
