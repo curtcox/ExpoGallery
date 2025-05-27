@@ -23,6 +23,18 @@ function fetchJson(url) {
   });
 }
 
+async function fetchJsonWithRetry(url, attempts = 5, delayMs = 10000) {
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      return await fetchJson(url);
+    } catch (err) {
+      console.error(`Attempt ${i} of ${attempts} failed: ${err.message}`);
+      if (i === attempts) throw err;
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+}
+
 function getSiteUrl(details, channelId, projectId) {
   const project = details[projectId];
   if (!project) return null;
@@ -43,7 +55,7 @@ async function verifyDeployedSha({ channelId, projectId, deployDetails, versionP
     throw new Error('Could not extract site URL from Firebase deployment details.');
   }
   const versionUrl = `${siteUrl}/${versionPath}`;
-  const json = await fetchJson(versionUrl);
+  const json = await fetchJsonWithRetry(versionUrl);
   const deployedSha = json.build;
   if (!deployedSha) {
     throw new Error('Could not fetch deployed SHA');
@@ -54,7 +66,7 @@ async function verifyDeployedSha({ channelId, projectId, deployDetails, versionP
   return { siteUrl, versionUrl, deployedSha };
 }
 
-module.exports = { verifyDeployedSha, getSiteUrl, fetchJson };
+module.exports = { verifyDeployedSha, getSiteUrl, fetchJson, fetchJsonWithRetry };
 
 if (require.main === module) {
   const [,, channelId, projectId, detailsJson, versionPath, expectedSha] = process.argv;
