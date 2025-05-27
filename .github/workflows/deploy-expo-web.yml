@@ -39,7 +39,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.call_reusable_build.outputs.build_artifact_name }}
-          path: downloaded-artifact # Artifact content will be in 'dist' if output-path was 'dist'
+          path: downloaded-artifact # Artifact content will include the Expo project directory
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }}'
+          path: './downloaded-artifact/ExpoGallery/${{ needs.call_reusable_build.outputs.build_output_dir_name }}'
 
       - name: Deploy to GitHub Pages
         id: deployment

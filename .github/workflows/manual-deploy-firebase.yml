@@ -37,8 +37,9 @@ jobs:
       - name: Prepare Firebase deployment directory
         run: |
           mkdir -p site/public
-          echo "Copying from ./downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }} to ./site/public/"
-          cp -r ./downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }}/* ./site/public/
+          echo "Copying from ./downloaded-artifact/ExpoGallery/${{ needs.call_reusable_build.outputs.build_output_dir_name }} to ./site/public/"
+          # Artifact retains the Expo project directory
+          cp -r ./downloaded-artifact/ExpoGallery/${{ needs.call_reusable_build.outputs.build_output_dir_name }}/* ./site/public/
           echo "Expected version.json at: ./site/public/${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
           ls -l ./site/public/${{ needs.call_reusable_build.outputs.version_json_relative_path }}
 
