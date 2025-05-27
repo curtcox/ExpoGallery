@@ -5,6 +5,7 @@ const http = require('http');
 const { prepareFirebaseDir } = require('../scripts/prepareFirebaseDir');
 const { replaceGithubSha } = require('../scripts/replaceGithubSha');
 const { verifyDeployedSha } = require('../scripts/verifyDeployedSha');
+const { run: prepareFromArtifact } = require('../scripts/prepareFirebaseDirFromArtifact');
 
 describe('prepareFirebaseDir', () => {
   test('copies files and checks version.json', () => {
@@ -69,5 +70,25 @@ describe('verifyDeployedSha', () => {
       })
     ).rejects.toThrow();
     server.close();
+  });
+});
+
+describe('prepareFirebaseDirFromArtifact detection', () => {
+  test('handles ExpoGallery artifact layout', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'artifact'));
+    const cwd = process.cwd();
+    process.chdir(tmpDir);
+
+    // simulate downloaded artifact structure: downloaded-artifact/ExpoGallery/dist/public/version.json
+    const artifactPath = path.join('downloaded-artifact', 'ExpoGallery', 'dist', 'public');
+    fs.mkdirSync(artifactPath, { recursive: true });
+    fs.writeFileSync(path.join(artifactPath, 'version.json'), '{"build":"x"}');
+    fs.writeFileSync(path.join('downloaded-artifact', 'ExpoGallery', 'dist', 'file.txt'), 'data');
+
+    expect(() => prepareFromArtifact('expo-web-build-1', 'dist', 'public/version.json')).not.toThrow();
+    expect(fs.existsSync(path.join('site', 'public', 'file.txt'))).toBe(true);
+    expect(fs.existsSync(path.join('site', 'public', 'public', 'version.json'))).toBe(true);
+
+    process.chdir(cwd);
   });
 });
