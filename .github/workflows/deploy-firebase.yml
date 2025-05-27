@@ -1,5 +1,3 @@
-# See https://github.com/FirebaseExtended/action-hosting-deploy
-
 name: Deploy to Firebase Hosting
 
 on:
@@ -94,7 +92,7 @@ jobs:
             NORMALIZED_BRANCH_INPUT=$(echo "${{ github.event.inputs.branch }}" | tr '[:upper:]' '[:lower:]') # For 'main' check
             if [ "$NORMALIZED_BRANCH_INPUT" == "main" ]; then
               CHANNEL_ID="live" # Manual dispatch for main branch also goes to live
-            elif [ -z "$BRANCH_NAME" ]; then 
+            elif [ -z "$BRANCH_NAME" ]; then
               CHANNEL_ID="preview-manual" # Default for empty/invalid manual input
             else
               CHANNEL_ID="preview-$BRANCH_NAME"
@@ -136,7 +134,7 @@ jobs:
         run: |
           # GITHUB_SHA for comparison is from the commit that triggered this overall workflow
           EXPECTED_SHA="${{ github.sha }}"
-          
+
           sudo apt-get update && sudo apt-get install -y jq
           echo "Firebase Deploy Details: $FIREBASE_DEPLOY_DETAILS"
 
@@ -156,7 +154,7 @@ jobs:
           # e.g., public/version.json. This is correct for constructing the URL.
           DEPLOYED_VERSION_URL="$ACTUAL_SITE_URL/${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
           echo "Fetching deployed version from: $DEPLOYED_VERSION_URL"
-          
+
           DEPLOYED_SHA=""
           for i in 1 2 3 4 5; do
             HTTP_CODE=$(curl -s -w "%{http_code}" -o response.json "$DEPLOYED_VERSION_URL")
@@ -176,7 +174,7 @@ jobs:
             cat response.json # Output content of response.json for debugging
             exit 1
           fi
-          
+
           echo "Deployed SHA: $DEPLOYED_SHA"
           echo "Expected SHA: $EXPECTED_SHA"
           if [ "$DEPLOYED_SHA" != "$EXPECTED_SHA" ]; then
