@@ -50,9 +50,10 @@ jobs:
       - name: Prepare Firebase deployment directory
         run: |
           mkdir -p site/public
-          echo "Copying from ./downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }} to ./site/public/"
-          # This line assumes 'downloaded-artifact' contains a subdirectory matching 'build_output_dir_name' (e.g. 'dist')
-          cp -r ./downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }}/* ./site/public/
+          echo "Copying from ./downloaded-artifact/ExpoGallery/${{ needs.call_reusable_build.outputs.build_output_dir_name }} to ./site/public/"
+          # The artifact retains the Expo project directory (ExpoGallery) when uploaded
+          # so the build output is under ./downloaded-artifact/ExpoGallery/<output-path>
+          cp -r ./downloaded-artifact/ExpoGallery/${{ needs.call_reusable_build.outputs.build_output_dir_name }}/* ./site/public/
           # Verify version.json is in the right place for Firebase
           # If build_output_dir_name is 'dist' and version_json_relative_path is 'public/version.json',
           # this expects version.json at site/public/public/version.json
