@@ -31,12 +31,22 @@ function run(buildArtifactName, buildOutputDirName, versionJsonRelativePath) {
     }
   }
 
-  if (!artifactDir) {
-    throw new Error(`Unable to locate ${buildOutputDirName} in any expected directory`);
+  let sourceDir;
+  if (artifactDir) {
+    sourceDir = path.join(artifactDir, buildOutputDirName);
+    console.log(`- Using source directory: ${sourceDir}`);
+  } else {
+    const potentialRootPath = baseDir;
+    console.log(`- ${buildOutputDirName} not found as subdirectory. Checking if ${potentialRootPath} is the build output directory.`);
+    if (fs.existsSync(path.join(potentialRootPath, versionJsonRelativePath))) {
+      sourceDir = potentialRootPath;
+      console.log(`- Treating ${potentialRootPath} as the build output directory.`);
+    } else {
+      throw new Error(
+        `Unable to locate ${buildOutputDirName} in any expected directory, and ${potentialRootPath} does not appear to be it either (missing ${versionJsonRelativePath}).`
+      );
+    }
   }
-
-  const sourceDir = path.join(artifactDir, buildOutputDirName);
-  console.log(`- Using source directory: ${sourceDir}`);
 
   prepareFirebaseDir(sourceDir, destDir, versionJsonRelativePath);
 }
