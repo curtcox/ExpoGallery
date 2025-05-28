@@ -39,7 +39,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.call_reusable_build.outputs.build_artifact_name }}
-          path: downloaded-artifact # Artifact content will be in 'dist' if output-path was 'dist'
+          path: downloaded-artifact # Artifact content will include the Expo project directory
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

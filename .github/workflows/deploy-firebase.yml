@@ -1,5 +1,3 @@
-# See https://github.com/FirebaseExtended/action-hosting-deploy
-
 name: Deploy to Firebase Hosting
 
 on:
@@ -49,74 +47,25 @@ jobs:
 
       - name: Prepare Firebase deployment directory
         run: |
-          mkdir -p site/public
-          echo "Copying from ./downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }} to ./site/public/"
-          # This line assumes 'downloaded-artifact' contains a subdirectory matching 'build_output_dir_name' (e.g. 'dist')
-          cp -r ./downloaded-artifact/${{ needs.call_reusable_build.outputs.build_output_dir_name }}/* ./site/public/
-          # Verify version.json is in the right place for Firebase
-          # If build_output_dir_name is 'dist' and version_json_relative_path is 'public/version.json',
-          # this expects version.json at site/public/public/version.json
-          echo "Expected version.json at: ./site/public/${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
-          ls -l ./site/public/${{ needs.call_reusable_build.outputs.version_json_relative_path }}
+          node ExpoGallery/scripts/prepareFirebaseDirFromArtifact.js \
+            "${{ needs.call_reusable_build.outputs.build_artifact_name }}" \
+            "${{ needs.call_reusable_build.outputs.build_output_dir_name }}" \
+            "${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
 
 
       - name: Determine Firebase Channel ID
         id: channel_id
         run: |
-          # Determine Firebase Channel ID based on GitHub event context
-          CHANNEL_ID=""
-          # Sanitize branch name function (example, actual commands are in if/else)
-          # sanitize_branch_name() {
-          #   echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-36 | sed 's/^-*\(.*[^-]\)-*$//'
-          # }
-
-          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            # Deployments to main branch go to the 'live' channel
-            CHANNEL_ID="live"
-          elif [ "${{ github.event_name }}" == "push" ]; then
-            # Pushes to other branches create/update a preview channel
-            # Sanitize branch name:
-            # 1. Convert to lowercase (tr '[:upper:]' '[:lower:]')
-            # 2. Replace non-alphanumeric characters (excluding hyphens) with a hyphen (sed 's/[^a-z0-9-]/-/g')
-            # 3. Truncate to 36 characters (cut -c1-36)
-            # 4. Remove leading/trailing hyphens (sed 's/^-*\(.*[^-]\)-*$//')
-            BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-36 | sed 's/^-*\(.*[^-]\)-*$//')
-            if [ -z "$BRANCH_NAME" ]; then BRANCH_NAME="preview"; fi # Default if branch name is empty after sanitization
-            CHANNEL_ID="preview-$BRANCH_NAME"
-          elif [ "${{ github.event_name }}" == "pull_request" ]; then
-            # Pull requests also create/update a preview channel named after the PR number
-            CHANNEL_ID="preview-pr-${{ github.event.number }}"
-          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            # Manual workflow runs
-            # Sanitize the input branch name using the same logic as for push events
-            BRANCH_NAME=$(echo "${{ github.event.inputs.branch }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-36 | sed 's/^-*\(.*[^-]\)-*$//')
-            NORMALIZED_BRANCH_INPUT=$(echo "${{ github.event.inputs.branch }}" | tr '[:upper:]' '[:lower:]') # For 'main' check
-            if [ "$NORMALIZED_BRANCH_INPUT" == "main" ]; then
-              CHANNEL_ID="live" # Manual dispatch for main branch also goes to live
-            elif [ -z "$BRANCH_NAME" ]; then 
-              CHANNEL_ID="preview-manual" # Default for empty/invalid manual input
-            else
-              CHANNEL_ID="preview-$BRANCH_NAME"
-            fi
-          else
-            echo "::error::Unknown event type or context for Firebase deployment."
-            exit 1
-          fi
-          echo "Firebase Channel ID: $CHANNEL_ID"
-          echo "channel_id=$CHANNEL_ID" >> $GITHUB_OUTPUT
-
+          node ExpoGallery/scripts/getFirebaseChannelId.js
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_EVENT_NUMBER: ${{ github.event.number }}
+          INPUT_BRANCH: ${{ github.event.inputs.branch }}
       - name: Replace GITHUB_SHA in about.html
-        # working-directory is now ./site/public, so paths are relative to that
-        working-directory: ./site/public
         run: |
-          if [ -f "about.html" ]; then
-            echo "Replacing GITHUB_SHA in about.html with ${{ github.sha }}"
-            # sed -i.bak modifies the file in place and creates a backup with .bak extension
-            sed -i.bak 's/GITHUB_SHA/'${GITHUB_SHA}'/g' about.html
-          else
-            echo "about.html not found in current directory (expected ./site/public/about.html)"
-          fi
-
+          node ExpoGallery/scripts/replaceGithubSha.js site/public/about.html "${{ github.sha }}"
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         id: firebase_deploy
@@ -128,59 +77,10 @@ jobs:
           channelId: ${{ steps.channel_id.outputs.channel_id }}
 
       - name: Verify deployed SHA
-        env:
-          CHANNEL_ID_OUTPUT: ${{ steps.channel_id.outputs.channel_id }}
-          FIREBASE_PROJECT_ID: mapchatai
-          FIREBASE_DEPLOY_DETAILS: ${{ steps.firebase_deploy.outputs.details }}
         run: |
-          # GITHUB_SHA for comparison is from the commit that triggered this overall workflow
-          EXPECTED_SHA="${{ github.sha }}"
-          
-          sudo apt-get update && sudo apt-get install -y jq
-          echo "Firebase Deploy Details: $FIREBASE_DEPLOY_DETAILS"
-
-          ACTUAL_SITE_URL=""
-          if [ "$CHANNEL_ID_OUTPUT" == "live" ]; then
-            ACTUAL_SITE_URL=$(echo "$FIREBASE_DEPLOY_DETAILS" | jq -r --arg project_id "$FIREBASE_PROJECT_ID" '.[$project_id].live.url')
-          else
-            ACTUAL_SITE_URL=$(echo "$FIREBASE_DEPLOY_DETAILS" | jq -r --arg project_id "$FIREBASE_PROJECT_ID" --arg channel_prefix "$CHANNEL_ID_OUTPUT" '.[$project_id] | to_entries[] | select(.key | startswith($channel_prefix)) | .value.url')
-          fi
-
-          if [ -z "$ACTUAL_SITE_URL" ] || [ "$ACTUAL_SITE_URL" == "null" ]; then
-            echo "::error::Could not extract site URL from Firebase deployment details."
-            exit 1
-          fi
-
-          # version_json_relative_path from reusable workflow is relative to the build output dir.
-          # e.g., public/version.json. This is correct for constructing the URL.
-          DEPLOYED_VERSION_URL="$ACTUAL_SITE_URL/${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
-          echo "Fetching deployed version from: $DEPLOYED_VERSION_URL"
-          
-          DEPLOYED_SHA=""
-          for i in 1 2 3 4 5; do
-            HTTP_CODE=$(curl -s -w "%{http_code}" -o response.json "$DEPLOYED_VERSION_URL")
-            if [ "$HTTP_CODE" -eq 200 ]; then
-              DEPLOYED_SHA=$(jq -r '.build' response.json)
-              if [ -n "$DEPLOYED_SHA" ] && [ "$DEPLOYED_SHA" != "null" ]; then
-                echo "Successfully fetched deployed SHA: $DEPLOYED_SHA"
-                break
-              fi
-            fi
-            echo "Attempt $i: Failed to fetch or parse version.json (HTTP: $HTTP_CODE) from $DEPLOYED_VERSION_URL. Retrying in 10 seconds..."
-            sleep 10
-          done
-
-          if [ -z "$DEPLOYED_SHA" ] || [ "$DEPLOYED_SHA" == "null" ]; then
-            echo "::error::Could not fetch deployed SHA from $DEPLOYED_VERSION_URL after multiple retries."
-            cat response.json # Output content of response.json for debugging
-            exit 1
-          fi
-          
-          echo "Deployed SHA: $DEPLOYED_SHA"
-          echo "Expected SHA: $EXPECTED_SHA"
-          if [ "$DEPLOYED_SHA" != "$EXPECTED_SHA" ]; then
-            echo "::error::Deployed SHA ($DEPLOYED_SHA) does not match expected SHA ($EXPECTED_SHA)."
-            exit 1
-          fi
-          echo "Successfully verified deployed SHA on $DEPLOYED_VERSION_URL"
-        shell: bash
+          node ExpoGallery/scripts/verifyDeployedSha.js \
+            "${{ steps.channel_id.outputs.channel_id }}" \
+            mapchatai \
+            '${{ steps.firebase_deploy.outputs.details }}' \
+            '${{ needs.call_reusable_build.outputs.version_json_relative_path }}' \
+            '${{ github.sha }}'
