@@ -31,19 +31,14 @@ on:
         description: "The name of the directory containing the build output, relative to the artifact root (this is the value of inputs.output-path)."
         value: ${{ inputs.output-path }}
       version_json_relative_path:
-        description: "Relative path to version.json within the build output directory (e.g., public/version.json)."
-        value: "public/version.json"
+        description: "Relative path to version.json within the build output directory (e.g., version.json)."
+        value: "version.json"
 
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
     outputs:
       job_build_artifact_name: expo-web-build-${{ github.run_id }}
-      # The following are not strictly needed as job outputs if workflow outputs can derive them from inputs
-      # but defining them for clarity if direct reference from job is ever preferred.
-      # For this setup, workflow outputs directly use inputs or fixed values where appropriate.
-      # job_build_output_path_relative: ${{ inputs.output-path }} # This is the name of the folder, e.g. "dist"
-      # job_version_json_path_relative: public/version.json # Relative to the output-path
 
     steps:
       - name: Checkout code
@@ -80,17 +75,17 @@ jobs:
           cd ${{ inputs.expo-working-directory }}
           npx expo export --platform web --no-minify --dev --output-dir ./${{ inputs.output-path }}
 
-      - name: Create/Overwrite version.json
+      - name: Create/Overwrite version.json at root level
         run: |
           cd ${{ inputs.expo-working-directory }}
-          mkdir -p ${{ inputs.output-path }}/public
-          echo '{"build": "${{ github.sha }}"}' > ${{ inputs.output-path }}/public/version.json
+          # Create version.json at the root of the build output, not in public subdirectory
+          echo '{"build": "${{ github.sha }}"}' > ${{ inputs.output-path }}/version.json
 
           # Debug: Show where version.json was created
-          echo "=== Created version.json at: ==="
-          find ${{ inputs.output-path }} -name "version.json" -type f
+          echo "=== Created version.json at root level ==="
+          ls -la ${{ inputs.output-path }}/version.json
           echo "=== Contents: ==="
-          cat ${{ inputs.output-path }}/public/version.json
+          cat ${{ inputs.output-path }}/version.json
         shell: bash
 
       - name: Create .nojekyll file
@@ -103,8 +98,8 @@ jobs:
           cd ${{ inputs.expo-working-directory }}
           echo "=== Build output structure ==="
           find ${{ inputs.output-path }} -type f | head -20
-          echo "=== Checking for version.json ==="
-          ls -la ${{ inputs.output-path }}/public/ || echo "No public directory"
+          echo "=== Checking for version.json at root ==="
+          ls -la ${{ inputs.output-path }}/version.json || echo "No version.json at root"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

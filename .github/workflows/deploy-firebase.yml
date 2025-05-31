@@ -26,16 +26,11 @@ jobs:
       node-version: '20' # Firebase workflow uses Node 20
       expo-working-directory: 'ExpoGallery'
       output-path: 'dist' # Standard output path from reusable workflow
-      # cache-dependency-path is not specified, so it will use default from reusable workflow
-    # secrets: inherit # If reusable workflow needed secrets
 
   build_and_deploy_firebase:
     needs: call_reusable_build
     runs-on: ubuntu-latest
-    # Removed if: success() because reusable workflow failing will prevent this from running.
     steps:
-      # Checkout code for Firebase tools, firebase.json, and scripts not in artifact.
-      # Also needed for github.sha if not available otherwise, though it should be.
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -43,49 +38,27 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.call_reusable_build.outputs.build_artifact_name }}
-          path: downloaded-artifact # Downloads to ./downloaded-artifact/
-
-      - name: Debug artifact contents
-        run: |
-          echo "=== Artifact contents ==="
-          find downloaded-artifact -type f | head -20
-          echo "=== Looking for version.json ==="
-          find downloaded-artifact -name "version.json" -type f
-          echo "=== Checking for public directory ==="
-          find downloaded-artifact -name "public" -type d
-          echo "=== Root level files ==="
-          ls -la downloaded-artifact/
+          path: downloaded-artifact
 
       - name: Prepare Firebase deployment directory
         run: |
           mkdir -p site/public
 
-          # The artifact contains the expo build output directly
-          # Copy all contents to site/public
+          # Copy all build output to site/public
           echo "Copying build output from downloaded-artifact to site/public"
           cp -r downloaded-artifact/* site/public/
 
-          # Check where version.json actually is
-          echo "=== Checking version.json location after copy ==="
-          find site/public -name "version.json" -type f
-
-          # The version.json should be at public/version.json relative to the build output
-          # If it's at the root, we may need to move it
-          if [ -f "site/public/version.json" ] && [ ! -f "site/public/public/version.json" ]; then
-            echo "Found version.json at root, creating public subdirectory"
-            mkdir -p site/public/public
-            mv site/public/version.json site/public/public/version.json
-          fi
-
-          # Verify final structure
-          if [ ! -f "site/public/public/version.json" ]; then
-            echo "Error: version.json not found at expected location site/public/public/version.json"
-            echo "Final structure of site/public:"
-            find site/public -type f | head -20
+          # Verify version.json exists at the root level
+          if [ ! -f "site/public/version.json" ]; then
+            echo "Error: version.json not found at site/public/version.json"
+            echo "Contents of site/public:"
+            ls -la site/public/
             exit 1
           fi
 
           echo "Successfully prepared Firebase directory"
+          echo "Version.json content:"
+          cat site/public/version.json
 
       - name: Determine Firebase Channel ID
         id: channel_id
@@ -97,16 +70,18 @@ jobs:
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_EVENT_NUMBER: ${{ github.event.number }}
           INPUT_BRANCH: ${{ github.event.inputs.branch }}
+
       - name: Replace GITHUB_SHA in about.html
         run: |
           node ExpoGallery/scripts/replaceGithubSha.js site/public/about.html "${{ github.sha }}"
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         id: firebase_deploy
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPCHATAI }}
-          entryPoint: ./site # Path to the directory containing firebase.json and public/
+          entryPoint: ./site
           projectId: mapchatai
           channelId: ${{ steps.channel_id.outputs.channel_id }}
 
