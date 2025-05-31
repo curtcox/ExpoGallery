@@ -45,12 +45,30 @@ jobs:
           name: ${{ needs.call_reusable_build.outputs.build_artifact_name }}
           path: downloaded-artifact # Downloads to ./downloaded-artifact/
 
+      - name: Debug artifact contents
+        run: |
+          echo "=== Artifact contents ==="
+          find downloaded-artifact -type f | head -20
+          echo "=== Looking for version.json ==="
+          find downloaded-artifact -name "version.json" -type f
+          echo "=== Contents of downloaded-artifact ==="
+          ls -la downloaded-artifact/
+
       - name: Prepare Firebase deployment directory
         run: |
-          node ExpoGallery/scripts/prepareFirebaseDirFromArtifact.js \
-            "${{ needs.call_reusable_build.outputs.build_artifact_name }}" \
-            "${{ needs.call_reusable_build.outputs.build_output_dir_name }}" \
-            "${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
+          # Since the artifact contains the dist contents directly, we need to use downloaded-artifact as the source
+          mkdir -p site/public
+          echo "Copying downloaded-artifact -> site/public"
+          cp -r downloaded-artifact/* site/public/
+
+          # Verify version.json exists
+          if [ ! -f "site/public/public/version.json" ]; then
+            echo "Error: version.json not found at site/public/public/version.json"
+            echo "Looking for version.json in site/public:"
+            find site/public -name "version.json" -type f || echo "No version.json found"
+            exit 1
+          fi
+          echo "Successfully prepared Firebase directory"
 
 
       - name: Determine Firebase Channel ID
