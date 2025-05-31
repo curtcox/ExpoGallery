@@ -69,16 +69,9 @@ jobs:
       - name: Run predeploy script
         run: |
           cd ${{ inputs.expo-working-directory }}
-          npm run predeploy 
+          npm run predeploy
           # This script is expected to copy assets/index.html to ${{ inputs.output-path }}/
           # and potentially an initial assets/version.json to ${{ inputs.output-path }}/public/
-
-      - name: Create/Overwrite version.json
-        run: |
-          cd ${{ inputs.expo-working-directory }}
-          mkdir -p ${{ inputs.output-path }}/public
-          echo '{"build": "${{ github.sha }}"}' > ${{ inputs.output-path }}/public/version.json
-        shell: bash
 
       - name: Build Expo web application
         env:
@@ -87,10 +80,31 @@ jobs:
           cd ${{ inputs.expo-working-directory }}
           npx expo export --platform web --no-minify --dev --output-dir ./${{ inputs.output-path }}
 
+      - name: Create/Overwrite version.json
+        run: |
+          cd ${{ inputs.expo-working-directory }}
+          mkdir -p ${{ inputs.output-path }}/public
+          echo '{"build": "${{ github.sha }}"}' > ${{ inputs.output-path }}/public/version.json
+
+          # Debug: Show where version.json was created
+          echo "=== Created version.json at: ==="
+          find ${{ inputs.output-path }} -name "version.json" -type f
+          echo "=== Contents: ==="
+          cat ${{ inputs.output-path }}/public/version.json
+        shell: bash
+
       - name: Create .nojekyll file
         run: |
           touch ${{ inputs.expo-working-directory }}/${{ inputs.output-path }}/.nojekyll
         shell: bash
+
+      - name: Debug build output structure
+        run: |
+          cd ${{ inputs.expo-working-directory }}
+          echo "=== Build output structure ==="
+          find ${{ inputs.output-path }} -type f | head -20
+          echo "=== Checking for version.json ==="
+          ls -la ${{ inputs.output-path }}/public/ || echo "No public directory"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
