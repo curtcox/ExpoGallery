@@ -26,16 +26,11 @@ jobs:
       node-version: '20' # Firebase workflow uses Node 20
       expo-working-directory: 'ExpoGallery'
       output-path: 'dist' # Standard output path from reusable workflow
-      # cache-dependency-path is not specified, so it will use default from reusable workflow
-    # secrets: inherit # If reusable workflow needed secrets
 
   build_and_deploy_firebase:
     needs: call_reusable_build
     runs-on: ubuntu-latest
-    # Removed if: success() because reusable workflow failing will prevent this from running.
     steps:
-      # Checkout code for Firebase tools, firebase.json, and scripts not in artifact.
-      # Also needed for github.sha if not available otherwise, though it should be.
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -43,15 +38,27 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.call_reusable_build.outputs.build_artifact_name }}
-          path: downloaded-artifact # Downloads to ./downloaded-artifact/
+          path: downloaded-artifact
 
       - name: Prepare Firebase deployment directory
         run: |
-          node ExpoGallery/scripts/prepareFirebaseDirFromArtifact.js \
-            "${{ needs.call_reusable_build.outputs.build_artifact_name }}" \
-            "${{ needs.call_reusable_build.outputs.build_output_dir_name }}" \
-            "${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
+          mkdir -p site/public
 
+          # Copy all build output to site/public
+          echo "Copying build output from downloaded-artifact to site/public"
+          cp -r downloaded-artifact/* site/public/
+
+          # Verify version.json exists at the root level
+          if [ ! -f "site/public/version.json" ]; then
+            echo "Error: version.json not found at site/public/version.json"
+            echo "Contents of site/public:"
+            ls -la site/public/
+            exit 1
+          fi
+
+          echo "Successfully prepared Firebase directory"
+          echo "Version.json content:"
+          cat site/public/version.json
 
       - name: Determine Firebase Channel ID
         id: channel_id
@@ -63,24 +70,74 @@ jobs:
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_EVENT_NUMBER: ${{ github.event.number }}
           INPUT_BRANCH: ${{ github.event.inputs.branch }}
+
       - name: Replace GITHUB_SHA in about.html
         run: |
           node ExpoGallery/scripts/replaceGithubSha.js site/public/about.html "${{ github.sha }}"
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         id: firebase_deploy
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPCHATAI }}
-          entryPoint: ./site # Path to the directory containing firebase.json and public/
+          entryPoint: ./site
           projectId: mapchatai
           channelId: ${{ steps.channel_id.outputs.channel_id }}
 
+      - name: Debug Firebase deployment outputs
+        run: |
+          echo "=== Firebase deployment outputs ==="
+          echo "details: '${{ steps.firebase_deploy.outputs.details }}'"
+          echo "details_url: '${{ steps.firebase_deploy.outputs.details_url }}'"
+          echo "expire_time: '${{ steps.firebase_deploy.outputs.expire_time }}'"
+
       - name: Verify deployed SHA
         run: |
-          node ExpoGallery/scripts/verifyDeployedSha.js \
-            "${{ steps.channel_id.outputs.channel_id }}" \
-            mapchatai \
-            '${{ steps.firebase_deploy.outputs.details }}' \
-            '${{ needs.call_reusable_build.outputs.version_json_relative_path }}' \
-            '${{ github.sha }}'
+          # Use the details_url directly instead of parsing from details JSON
+          DEPLOYED_URL="${{ steps.firebase_deploy.outputs.details_url }}"
+          VERSION_URL="${DEPLOYED_URL}/${{ needs.call_reusable_build.outputs.version_json_relative_path }}"
+          EXPECTED_SHA="${{ github.sha }}"
+
+          echo "Verifying deployment..."
+          echo "Expected SHA: $EXPECTED_SHA"
+          echo "Fetching deployed version from: $VERSION_URL"
+
+          # Fetch version.json with retry logic
+          DEPLOYED_SHA=""
+          for i in 1 2 3 4 5; do
+            HTTP_CODE=$(curl -s -L -w "%{http_code}" -o response.json "$VERSION_URL")
+            if [ "$HTTP_CODE" -eq 200 ]; then
+              if [ -s response.json ] && jq -e '.build != null' response.json > /dev/null; then
+                DEPLOYED_SHA=$(jq -r '.build' response.json)
+                if [ -n "$DEPLOYED_SHA" ]; then
+                   echo "Successfully fetched deployed SHA: $DEPLOYED_SHA"
+                   break
+                else
+                   echo "Attempt $i: Fetched 'build' field is empty."
+                fi
+              else
+                echo "Attempt $i: Fetched content is not valid JSON or 'build' key is missing."
+                echo "Response content:"
+                cat response.json
+              fi
+            else
+              echo "Attempt $i: HTTP request failed with status code $HTTP_CODE."
+              echo "Response content (if any):"
+              cat response.json
+            fi
+            echo "Retrying in 10 seconds..."
+            sleep 10
+          done
+
+          if [ -z "$DEPLOYED_SHA" ] || [ "$DEPLOYED_SHA" == "null" ]; then
+            echo "::error::Could not fetch or parse deployed SHA from $VERSION_URL after multiple retries."
+            exit 1
+          fi
+
+          if [ "$DEPLOYED_SHA" != "$EXPECTED_SHA" ]; then
+            echo "::error::Deployed SHA ($DEPLOYED_SHA) does not match expected SHA ($EXPECTED_SHA)."
+            exit 1
+          fi
+
+          echo "✅ Successfully verified deployed SHA ($DEPLOYED_SHA) on $VERSION_URL"
